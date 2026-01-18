@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+
+.right-direction {
+    direction: rtl;
+}
+.left-direction {
+    direction: ltr;
+}
