@@ -11,6 +11,9 @@ import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
+import { amiriFontBase64 } from "../../assets/AmiriFont";
+
+
 const FarmCodingRequest = () => {
   const t = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
@@ -243,67 +246,78 @@ const FarmCodingRequest = () => {
     setShowDownloadMenu(false);
   };
 
-  const downloadPDF = async () => {
+
+  //! DOWNLOAD PDF
+
+const downloadPDF = async () => {
     const data = prepareDataForExport();
-    
-    if (data.length === 0) {
-      toast.error('No data to export');
-      setShowDownloadMenu(false);
-      return;
-    }
-    
+    if (data.length === 0) return;
+
+    // 1. Headers Mapping
+    const headerTranslations = {
+        "status": "الحالة",
+        "name": "الاسم",
+        "farmId": "معرف المزرعة",
+        "location": "الموقع",
+        // Baaki headers yahan add karein
+    };
+
     try {
-      const doc = new jsPDF({
-        orientation: 'landscape'
-      });
+        const doc = new jsPDF({ orientation: 'landscape' });
 
-      const reverseArabic = (text) => {
-        if (!isArabic || !text) return text;
-        return text.split('').reverse().join('');
-      };
+        // Font Setup
+        doc.addFileToVFS("Amiri-Regular.ttf", amiriFontBase64);
+        doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+        doc.setFont("Amiri");
 
-      doc.setFontSize(16);
-      const title = `Farm Coding Data - ${selectedStatus}`;
-      doc.text(isArabic ? reverseArabic(title) : title, 14, 15);
-      
-      doc.setFontSize(10);
-      doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 22);
-      doc.text(`Total Records: ${data.length}`, 14, 28);
+        // 2. Prepare Headers (Translation only, No Text Reversal)
+        const rawKeys = Object.keys(data[0]);
+        let tableHeaders = rawKeys.map(key => isArabic ? (headerTranslations[key] || key) : key);
 
-      const headers = Object.keys(data[0]).map(h => isArabic ? reverseArabic(h) : h);
-      const rows = data.map(row => 
-        Object.keys(row).map(key => {
-          const value = row[key]?.toString() || '';
-          return isArabic ? reverseArabic(value) : value;
-        })
-      );
+        // 3. Prepare Rows (Raw data, No Text Reversal)
+        let tableRows = data.map(row => rawKeys.map(key => row[key] || ''));
 
-      autoTable(doc, {
-        head: [headers],
-        body: rows,
-        startY: 34,
-        styles: { 
-          fontSize: 9,
-          font: 'helvetica'
-        },
-        headStyles: { 
-          fillColor: [34, 197, 94],
-          halign: isArabic ? 'right' : 'left'
-        },
-        bodyStyles: {
-          halign: isArabic ? 'right' : 'left'
+        // 4. ORIENTATION REVERSE (Sirf Array ki order badalna)
+        if (isArabic) {
+            tableHeaders = [...tableHeaders].reverse(); // Header columns right-to-left
+            tableRows = tableRows.map(row => [...row].reverse()); // Row cells right-to-left
         }
-      });
 
-      doc.save(`farms_${selectedStatus}_${new Date().toISOString().split('T')[0]}.pdf`);
-      toast.success('PDF downloaded successfully');
-      setShowDownloadMenu(false);
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      toast.error('Failed to generate PDF');
-      setShowDownloadMenu(false);
+        // --- TITLE ---
+        doc.setFontSize(18);
+        const title = isArabic ? "بيانات ترميز المزرعة" : "Farm Coding Data";
+        doc.text(title, isArabic ? 280 : 14, 15, { align: isArabic ? 'right' : 'left' });
+
+        // --- TABLE ---
+      autoTable(doc, {
+    head: [tableHeaders],
+    body: tableRows,
+    startY: 30,
+    styles: {
+        font: 'Amiri', // Body cells ke liye
+        fontSize: 10,
+        halign: isArabic ? 'right' : 'left'
+    },
+    headStyles: {
+        font: 'Amiri',       // YEH ZARURI HAI: Header ke liye font set karein
+        fontStyle: 'normal', // Bold ki wajah se aksar boxes aate hain, isse normal rakhein
+        fillColor: [34, 197, 94],
+        textColor: [255, 255, 255],
+        halign: isArabic ? 'right' : 'left',
+        fontSize: 11         // Header size thora bara kar sakte hain
+    },
+    // Agar columns abhi bhi agay peechay hain to layout direction yahan se fix karein
+    columnStyles: {
+        all: { halign: isArabic ? 'right' : 'left' }
     }
-  };
+});
+
+        doc.save(`farms_report.pdf`);
+        setShowDownloadMenu(false);
+    } catch (error) {
+        console.error('PDF Error:', error);
+    }
+};
 
   return activeTab.includes("farm-requests") ? (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">

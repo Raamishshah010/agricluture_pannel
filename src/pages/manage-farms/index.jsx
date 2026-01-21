@@ -26,6 +26,11 @@ export default function Index(props) {
     const [center, setCenter] = useState(null);
     const [location, setLocation] = useState(null);
 
+  // State section mein add karein
+const [sizeFilter, setSizeFilter] = useState(''); 
+
+
+
     useEffect(() => {
         sessionStorage.setItem('activeTab', activeTab);
     }, [activeTab]);
@@ -104,25 +109,28 @@ export default function Index(props) {
         });
     }, [farms, setFarms, t]);
 
-    const filteredFarms = useMemo(() => {
-        const lowerQuery = query.trim().toLowerCase();
+const filteredFarms = useMemo(() => {
+    const lowerQuery = query.trim().toLowerCase();
 
-        return farms.filter(farm => {
-            const matchesSearch =
-                !lowerQuery ||
-                farm.farmName.toLowerCase().includes(lowerQuery) ||
-                (farm.agricultureId &&
-                    farm.agricultureId.toString().toLowerCase().includes(lowerQuery));
+    return farms.filter(farm => {
+        const matchesSearch =
+            !lowerQuery ||
+            farm.farmName.toLowerCase().includes(lowerQuery) ||
+            (farm.agricultureId &&
+                farm.agricultureId.toString().toLowerCase().includes(lowerQuery));
 
-            const matchesFilters =
-                (emirate ? farm.emirate === emirate.id : true) &&
-                (center ? farm.serviceCenter === center.id : true) &&
-                (location ? farm.location === location.id : true);
+        const matchesFilters =
+            (emirate ? farm.emirate === emirate.id : true) &&
+            (center ? farm.serviceCenter === center.id : true) &&
+            (location ? farm.location === location.id : true);
 
-            return matchesSearch && matchesFilters;
-        });
-    }, [center, emirate, farms, location, query]);
+        // --- SIZE FILTER LOGIC ---
+        // Agar sizeFilter khali hai to true, warna farm.size match karein
+        const matchesSize = !sizeFilter || farm.size?.toString() === sizeFilter;
 
+        return matchesSearch && matchesFilters && matchesSize;
+    });
+}, [center, emirate, farms, location, query, sizeFilter]); // sizeFilter dependency add ki
 
     const itemsPerPage = 50;
     const totalPages = Math.ceil(filteredFarms.length / 50);
@@ -153,6 +161,14 @@ export default function Index(props) {
                     onChange={(e) => setQuery(e.target.value)}
                     className="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
+
+                <input
+            type="number"
+            placeholder="Size" 
+            value={sizeFilter}
+            onChange={(e) => setSizeFilter(e.target.value)}
+            className="border border-gray-300 rounded-lg p-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
                 <div className="flex  gap-2 sm:p-4 border-gray-200">
                     <Dropdown
                         options={emirates}
@@ -182,6 +198,7 @@ export default function Index(props) {
                             setCenter(null);
                             setLocation(null);
                             setQuery('');
+                            setSizeFilter('');
                         }}
                     >
                         {t('manageFarms.clear')}
