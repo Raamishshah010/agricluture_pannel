@@ -1,7 +1,12 @@
-import React from 'react';
-import { MapPin, User, Droplet, Sprout, Calendar, FileText, Map, CheckCircle, XCircle, ArrowLeft, Users, TreePine, Home, Pencil, SquarePenIcon } from 'lucide-react';
+import React, { useState } from 'react';
+import { MapPin, User, Droplet, Sprout, Calendar, FileText, Map, CheckCircle, XCircle, ArrowLeft, Users, TreePine, Home, Pencil, SquarePenIcon, Download, ChevronDown } from 'lucide-react';
 import useStore from '../../store/store';
 import PolygonDisplayComponent from '../../components/displayPolygon';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import { amiriFontBase64 } from '../../assets/AmiriFont';
+import { toast } from 'react-toastify';
 
 const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     const {
@@ -14,6 +19,8 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         livestocks,
         language: lang
     } = useStore((state) => state);
+
+    const [isDownloadOpen, setIsDownloadOpen] = useState(false);
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
@@ -60,51 +67,691 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     );
 
     const fruitType = (fr) => {
-    const item = fruitTypes.find((it) => it.id === fr.fruidId);
-    return !lang.includes('en') ? (item?.nameInArrabic ?? fr.fruitType) : (item?.name ?? fr.fruitType);
-};
+        const item = fruitTypes.find((it) => it.id === fr.fruidId);
+        return !lang.includes('en') ? (item?.nameInArrabic ?? fr.fruitType) : (item?.name ?? fr.fruitType);
+    };
 
-const stockType = (fr) => {
-    const item = livestocks.find((it) => it.id === fr.stockId);
-    return !lang.includes('en') ? (item?.nameInArrabic ?? fr.stockType) : (item?.name ?? fr.stockType);
-};
+    const stockType = (fr) => {
+        const item = livestocks.find((it) => it.id === fr.stockId);
+        return !lang.includes('en') ? (item?.nameInArrabic ?? fr.stockType) : (item?.name ?? fr.stockType);
+    };
 
-const vegetableType = (veg) => {
-    const item = vegetableTypes.find((it) => it.id === veg.vegetableId);
-    return !lang.includes('en') ? (item?.nameInArrabic ?? veg.vegetableType) : (item?.name ?? veg.vegetableType);
-};
+    const vegetableType = (veg) => {
+        const item = vegetableTypes.find((it) => it.id === veg.vegetableId);
+        return !lang.includes('en') ? (item?.nameInArrabic ?? veg.vegetableType) : (item?.name ?? veg.vegetableType);
+    };
 
-const fodderTypeHandler = (fodd) => {
-    const item = fodderTypes.find((it) => it.id === fodd.fodderId);
-    return !lang.includes('en') ? (item?.nameInArrabic ?? fodd.fodderType) : (item?.name ?? fodd.fodderType);
-};
+    const fodderTypeHandler = (fodd) => {
+        const item = fodderTypes.find((it) => it.id === fodd.fodderId);
+        return !lang.includes('en') ? (item?.nameInArrabic ?? fodd.fodderType) : (item?.name ?? fodd.fodderType);
+    };
 
-const farmingSystemHandler = (fs) => {
-    const item = farmingSystems.find((it) => it.id === fs.farmingSystemId);
-    return !lang.includes('en') ? (item?.nameInArrabic ?? fs.farmingSystem) : (item?.name ?? fs.farmingSystem);
-};
+    const farmingSystemHandler = (fs) => {
+        const item = farmingSystems.find((it) => it.id === fs.farmingSystemId);
+        return !lang.includes('en') ? (item?.nameInArrabic ?? fs.farmingSystem) : (item?.name ?? fs.farmingSystem);
+    };
 
-const coverTypeHandler = (fs) => {
-    const item = coverTypes.find((it) => it.id === fs.coverTypeId);
-    return !lang.includes('en') ? (item?.nameInArrabic ?? fs.coverType) : (item?.name ?? fs.coverType);
-};
+    const coverTypeHandler = (fs) => {
+        const item = coverTypes.find((it) => it.id === fs.coverTypeId);
+        return !lang.includes('en') ? (item?.nameInArrabic ?? fs.coverType) : (item?.name ?? fs.coverType);
+    };
+
+    // Helper to get localized possession style name
+    const getPossessionStyleName = () => {
+        if (!farm.possessionStyle) return 'N/A';
+        return isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic;
+    };
+
+    // Helper to get localized farming system names
+    const getFarmingSystemNames = () => {
+        if (!farm.farmingSystem || farm.farmingSystem.length === 0) return 'N/A';
+        return farm.farmingSystem.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ');
+    };
 
     const isLTR = lang.includes('en');
-
     const coder = farmers.find(f => f.farms?.includes(farm.id));
 
+    // Download as PDF
+    const downloadPDF = () => {
+        const doc = new jsPDF();
+        
+        // Font Setup
+        doc.addFileToVFS('Amiri-Regular.ttf', amiriFontBase64);
+        doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+        doc.setFont('Amiri');
 
-    // console.log(farm);
-    
+        let yPosition = 20;
+
+        // Title
+        doc.setFontSize(18);
+        doc.setTextColor(34, 197, 94);
+        const titleText = isLTR ? `Farm Details: ${farm.farmName}` : `تفاصيل المزرعة: ${farm.farmName}`;
+        doc.text(titleText, 105, yPosition, { align: 'center' });
+        yPosition += 15;
+
+        // Basic Information
+        doc.setFontSize(14);
+        doc.setTextColor(0, 0, 0);
+        doc.text(isLTR ? 'Basic Information' : 'المعلومات الأساسية', 20, yPosition);
+        yPosition += 10;
+
+        const basicInfo = [
+            [isLTR ? 'Agriculture ID' : 'معرف الزراعة', farm.agricultureId || 'N/A'],
+            [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.phoneNumber || 'N/A'],
+            [isLTR ? 'Farm Number' : 'رقم المزرعة', farm.farmNo || 'N/A'],
+            [isLTR ? 'Farm Serial' : 'مسلسل المزرعة', farm.farmSerial || 'N/A'],
+            [isLTR ? 'Status' : 'الحالة', farm.status || 'N/A'],
+            [isLTR ? 'Total Area' : 'المساحة الإجمالية', `${Math.round(farm.totalArea)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [isLTR ? 'Size' : 'الحجم', `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [isLTR ? 'Possession Style' : 'أسلوب الاستحواذ', getPossessionStyleName()],
+            [isLTR ? 'Farming System' : 'نظام الزراعة', getFarmingSystemNames()],
+        ];
+
+        autoTable(doc, {
+            startY: yPosition,
+            head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+            body: basicInfo,
+            theme: 'grid',
+            styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
+            headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+        });
+
+        yPosition = doc.lastAutoTable.finalY + 15;
+
+        // Owner Information
+        if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        doc.setFontSize(14);
+        doc.text(isLTR ? 'Owner Information' : 'معلومات المالك', 20, yPosition);
+        yPosition += 10;
+
+        const ownerInfo = [
+            [isLTR ? 'Name' : 'الاسم', farm.owner?.name || 'N/A'],
+            [isLTR ? 'Email' : 'البريد الإلكتروني', farm.owner?.email || 'N/A'],
+            [isLTR ? 'Emirates ID' : 'الهوية الإماراتية', farm.emiratesID || 'N/A'],
+            [isLTR ? 'Email Verified' : 'تم التحقق من البريد الإلكتروني', farm.owner?.isEmailVerified ? (isLTR ? 'Yes' : 'نعم') : (isLTR ? 'No' : 'لا')],
+        ];
+
+        autoTable(doc, {
+            startY: yPosition,
+            head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+            body: ownerInfo,
+            theme: 'grid',
+            styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
+            headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+        });
+
+        yPosition = doc.lastAutoTable.finalY + 15;
+
+        // Holder Information
+        if (farm.holder) {
+            if (yPosition > 250) {
+                doc.addPage();
+                yPosition = 20;
+            }
+            doc.setFontSize(14);
+            doc.text(isLTR ? 'Holder Information' : 'معلومات الحامل', 20, yPosition);
+            yPosition += 10;
+
+            const holderInfo = [
+                [isLTR ? 'Name' : 'الاسم', farm.holder?.name || 'N/A'],
+                [isLTR ? 'Email' : 'البريد الإلكتروني', farm.holder?.email || 'N/A'],
+                [isLTR ? 'Email Verified' : 'تم التحقق من البريد الإلكتروني', farm.holder?.isEmailVerified ? (isLTR ? 'Yes' : 'نعم') : (isLTR ? 'No' : 'لا')],
+                [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.holder?.phoneNumber || 'N/A'],
+            ];
+
+            autoTable(doc, {
+                startY: yPosition,
+                head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+                body: holderInfo,
+                theme: 'grid',
+                styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
+                headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+            });
+
+            yPosition = doc.lastAutoTable.finalY + 15;
+        }
+
+        // Location Information
+        if (yPosition > 250) {
+            doc.addPage();
+            yPosition = 20;
+        }
+        doc.setFontSize(14);
+        doc.text(isLTR ? 'Location Information' : 'معلومات الموقع', 20, yPosition);
+        yPosition += 10;
+
+        const locationInfo = [
+            [isLTR ? 'Location' : 'الموقع', (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Region' : 'المنطقة', (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Emirate' : 'الإمارة', (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Service Center' : 'مركز الخدمة', (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Coordinates' : 'الإحداثيات', `${farm.coordinates?.lat || 'N/A'}, ${farm.coordinates?.lng || 'N/A'}`],
+        ];
+
+        autoTable(doc, {
+            startY: yPosition,
+            head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+            body: locationInfo,
+            theme: 'grid',
+            styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
+            headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+        });
+
+        yPosition = doc.lastAutoTable.finalY + 15;
+
+        // Land Use Information
+        if (farm.landUse) {
+            if (yPosition > 230) {
+                doc.addPage();
+                yPosition = 20;
+            }
+            doc.setFontSize(14);
+            doc.text(isLTR ? 'Land Use Distribution' : 'توزيع استخدامات الأراضي', 20, yPosition);
+            yPosition += 10;
+
+            const landUseInfo = [
+                [isLTR ? 'Vegetables (Open)' : 'الخضروات (مفتوحة)', `${farm.landUse?.arrableLand?.vegetablesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Fruit & Palm Trees (Open)' : 'أشجار الفاكهة والنخيل (مفتوح)', `${farm.landUse?.arrableLand?.fruitPalmTreesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Field Crops & Fodder' : 'المحاصيل الحقلية والأعلاف', `${farm.landUse?.arrableLand?.fieldCropsFodder || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Buildings & Roads' : 'المباني والطرق', `${farm.landUse?.nonArrableLand?.buildingsRoads || 0} ${isLTR ? 'm²' : 'م²'}`],
+            ];
+
+            autoTable(doc, {
+                startY: yPosition,
+                head: [[isLTR ? 'Land Use Type' : 'نوع استخدام الأرض', isLTR ? 'Area' : 'المساحة']],
+                body: landUseInfo,
+                theme: 'grid',
+                styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
+                headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+            });
+
+            yPosition = doc.lastAutoTable.finalY + 15;
+        }
+
+        // Water Sources & Irrigation
+        if (farm.waterSources && farm.waterSources.length > 0) {
+            if (yPosition > 250) {
+                doc.addPage();
+                yPosition = 20;
+            }
+            doc.setFontSize(14);
+            doc.text(isLTR ? 'Water & Irrigation' : 'المياه والري', 20, yPosition);
+            yPosition += 10;
+
+            const waterInfo = [
+                [isLTR ? 'Water Sources' : 'مصادر المياه', farm.waterSources.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ')],
+                [isLTR ? 'Irrigation Systems' : 'أنظمة الري', farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || 'N/A'],
+                [isLTR ? 'Production Wells' : 'آبار الإنتاج', farm.numberOfProductionWells || 'N/A'],
+                [isLTR ? 'Desalination Units' : 'وحدات تحلية المياه', farm.desalinationUnits || 'N/A'],
+            ];
+
+            autoTable(doc, {
+                startY: yPosition,
+                head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+                body: waterInfo,
+                theme: 'grid',
+                styles: { font: 'Amiri', fontSize: 9, halign: 'center' },
+                headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+            });
+
+            yPosition = doc.lastAutoTable.finalY + 15;
+        }
+
+        // Crops Information - Fruits
+        if (farm.crops?.fruits && farm.crops.fruits.length > 0) {
+            if (yPosition > 250) {
+                doc.addPage();
+                yPosition = 20;
+            }
+            doc.setFontSize(14);
+            doc.text(isLTR ? 'Fruit Trees' : 'أشجار الفاكهة', 20, yPosition);
+            yPosition += 10;
+
+            const fruitsData = farm.crops.fruits.map(fruit => [
+                fruitType(fruit),
+                `${fruit.area} ${isLTR ? 'm²' : 'م²'}`,
+                fruit.totalTrees || 'N/A',
+                `${fruit.productionPercent} ${isLTR ? 'kg' : 'كجم'}`
+            ]);
+
+            autoTable(doc, {
+                startY: yPosition,
+                head: [[
+                    isLTR ? 'Type' : 'النوع',
+                    isLTR ? 'Area' : 'المساحة',
+                    isLTR ? 'Total Trees' : 'إجمالي الأشجار',
+                    isLTR ? 'Production' : 'الإنتاج'
+                ]],
+                body: fruitsData,
+                theme: 'grid',
+                styles: { font: 'Amiri', fontSize: 9, halign: 'center' },
+                headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+            });
+
+            yPosition = doc.lastAutoTable.finalY + 15;
+        }
+
+        // Vegetables
+        if (farm.crops?.vegetables && farm.crops.vegetables.length > 0) {
+            if (yPosition > 250) {
+                doc.addPage();
+                yPosition = 20;
+            }
+            doc.setFontSize(14);
+            doc.text(isLTR ? 'Vegetables' : 'الخضروات', 20, yPosition);
+            yPosition += 10;
+
+            const vegetablesData = farm.crops.vegetables.map(veg => [
+                vegetableType(veg),
+                `${veg.area} ${isLTR ? 'm²' : 'م²'}`,
+                `${veg.productionPercent} ${isLTR ? 'kg' : 'كجم'}`
+            ]);
+
+            autoTable(doc, {
+                startY: yPosition,
+                head: [[
+                    isLTR ? 'Type' : 'النوع',
+                    isLTR ? 'Area' : 'المساحة',
+                    isLTR ? 'Production' : 'الإنتاج'
+                ]],
+                body: vegetablesData,
+                theme: 'grid',
+                styles: { font: 'Amiri', fontSize: 9, halign: 'center' },
+                headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+            });
+
+            yPosition = doc.lastAutoTable.finalY + 15;
+        }
+
+        // Field Crops & Fodder
+        if (farm.crops?.fieldCropsFodder && farm.crops.fieldCropsFodder.length > 0) {
+            if (yPosition > 250) {
+                doc.addPage();
+                yPosition = 20;
+            }
+            doc.setFontSize(14);
+            doc.text(isLTR ? 'Field Crops & Fodder' : 'المحاصيل الحقلية والأعلاف', 20, yPosition);
+            yPosition += 10;
+
+            const fodderData = farm.crops.fieldCropsFodder.map(fodder => [
+                fodderTypeHandler(fodder),
+                `${fodder.area} ${isLTR ? 'm²' : 'م²'}`,
+                `${fodder.productionPercent} ${isLTR ? 'kg' : 'كجم'}`
+            ]);
+
+            autoTable(doc, {
+                startY: yPosition,
+                head: [[
+                    isLTR ? 'Type' : 'النوع',
+                    isLTR ? 'Area' : 'المساحة',
+                    isLTR ? 'Production' : 'الإنتاج'
+                ]],
+                body: fodderData,
+                theme: 'grid',
+                styles: { font: 'Amiri', fontSize: 9, halign: 'center' },
+                headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+            });
+
+            yPosition = doc.lastAutoTable.finalY + 15;
+        }
+
+        // Livestocks
+        if (farm.livestocks && farm.livestocks.length > 0) {
+            if (yPosition > 250) {
+                doc.addPage();
+                yPosition = 20;
+            }
+            doc.setFontSize(14);
+            doc.text(isLTR ? 'Livestocks' : 'الثروة الحيوانية', 20, yPosition);
+            yPosition += 10;
+
+            const livestocksData = farm.livestocks.map(stock => [
+                stockType(stock),
+                stock.numberOfAnimals || 'N/A'
+            ]);
+
+            autoTable(doc, {
+                startY: yPosition,
+                head: [[
+                    isLTR ? 'Type' : 'النوع',
+                    isLTR ? 'Number of Animals' : 'عدد الحيوانات'
+                ]],
+                body: livestocksData,
+                theme: 'grid',
+                styles: { font: 'Amiri', fontSize: 9, halign: 'center' },
+                headStyles: { fillColor: [34, 197, 94], halign: 'center' },
+            });
+
+            yPosition = doc.lastAutoTable.finalY + 15;
+        }
+
+        doc.save(`farm-details-${farm.farmName}.pdf`);
+        setIsDownloadOpen(false);
+        toast.success(isLTR ? 'PDF downloaded successfully!' : 'تم تنزيل ملف PDF بنجاح!');
+    };
+
+    // Download as Excel
+    const downloadExcel = () => {
+        const workbook = XLSX.utils.book_new();
+
+        // Basic Information Sheet
+        const basicData = [
+            [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
+            [isLTR ? 'Farm Name' : 'اسم المزرعة', farm.farmName],
+            [isLTR ? 'Agriculture ID' : 'معرف الزراعة', farm.agricultureId],
+            [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.phoneNumber],
+            [isLTR ? 'Farm Number' : 'رقم المزرعة', farm.farmNo],
+            [isLTR ? 'Farm Serial' : 'مسلسل المزرعة', farm.farmSerial],
+            [isLTR ? 'Status' : 'الحالة', farm.status],
+            [isLTR ? 'Total Area' : 'المساحة الإجمالية', `${Math.round(farm.totalArea)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [isLTR ? 'Size' : 'الحجم', `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [isLTR ? 'Possession Style' : 'أسلوب الاستحواذ', getPossessionStyleName()],
+            [isLTR ? 'Farming System' : 'نظام الزراعة', getFarmingSystemNames()],
+            [isLTR ? 'Workers' : 'العمال', farm.noOfWorkers || 0],
+        ];
+        const basicSheet = XLSX.utils.aoa_to_sheet(basicData);
+        XLSX.utils.book_append_sheet(workbook, basicSheet, isLTR ? 'Basic Info' : 'المعلومات الأساسية');
+
+        // Owner Information Sheet
+        const ownerData = [
+            [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
+            [isLTR ? 'Name' : 'الاسم', farm.owner?.name || 'N/A'],
+            [isLTR ? 'Email' : 'البريد الإلكتروني', farm.owner?.email || 'N/A'],
+            [isLTR ? 'Emirates ID' : 'الهوية الإماراتية', farm.emiratesID || 'N/A'],
+            [isLTR ? 'Email Verified' : 'تم التحقق من البريد الإلكتروني', farm.owner?.isEmailVerified ? (isLTR ? 'Yes' : 'نعم') : (isLTR ? 'No' : 'لا')],
+        ];
+        const ownerSheet = XLSX.utils.aoa_to_sheet(ownerData);
+        XLSX.utils.book_append_sheet(workbook, ownerSheet, isLTR ? 'Owner Info' : 'معلومات المالك');
+
+        // Holder Information Sheet
+        if (farm.holder) {
+            const holderData = [
+                [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
+                [isLTR ? 'Name' : 'الاسم', farm.holder?.name || 'N/A'],
+                [isLTR ? 'Email' : 'البريد الإلكتروني', farm.holder?.email || 'N/A'],
+                [isLTR ? 'Email Verified' : 'تم التحقق من البريد الإلكتروني', farm.holder?.isEmailVerified ? (isLTR ? 'Yes' : 'نعم') : (isLTR ? 'No' : 'لا')],
+                [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.holder?.phoneNumber || 'N/A'],
+            ];
+            const holderSheet = XLSX.utils.aoa_to_sheet(holderData);
+            XLSX.utils.book_append_sheet(workbook, holderSheet, isLTR ? 'Holder Info' : 'معلومات الحامل');
+        }
+
+        // Location Information Sheet
+        const locationData = [
+            [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
+            [isLTR ? 'Location' : 'الموقع', (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Region' : 'المنطقة', (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Emirate' : 'الإمارة', (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Service Center' : 'مركز الخدمة', (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Coordinates' : 'الإحداثيات', `${farm.coordinates?.lat || 'N/A'}, ${farm.coordinates?.lng || 'N/A'}`],
+        ];
+        const locationSheet = XLSX.utils.aoa_to_sheet(locationData);
+        XLSX.utils.book_append_sheet(workbook, locationSheet, isLTR ? 'Location Info' : 'معلومات الموقع');
+
+        // Land Use Sheet
+        if (farm.landUse) {
+            const landUseData = [
+                [isLTR ? 'Land Use Type' : 'نوع استخدام الأرض', isLTR ? 'Area' : 'المساحة'],
+                [isLTR ? 'Vegetables (Open)' : 'الخضروات (مفتوحة)', `${farm.landUse?.arrableLand?.vegetablesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Fruit & Palm Trees (Open)' : 'أشجار الفاكهة والنخيل (مفتوح)', `${farm.landUse?.arrableLand?.fruitPalmTreesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Field Crops & Fodder' : 'المحاصيل الحقلية والأعلاف', `${farm.landUse?.arrableLand?.fieldCropsFodder || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Left for Rest' : 'غادر للراحة', `${Math.round(farm.landUse?.arrableLand?.leftForRest || 0)} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Nurseries' : 'مشاتل', `${farm.landUse?.arrableLand?.nurseries || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Buildings & Roads' : 'المباني والطرق', `${farm.landUse?.nonArrableLand?.buildingsRoads || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Windbreaks' : 'مصدات الرياح', `${farm.landUse?.nonArrableLand?.windbreaks || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [isLTR ? 'Barren Land' : 'أرض قاحلة', `${farm.landUse?.nonArrableLand?.barrenLand || 0} ${isLTR ? 'm²' : 'م²'}`],
+            ];
+            const landUseSheet = XLSX.utils.aoa_to_sheet(landUseData);
+            XLSX.utils.book_append_sheet(workbook, landUseSheet, isLTR ? 'Land Use' : 'استخدام الأراضي');
+        }
+
+        // Water & Irrigation Sheet
+        if (farm.waterSources && farm.waterSources.length > 0) {
+            const waterData = [
+                [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
+                [isLTR ? 'Water Sources' : 'مصادر المياه', farm.waterSources.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ')],
+                [isLTR ? 'Irrigation Systems' : 'أنظمة الري', farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || 'N/A'],
+                [isLTR ? 'Production Wells' : 'آبار الإنتاج', farm.numberOfProductionWells || 'N/A'],
+                [isLTR ? 'Desalination Units' : 'وحدات تحلية المياه', farm.desalinationUnits || 'N/A'],
+            ];
+            const waterSheet = XLSX.utils.aoa_to_sheet(waterData);
+            XLSX.utils.book_append_sheet(workbook, waterSheet, isLTR ? 'Water & Irrigation' : 'المياه والري');
+        }
+
+        // Crops Sheet - Fruits
+        if (farm.crops?.fruits && farm.crops.fruits.length > 0) {
+            const fruitsData = [
+                [
+                    isLTR ? 'Type' : 'النوع',
+                    isLTR ? 'Area' : 'المساحة',
+                    isLTR ? 'Total Trees' : 'إجمالي الأشجار',
+                    isLTR ? 'Fruit Bearing' : 'تحمل الفاكهة',
+                    isLTR ? 'Production' : 'الإنتاج'
+                ],
+                ...farm.crops.fruits.map(fruit => [
+                    fruitType(fruit),
+                    `${fruit.area} ${isLTR ? 'm²' : 'م²'}`,
+                    fruit.totalTrees,
+                    fruit.fruitBearing,
+                    `${fruit.productionPercent} ${isLTR ? 'kg' : 'كجم'}`
+                ])
+            ];
+            const fruitsSheet = XLSX.utils.aoa_to_sheet(fruitsData);
+            XLSX.utils.book_append_sheet(workbook, fruitsSheet, isLTR ? 'Fruit Trees' : 'أشجار الفاكهة');
+        }
+
+        // Vegetables
+        if (farm.crops?.vegetables && farm.crops.vegetables.length > 0) {
+            const vegetablesData = [
+                [
+                    isLTR ? 'Type' : 'النوع',
+                    isLTR ? 'Area' : 'المساحة',
+                    isLTR ? 'Production' : 'الإنتاج'
+                ],
+                ...farm.crops.vegetables.map(veg => [
+                    vegetableType(veg),
+                    `${veg.area} ${isLTR ? 'm²' : 'م²'}`,
+                    `${veg.productionPercent} ${isLTR ? 'kg' : 'كجم'}`
+                ])
+            ];
+            const vegetablesSheet = XLSX.utils.aoa_to_sheet(vegetablesData);
+            XLSX.utils.book_append_sheet(workbook, vegetablesSheet, isLTR ? 'Vegetables' : 'الخضروات');
+        }
+
+        // Field Crops & Fodder
+        if (farm.crops?.fieldCropsFodder && farm.crops.fieldCropsFodder.length > 0) {
+            const fodderData = [
+                [
+                    isLTR ? 'Type' : 'النوع',
+                    isLTR ? 'Area' : 'المساحة',
+                    isLTR ? 'Production' : 'الإنتاج'
+                ],
+                ...farm.crops.fieldCropsFodder.map(fodder => [
+                    fodderTypeHandler(fodder),
+                    `${fodder.area} ${isLTR ? 'm²' : 'م²'}`,
+                    `${fodder.productionPercent} ${isLTR ? 'kg' : 'كجم'}`
+                ])
+            ];
+            const fodderSheet = XLSX.utils.aoa_to_sheet(fodderData);
+            XLSX.utils.book_append_sheet(workbook, fodderSheet, isLTR ? 'Field Crops & Fodder' : 'المحاصيل والأعلاف');
+        }
+
+        // Livestocks
+        if (farm.livestocks && farm.livestocks.length > 0) {
+            const livestocksData = [
+                [
+                    isLTR ? 'Type' : 'النوع',
+                    isLTR ? 'Number of Animals' : 'عدد الحيوانات'
+                ],
+                ...farm.livestocks.map(stock => [
+                    stockType(stock),
+                    stock.numberOfAnimals
+                ])
+            ];
+            const livestocksSheet = XLSX.utils.aoa_to_sheet(livestocksData);
+            XLSX.utils.book_append_sheet(workbook, livestocksSheet, isLTR ? 'Livestocks' : 'الثروة الحيوانية');
+        }
+
+        XLSX.writeFile(workbook, `farm-details-${farm.farmName}.xlsx`);
+        setIsDownloadOpen(false);
+        toast.success(isLTR ? 'Excel file downloaded successfully!' : 'تم تنزيل ملف Excel بنجاح!');
+    };
+
+    // Download as CSV
+    const downloadCSV = () => {
+        const headers = [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'];
+        const csvData = [
+            [isLTR ? 'Farm Name' : 'اسم المزرعة', farm.farmName],
+            [isLTR ? 'Agriculture ID' : 'معرف الزراعة', farm.agricultureId],
+            [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.phoneNumber],
+            [isLTR ? 'Farm Number' : 'رقم المزرعة', farm.farmNo],
+            [isLTR ? 'Farm Serial' : 'مسلسل المزرعة', farm.farmSerial],
+            [isLTR ? 'Status' : 'الحالة', farm.status],
+            [isLTR ? 'Total Area' : 'المساحة الإجمالية', `${Math.round(farm.totalArea)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [isLTR ? 'Size' : 'الحجم', `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [isLTR ? 'Possession Style' : 'أسلوب الاستحواذ', getPossessionStyleName()],
+            [isLTR ? 'Farming System' : 'نظام الزراعة', getFarmingSystemNames()],
+            [isLTR ? 'Workers' : 'العمال', farm.noOfWorkers || 0],
+            [isLTR ? 'Owner Name' : 'اسم المالك', farm.owner?.name || 'N/A'],
+            [isLTR ? 'Owner Email' : 'بريد المالك الإلكتروني', farm.owner?.email || 'N/A'],
+            [isLTR ? 'Emirates ID' : 'الهوية الإماراتية', farm.emiratesID || 'N/A'],
+            [isLTR ? 'Location' : 'الموقع', (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Region' : 'المنطقة', (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Emirate' : 'الإمارة', (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Service Center' : 'مركز الخدمة', (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic) || 'N/A'],
+            [isLTR ? 'Water Sources' : 'مصادر المياه', farm.waterSources?.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ') || 'N/A'],
+            [isLTR ? 'Irrigation Systems' : 'أنظمة الري', farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || 'N/A'],
+            [isLTR ? 'Production Wells' : 'آبار الإنتاج', farm.numberOfProductionWells || 'N/A'],
+            [isLTR ? 'Desalination Units' : 'وحدات تحلية المياه', farm.desalinationUnits || 'N/A'],
+        ];
+
+        const csvContent = [
+            headers.join(','),
+            ...csvData.map(row => row.map(cell => `"${cell}"`).join(','))
+        ].join('\n');
+
+        const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `farm-details-${farm.farmName}.csv`;
+        link.click();
+        setIsDownloadOpen(false);
+        toast.success(isLTR ? 'CSV file downloaded successfully!' : 'تم تنزيل ملف CSV بنجاح!');
+    };
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 p-0 md:p-6">
-            <button
-                onClick={handleBack}
-                className="flex items-center cursor-pointer gap-2 mb-4 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 rounded-lg shadow-md transition-colors duration-200 border border-gray-200"
-            >
-                <ArrowLeft className="w-4 h-4" />
-                <span className="font-medium">Back</span>
-            </button>
+            <div className="flex justify-between items-center mb-4">
+                <button
+                    onClick={handleBack}
+                    className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 rounded-lg shadow-md transition-colors duration-200 border border-gray-200"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span className="font-medium">Back</span>
+                </button>
+
+                {/* Download Dropdown */}
+                <div className="relative">
+                    <button
+                        onClick={() => setIsDownloadOpen(!isDownloadOpen)}
+                        className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
+                    >
+                        <Download size={20} />
+                        <span className="font-medium">Download</span>
+                        <ChevronDown
+                            size={16}
+                            className={`transition-transform duration-200 ${isDownloadOpen ? "rotate-180" : ""}`}
+                        />
+                    </button>
+
+                    {isDownloadOpen && (
+                        <>
+                            <div
+                                className="fixed inset-0 z-10"
+                                onClick={() => setIsDownloadOpen(false)}
+                            />
+                            <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl z-50 border border-gray-100 overflow-hidden">
+                                <button
+                                    onClick={downloadPDF}
+                                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                        <svg
+                                            className="w-5 h-5 text-emerald-600"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div className="font-medium text-gray-900">PDF Format</div>
+                                        <div className="text-xs text-gray-500">Printable document</div>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={downloadExcel}
+                                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                        <svg
+                                            className="w-5 h-5 text-emerald-600"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div className="font-medium text-gray-900">Excel Format</div>
+                                        <div className="text-xs text-gray-500">Spreadsheet file</div>
+                                    </div>
+                                </button>
+                                <button
+                                    onClick={downloadCSV}
+                                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group rounded-b-xl"
+                                >
+                                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                                        <svg
+                                            className="w-5 h-5 text-emerald-600"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                strokeWidth={2}
+                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                                            />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div className="font-medium text-gray-900">CSV Format</div>
+                                        <div className="text-xs text-gray-500">Comma-separated</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            </div>
+
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl shadow-2xl p-8 mb-6 text-white">

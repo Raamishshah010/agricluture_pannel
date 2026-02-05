@@ -96,7 +96,13 @@
     "farmingSystemsDistribution": "توزيع أنظمة الزراعة",
     "topFarmsbyGreenhouseArea": "أعلى المزارع حسب منطقة الدفيئة",
 
-    "farmCodingSub": "إدارة وتتبع طلبات ترميز المزرعة"
+    "farmCodingSub": "إدارة وتتبع طلبات ترميز المزرعة",
+    "dashboardOverview": "نظرة عامة على لوحة القيادة",
+    "farmanalytics&insights": "تحليلات المزرعة والرؤى",
+    "selectGreenhouseType": "اختر نوع البيت المحمي",
+    "selectCoverType": "اختر نوع الغطاء"
+
+
   },
 
   "status": {

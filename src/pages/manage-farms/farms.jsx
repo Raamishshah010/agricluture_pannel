@@ -14,18 +14,20 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
     const [selectedUser, setSelectedUser] = useState(null);
     const [search, setSearch] = useState("");
     const [coders, setCoders] = useState([]);
-    const { centers, emirates, locations } = useStore((state) => state);
+    const { centers, emirates, locations, language } = useStore((state) => state);
+
+    // DEBUG: Log the data structure to console (remove after debugging)
+    console.log('Language:', language);
+    console.log('Sample Emirate:', emirates[0]);
+    console.log('Sample Center:', centers[0]);
+    console.log('Sample Location:', locations[0]);
 
     const handleSubmit = async () => {
-        if (
-            !selectedFarm
-        ) {
+        if (!selectedFarm) {
             alert(t('manageFarms.farms.selectFarm'));
             return;
         }
-        if (
-            !selectedUser
-        ) {
+        if (!selectedUser) {
             alert(t('manageFarms.farms.selectUser'));
             return;
         }
@@ -47,7 +49,6 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
         }
     };
 
-
     const assignCoderHandle = async (farm) => {
         try {
             const res = await service.getCoders();
@@ -59,17 +60,19 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
             toast.error(error.response?.data?.message || error.message);
         }
     }
+
     const handleDelete = async (farm) => {
         try {
             if (window.confirm(t('manageFarms.farms.deleteConfirmation') + " " + farm.farmName)) {
                 await farmService.delete(farm.id);
                 setList(farm.id);
-                toast.success(t('manageFarms.farms.assignedSuccessfully'));
+                toast.success(t('manageFarms.farms.deletedSuccessfully'));
             }
         } catch (error) {
             toast.error(error.response?.data?.message || error.message);
         }
     }
+
     const getStatusBadge = (status) => {
         const baseClasses = "px-3 py-1 rounded-full text-sm font-medium";
         switch (status) {
@@ -85,9 +88,24 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                 return `${baseClasses} bg-gray-100 text-gray-800`;
         }
     };
+
     const getStatus = (status, isAssigned) => {
         if (!isAssigned) return 'draft';
         return status;
+    };
+
+    // Helper function to get localized name - supports multiple Arabic property names
+    const getLocalizedName = (item) => {
+        if (!item) return 'N/A';
+        
+        // If language is Arabic, try different possible Arabic property names
+        if (language === 'ar') {
+            // Try common Arabic property names
+            return item.nameInArrabic   || item.nameInArrabic  || item.nameInArrabic  || item.nameInArrabic  || item.nameInArrabic  || item.nameInArrabic ;
+        }
+        
+        // Default to English name
+        return item.name || item.nameEn || item.englishName || 'N/A';
     };
 
     const searchCoders = useMemo(() => {
@@ -101,6 +119,7 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
             return coders;
         }
     }, [coders, search]);
+
     return (
         <div className="min-h-screen bg-gray-50">
             <div>
@@ -122,55 +141,75 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                                {list.map((farm) => (
-                                    <tr key={farm.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{farm.farmName}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900 text-nowrap">{farm.agricultureId}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{farm.farmNo}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{farm.farmSerial}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{emirates.find(it => it.id === farm.emirate)?.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{centers.find(it => it.id === farm.serviceCenter)?.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{locations.find(it => it.id === farm.location)?.name}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{Math.round(farm.size)}</td>
-                                        <td className="py-5 px-6">
-                                            <span className={getStatusBadge(farm.status)}>
-                                                {getStatus(farm.status, farm.isAssigned)}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => assignCoderHandle(farm)}
-                                                    className="h-10 mt-4 px-2 bg-green-600 text-white cursor-pointer rounded-lg transition-colors"
-                                                    title={t('manageFarms.farms.assignCoder')}
-                                                >
-                                                    {t('manageFarms.farms.assign')}
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDetail(farm)}
-                                                    className="h-10 mt-4 px-2 bg-green-600 text-white cursor-pointer rounded-lg transition-colors"
-                                                    title={t('manageFarms.farms.view')}
-                                                >
-                                                    {t('manageFarms.farms.view')}
-                                                </button>
-                                                <button
-                                                    onClick={() => handleEdit(farm)}
-                                                    className="h-10 mt-4 px-2 bg-green-600 text-white cursor-pointer rounded-lg transition-colors"
-                                                    title={t('manageFarms.farms.edit')}
-                                                >
-                                                    {t('manageFarms.farms.edit')}
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(farm)}
-                                                    className="h-10 mt-4 px-2 bg-red-400 text-white cursor-pointer rounded-lg transition-colors"
-                                                    title={t('manageFarms.farms.delete')}
-                                                >
-                                                    {t('manageFarms.farms.delete')}
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                {list.map((farm) => {
+                                    // Find the related objects
+                                    const emirateObj = emirates.find(it => it.id === farm.emirate);
+                                    const centerObj = centers.find(it => it.id === farm.serviceCenter);
+                                    const locationObj = locations.find(it => it.id === farm.location);
+                                    
+                                    // DEBUG: Log for first farm only
+                                    if (farm === list[0]) {
+                                        console.log('First farm emirate object:', emirateObj);
+                                        console.log('First farm center object:', centerObj);
+                                        console.log('First farm location object:', locationObj);
+                                    }
+                                    
+                                    return (
+                                        <tr key={farm.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{farm.farmName}</td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900 text-nowrap">{farm.agricultureId}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{farm.farmNo}</td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{farm.farmSerial}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">
+                                                {getLocalizedName(emirateObj)}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">
+                                                {getLocalizedName(centerObj)}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">
+                                                {getLocalizedName(locationObj)}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{Math.round(farm.size)}</td>
+                                            <td className="py-5 px-6">
+                                                <span className={getStatusBadge(getStatus(farm.status, farm.isAssigned))}>
+                                                    {getStatus(farm.status, farm.isAssigned)}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => assignCoderHandle(farm)}
+                                                        className="h-10 mt-4 px-2 bg-green-600 text-white cursor-pointer rounded-lg transition-colors hover:bg-green-700"
+                                                        title={t('manageFarms.farms.assignCoder')}
+                                                    >
+                                                        {t('manageFarms.farms.assign')}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDetail(farm)}
+                                                        className="h-10 mt-4 px-2 bg-green-600 text-white cursor-pointer rounded-lg transition-colors hover:bg-green-700"
+                                                        title={t('manageFarms.farms.view')}
+                                                    >
+                                                        {t('manageFarms.farms.view')}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleEdit(farm)}
+                                                        className="h-10 mt-4 px-2 bg-green-600 text-white cursor-pointer rounded-lg transition-colors hover:bg-green-700"
+                                                        title={t('manageFarms.farms.edit')}
+                                                    >
+                                                        {t('manageFarms.farms.edit')}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(farm)}
+                                                        className="h-10 mt-4 px-2 bg-red-400 text-white cursor-pointer rounded-lg transition-colors hover:bg-red-500"
+                                                        title={t('manageFarms.farms.delete')}
+                                                    >
+                                                        {t('manageFarms.farms.delete')}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
@@ -254,11 +293,17 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                                             className="bg-white cursor-pointer rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.01] overflow-hidden"
                                         >
                                             <div className="p-2 flex items-center gap-6">
-                                                <img
-                                                    src={user.image}
-                                                    alt={user.name}
-                                                    className="w-12 h-12 rounded-full object-cover flex-shrink-0"
-                                                />
+                                                {user.image ? (
+                                                    <img
+                                                        src={user.image}
+                                                        alt={user.name}
+                                                        className="w-12 h-12 rounded-full object-cover flex-shrink-0"
+                                                    />
+                                                ) : (
+                                                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                                        <User className="w-6 h-6 text-gray-600" />
+                                                    </div>
+                                                )}
                                                 <div className="flex-1">
                                                     <h3 className="text-xl font-bold text-gray-900 mb-1">
                                                         {user.name}
@@ -281,21 +326,18 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                                     </button>
                                     <button
                                         onClick={handleSubmit}
-                                        className="px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                                        disabled={loading}
+                                        className="px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        {
-                                            loading ? (
-                                                <>
-                                                    <div>
-                                                        <svg aria-hidden="true" className="inline w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-green-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                            <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
-                                                            <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
-                                                        </svg>
-                                                        <span className="sr-only">Loading...</span>
-                                                    </div>
-                                                </>
-                                            ) : t('manageFarms.farms.assign')
-                                        }
+                                        {loading ? (
+                                            <div className="flex items-center gap-2">
+                                                <svg aria-hidden="true" className="inline w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-green-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
+                                                    <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
+                                                </svg>
+                                                <span className="sr-only">Loading...</span>
+                                            </div>
+                                        ) : t('manageFarms.farms.assign')}
                                     </button>
                                 </div>
                             </div>

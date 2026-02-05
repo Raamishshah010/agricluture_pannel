@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import useStore from '../../store/store';
 import Pagination from '../../components/pagination';
 import service from '../../services/farmService';
@@ -30,12 +30,91 @@ const FarmCodingRequest = () => {
   const [emirate, setEmirate] = useState(null);
   const [center, setCenter] = useState(null);
   const [location, setLocation] = useState(null);
+  const [selectedCoder, setSelectedCoder] = useState(null);
   
   const isArabic = language === 'ar';
+
+  // Helper function to translate status labels
+  const getStatusLabel = (status) => {
+    if (!isArabic) return status;
+    
+    const statusTranslations = {
+      'active': 'نشط',
+      'pending': 'قيد الانتظار',
+      'draft': 'مسودة',
+      'suspended': 'معلق',
+      'assigned': 'معين'
+    };
+    
+    return statusTranslations[status] || status;
+  };
+
+  // Helper function to translate status tab labels
+  const getStatusTabLabel = (status) => {
+    if (!isArabic) return status;
+    
+    const tabTranslations = {
+      'All': 'الكل',
+      'Active': 'نشط',
+      'Pending': 'قيد الانتظار',
+      'Assigned': 'معين',
+      'Drafts': 'مسودات',
+      'Rejected': 'مرفوض'
+    };
+    
+    return tabTranslations[status] || status;
+  };
 
   React.useEffect(() => {
     setCurrentPage(1);
   }, [selectedStatus]);
+
+  // Filter centers based on selected emirate
+  const filteredCenters = useMemo(() => {
+    if (!emirate) return centers;
+    return centers.filter(c => c.emirateId === emirate.id);
+  }, [centers, emirate]);
+
+  // Filter locations based on selected center
+  const filteredLocations = useMemo(() => {
+    if (!center) return locations;
+    return locations.filter(l => l.centerId === center.id);
+  }, [locations, center]);
+
+  // Handle emirate change and reset center/location if needed
+  const handleEmirateChange = (selectedEmirate) => {
+    setEmirate(selectedEmirate);
+    
+    // Reset center if it doesn't belong to the new emirate
+    if (center && selectedEmirate) {
+      const centerBelongsToEmirate = centers.find(
+        c => c.id === center.id && c.emirateId === selectedEmirate.id
+      );
+      if (!centerBelongsToEmirate) {
+        setCenter(null);
+        setLocation(null);
+      }
+    } else if (!selectedEmirate) {
+      // If emirate is cleared, optionally reset center and location
+      // setCenter(null);
+      // setLocation(null);
+    }
+  };
+
+  // Handle center change and reset location if needed
+  const handleCenterChange = (selectedCenter) => {
+    setCenter(selectedCenter);
+    
+    // Reset location if it doesn't belong to the new center
+    if (location && selectedCenter) {
+      const locationBelongsToCenter = locations.find(
+        l => l.id === location.id && l.centerId === selectedCenter.id
+      );
+      if (!locationBelongsToCenter) {
+        setLocation(null);
+      }
+    }
+  };
 
   const getStatusBadge = (status) => {
     const baseClasses = "px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide transition-all";
@@ -54,8 +133,8 @@ const FarmCodingRequest = () => {
   };
 
   const getStatus = (status, isAssigned) => {
-    if (!isAssigned) return 'draft';
-    return status;
+    if (!isAssigned) return getStatusLabel('draft');
+    return getStatusLabel(status);
   };
 
   const itemsPerPage = 30;
@@ -98,7 +177,11 @@ const FarmCodingRequest = () => {
         (!center || farm.serviceCenter === center.id) &&
         (!location || farm.location === location.id);
 
-      return matchesSearch && matchesFilters;
+      // Filter by selected coder
+      const matchesCoder = !selectedCoder || 
+        (selectedCoder.farms && selectedCoder.farms.includes(farm.id));
+
+      return matchesSearch && matchesFilters && matchesCoder;
     });
 
   const totalPages = Math.ceil(filteredFarms.length / itemsPerPage);
@@ -246,78 +329,66 @@ const FarmCodingRequest = () => {
     setShowDownloadMenu(false);
   };
 
-
-  //! DOWNLOAD PDF
-
-const downloadPDF = async () => {
+  const downloadPDF = async () => {
     const data = prepareDataForExport();
     if (data.length === 0) return;
 
-    // 1. Headers Mapping
     const headerTranslations = {
-        "status": "الحالة",
-        "name": "الاسم",
-        "farmId": "معرف المزرعة",
-        "location": "الموقع",
-        // Baaki headers yahan add karein
+      "status": "الحالة",
+      "name": "الاسم",
+      "farmId": "معرف المزرعة",
+      "location": "الموقع",
     };
 
     try {
-        const doc = new jsPDF({ orientation: 'landscape' });
+      const doc = new jsPDF({ orientation: 'landscape' });
 
-        // Font Setup
-        doc.addFileToVFS("Amiri-Regular.ttf", amiriFontBase64);
-        doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
-        doc.setFont("Amiri");
+      doc.addFileToVFS("Amiri-Regular.ttf", amiriFontBase64);
+      doc.addFont("Amiri-Regular.ttf", "Amiri", "normal");
+      doc.setFont("Amiri");
 
-        // 2. Prepare Headers (Translation only, No Text Reversal)
-        const rawKeys = Object.keys(data[0]);
-        let tableHeaders = rawKeys.map(key => isArabic ? (headerTranslations[key] || key) : key);
+      const rawKeys = Object.keys(data[0]);
+      let tableHeaders = rawKeys.map(key => isArabic ? (headerTranslations[key] || key) : key);
 
-        // 3. Prepare Rows (Raw data, No Text Reversal)
-        let tableRows = data.map(row => rawKeys.map(key => row[key] || ''));
+      let tableRows = data.map(row => rawKeys.map(key => row[key] || ''));
 
-        // 4. ORIENTATION REVERSE (Sirf Array ki order badalna)
-        if (isArabic) {
-            tableHeaders = [...tableHeaders].reverse(); // Header columns right-to-left
-            tableRows = tableRows.map(row => [...row].reverse()); // Row cells right-to-left
-        }
+      if (isArabic) {
+        tableHeaders = [...tableHeaders].reverse();
+        tableRows = tableRows.map(row => [...row].reverse());
+      }
 
-        // --- TITLE ---
-        doc.setFontSize(18);
-        const title = isArabic ? "بيانات ترميز المزرعة" : "Farm Coding Data";
-        doc.text(title, isArabic ? 280 : 14, 15, { align: isArabic ? 'right' : 'left' });
+      doc.setFontSize(18);
+      const title = isArabic ? "بيانات ترميز المزرعة" : "Farm Coding Data";
+      doc.text(title, isArabic ? 280 : 14, 15, { align: isArabic ? 'right' : 'left' });
 
-        // --- TABLE ---
       autoTable(doc, {
-    head: [tableHeaders],
-    body: tableRows,
-    startY: 30,
-    styles: {
-        font: 'Amiri', // Body cells ke liye
-        fontSize: 10,
-        halign: isArabic ? 'right' : 'left'
-    },
-    headStyles: {
-        font: 'Amiri',       // YEH ZARURI HAI: Header ke liye font set karein
-        fontStyle: 'normal', // Bold ki wajah se aksar boxes aate hain, isse normal rakhein
-        fillColor: [34, 197, 94],
-        textColor: [255, 255, 255],
-        halign: isArabic ? 'right' : 'left',
-        fontSize: 11         // Header size thora bara kar sakte hain
-    },
-    // Agar columns abhi bhi agay peechay hain to layout direction yahan se fix karein
-    columnStyles: {
-        all: { halign: isArabic ? 'right' : 'left' }
-    }
-});
+        head: [tableHeaders],
+        body: tableRows,
+        startY: 30,
+        styles: {
+          font: 'Amiri',
+          fontSize: 10,
+          halign: isArabic ? 'right' : 'left'
+        },
+        headStyles: {
+          font: 'Amiri',
+          fontStyle: 'normal',
+          fillColor: [34, 197, 94],
+          textColor: [255, 255, 255],
+          halign: isArabic ? 'right' : 'left',
+          fontSize: 11
+        },
+        columnStyles: {
+          all: { halign: isArabic ? 'right' : 'left' }
+        }
+      });
 
-        doc.save(`farms_report.pdf`);
-        setShowDownloadMenu(false);
+      doc.save(`farms_report.pdf`);
+      setShowDownloadMenu(false);
     } catch (error) {
-        console.error('PDF Error:', error);
+      console.error('PDF Error:', error);
     }
-};
+  };
 
   return activeTab.includes("farm-requests") ? (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -350,50 +421,57 @@ const downloadPDF = async () => {
               </button>
 
               {showDownloadMenu && (
-                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl z-50 border border-gray-100 overflow-hidden">
-                  <button
-                    onClick={downloadCSV}
-                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                      <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">CSV Format</div>
-                      <div className="text-xs text-gray-500">Comma-separated</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={downloadExcel}
-                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                      <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">Excel Format</div>
-                      <div className="text-xs text-gray-500">Spreadsheet file</div>
-                    </div>
-                  </button>
-                  <button
-                    onClick={downloadPDF}
-                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group rounded-b-xl"
-                  >
-                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                      <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <div className="font-medium text-gray-900">PDF Format</div>
-                      <div className="text-xs text-gray-500">Printable document</div>
-                    </div>
-                  </button>
-                </div>
+                <>
+                  {/* Backdrop to close menu when clicking outside */}
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowDownloadMenu(false)}
+                  />
+                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl z-50 border border-gray-100 overflow-hidden">
+                    <button
+                      onClick={downloadCSV}
+                      className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                        <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-900">CSV Format</div>
+                        <div className="text-xs text-gray-500">Comma-separated</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={downloadExcel}
+                      className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                        <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-900">Excel Format</div>
+                        <div className="text-xs text-gray-500">Spreadsheet file</div>
+                      </div>
+                    </button>
+                    <button
+                      onClick={downloadPDF}
+                      className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group rounded-b-xl"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                        <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <div className="font-medium text-gray-900">PDF Format</div>
+                        <div className="text-xs text-gray-500">Printable document</div>
+                      </div>
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -412,7 +490,7 @@ const downloadPDF = async () => {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                <span>{status}</span>
+                <span>{getStatusTabLabel(status)}</span>
                 <span
                   className={`px-2.5 py-1 rounded-full text-xs font-bold transition-all ${
                     selectedStatus === status
@@ -452,24 +530,32 @@ const downloadPDF = async () => {
                 <Dropdown
                   options={emirates}
                   value={emirate}
-                  onChange={setEmirate}
+                  onChange={handleEmirateChange}
                   placeholder={t('common.components.farmCoding.selectEmirate')}
                 />
               </div>
               <div className="flex-1 min-w-[200px]">
                 <Dropdown
-                  options={centers}
+                  options={filteredCenters}
                   value={center}
-                  onChange={setCenter}
+                  onChange={handleCenterChange}
                   placeholder={t('common.components.farmCoding.selectCenter')}
                 />
               </div>
               <div className="flex-1 min-w-[200px]">
                 <Dropdown
-                  options={locations}
+                  options={filteredLocations}
                   value={location}
                   onChange={setLocation}
                   placeholder={t('common.components.farmCoding.selectLocation')}
+                />
+              </div>
+              <div className="flex-1 min-w-[200px]">
+                <Dropdown
+                  options={farmers}
+                  value={selectedCoder}
+                  onChange={setSelectedCoder}
+                  placeholder={isArabic ? 'اختر المُرمّز' : 'Select Coder'}
                 />
               </div>
               <button
@@ -478,6 +564,7 @@ const downloadPDF = async () => {
                   setEmirate(null);
                   setCenter(null);
                   setLocation(null);
+                  setSelectedCoder(null);
                   setQuery('');
                   setSelectedStatus('All');
                 }}
@@ -569,6 +656,8 @@ const downloadPDF = async () => {
           />
         </div>
       </div>
+
+      
 
       {/* Status Change Modal */}
       <Modal

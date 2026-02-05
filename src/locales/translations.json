@@ -98,7 +98,11 @@
     
     
     
-    "farmCodingSub": "Manage and track farm coding requests"
+    "farmCodingSub": "Manage and track farm coding requests",
+    "dashboardOverview": "Dashboard Overview",
+    "farmanalytics&insights": "Farm analytics & insights",
+    "selectGreenhouseType": "Select Greenhouse Type",
+    "selectCoverType": "Select Cover Type"
 
   },
 

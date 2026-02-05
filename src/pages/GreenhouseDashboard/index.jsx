@@ -12,6 +12,8 @@ const GreenhouseDashboard = () => {
     const [region, setRegion] = useState(null);
     const [emirate, setEmirate] = useState(null);
     const [center, setCenter] = useState(null);
+    const [selectedGreenhouseType, setSelectedGreenhouseType] = useState(null);
+    const [selectedCoverType, setSelectedCoverType] = useState(null);
     const [isExporting, setIsExporting] = useState(false);
     const isLTR = lang.includes('en');
 
@@ -20,8 +22,10 @@ const GreenhouseDashboard = () => {
         return fCenters;
     }, [emirate, centers]);
 
-    const filteredFarms = useMemo(() => {
+    // First filter farms by location filters
+    const locationFilteredFarms = useMemo(() => {
         let fFarms = farms.filter(farm => farm.crops.greenhouses && farm.crops.greenhouses.length > 0);
+        
         if (region) {
             fFarms = fFarms.filter(farm => farm.region === region.id);
         }
@@ -31,8 +35,34 @@ const GreenhouseDashboard = () => {
         if (center) {
             fFarms = fFarms.filter(farm => farm.serviceCenter === center.id);
         }
+        
         return fFarms;
     }, [center, emirate, farms, region]);
+
+    // Then create a filtered list with only matching greenhouses
+    const filteredFarms = useMemo(() => {
+        return locationFilteredFarms.map(farm => {
+            // Filter greenhouses based on type filters
+            let filteredGreenhouses = farm.crops.greenhouses;
+            
+            if (selectedGreenhouseType) {
+                filteredGreenhouses = filteredGreenhouses.filter(gh => gh.greenhouseTypeId === selectedGreenhouseType.id);
+            }
+            
+            if (selectedCoverType) {
+                filteredGreenhouses = filteredGreenhouses.filter(gh => gh.coverTypeId === selectedCoverType.id);
+            }
+            
+            // Return farm with filtered greenhouses
+            return {
+                ...farm,
+                crops: {
+                    ...farm.crops,
+                    greenhouses: filteredGreenhouses
+                }
+            };
+        }).filter(farm => farm.crops.greenhouses.length > 0); // Only keep farms that still have greenhouses after filtering
+    }, [locationFilteredFarms, selectedGreenhouseType, selectedCoverType]);
 
     const analytics = useMemo(() => {
         // Total greenhouses count
@@ -204,6 +234,13 @@ const GreenhouseDashboard = () => {
                 ['Greenhouse Analytics Dashboard'],
                 ['Generated on:', new Date().toLocaleString()],
                 [],
+                ['Applied Filters:'],
+                ['Region:', region ? (isLTR ? region.name : region.nameInArrabic) : 'All'],
+                ['Emirate:', emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : 'All'],
+                ['Center:', center ? (isLTR ? center.name : center.nameInArrabic) : 'All'],
+                ['Greenhouse Type:', selectedGreenhouseType ? (isLTR ? selectedGreenhouseType.name : selectedGreenhouseType.nameInArrabic) : 'All'],
+                ['Cover Type:', selectedCoverType ? (isLTR ? selectedCoverType.name : selectedCoverType.nameInArrabic) : 'All'],
+                [],
                 ['Metric', 'Value'],
                 [`${t('translation.farmsWithGreenhouses')}`, analytics.totalFarms],
                 [`${t('translation.totalGreenhouses')}`, analytics.totalGreenhouses],
@@ -338,7 +375,7 @@ const GreenhouseDashboard = () => {
         </div>
     );
 
-    const hasActiveFilters = region || emirate || center;
+    const hasActiveFilters = region || emirate || center || selectedGreenhouseType || selectedCoverType;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50">
@@ -392,6 +429,20 @@ const GreenhouseDashboard = () => {
                             onChange={setCenter}
                             placeholder={t('analytics.greenhouseDashboard.selectCenter') || 'Select Center'}
                         />
+                        <Dropdown
+                            options={greenHouseTypes}
+                            value={selectedGreenhouseType}
+                            classes='min-w-[180px]'
+                            onChange={setSelectedGreenhouseType}
+                            placeholder={t("translation.selectGreenhouseType")}
+                        />
+                        <Dropdown
+                            options={coverTypes}
+                            value={selectedCoverType}
+                            classes='min-w-[180px]'
+                            onChange={setSelectedCoverType}
+                            placeholder={t("translation.selectCoverType")}
+                        />
                         {hasActiveFilters && (
                             <button
                                 className="flex items-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium transition-colors border border-red-200 text-sm"
@@ -399,6 +450,8 @@ const GreenhouseDashboard = () => {
                                     setEmirate(null);
                                     setCenter(null);
                                     setRegion(null);
+                                    setSelectedGreenhouseType(null);
+                                    setSelectedCoverType(null);
                                 }}
                             >
                                 <X className="w-4 h-4" />

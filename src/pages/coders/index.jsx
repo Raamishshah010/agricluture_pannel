@@ -27,6 +27,8 @@ export default function Coders() {
   const [loading, setLoading] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
+  const [selectedCoder, setSelectedCoder] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     emirateId: "",
@@ -36,7 +38,7 @@ export default function Coders() {
     password: "",
   });
   const token = sessionStorage.getItem("adminToken");
-  const { farms } = useStore((st) => st);
+  const { farms, farmers } = useStore((st) => st);
 
   useEffect(() => {
     service
@@ -78,6 +80,16 @@ export default function Coders() {
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingItem(null);
+  };
+
+  const openCoderDetails = (coder) => {
+    setSelectedCoder(coder);
+    setIsDetailsModalOpen(true);
+  };
+
+  const closeDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedCoder(null);
   };
 
   const handleInputChange = (e) => {
@@ -516,7 +528,7 @@ const downloadPDF = () => {
                     <td className="px-6 py-4">
                       <div className="flex justify-center gap-2">
                         <button
-                          onClick={() => openEditModal(coder)}
+                          onClick={() => openCoderDetails(coder)}
                           className="p-2.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 hover:shadow-md"
                           title={t("coders.view")}
                         >
@@ -822,6 +834,123 @@ const downloadPDF = () => {
                   )}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Coder Details Modal */}
+      {isDetailsModalOpen && selectedCoder && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden transform transition-all animate-slideUp">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
+                  <Eye className="text-white" size={20} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {t("coders.coderDetails")}
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    {selectedCoder.name}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={closeDetailsModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="px-8 py-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+              <div className="space-y-6">
+                {/* Coder Information */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    {t("coders.coderInformation")}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">{t("coders.name")}</label>
+                      <p className="text-gray-900 font-medium">{selectedCoder.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">{t("coders.emirateId")}</label>
+                      <p className="text-gray-900 font-medium">{selectedCoder.emirateId || "N/A"}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">{t("coders.email")}</label>
+                      <p className="text-gray-900 font-medium">{selectedCoder.email}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">{t("coders.phoneNumber")}</label>
+                      <p className="text-gray-900 font-medium">{selectedCoder.phoneNumber || "N/A"}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium text-gray-600">{t("coders.createdAt")}</label>
+                      <p className="text-gray-900 font-medium">{formatDate(selectedCoder.createdAt)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Related Farms */}
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    {t("coders.relatedFarms")}
+                  </h3>
+                  {farmers.length > 0 ? (
+                    <div className="space-y-3">
+                      {farmers
+                        .filter(farmer => farmer.farms && farmer.farms.includes(selectedCoder.id))
+                        .map(farmer => (
+                          <div key={farmer.id} className="bg-white rounded-lg p-4 border border-gray-200">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h4 className="font-medium text-gray-900">{farmer.name}</h4>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  {t("coders.farmLocation")}: {farmer.location || "N/A"}
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  {t("coders.farmSize")}: {farmer.size || "N/A"}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-100 text-xs font-medium text-emerald-800">
+                                  {t("coders.active")}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))
+                      }
+                      {farmers.filter(farmer => farmer.farms && farmer.farms.includes(selectedCoder.id)).length === 0 && (
+                        <p className="text-gray-500 text-center py-4">
+                          {t("coders.noFarmsAssigned")}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 text-center py-4">
+                      {t("coders.noFarmsAvailable")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-end gap-3 px-8 py-6 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={closeDetailsModal}
+                className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition-all"
+              >
+                {t("coders.close")}
+              </button>
             </div>
           </div>
         </div>

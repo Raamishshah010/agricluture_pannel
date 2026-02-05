@@ -142,22 +142,25 @@ export default function Index(props) {
     const endIndex = startIndex + itemsPerPage;
     const currentRequests = filteredFarms.slice(startIndex, endIndex);
 
-    // Helper function to get emirate name
+    // Helper function to get emirate name with Arabic support
     const getEmirateName = (emirateId) => {
         const emirateObj = emirates.find(e => e.id === emirateId);
-        return emirateObj?.name || '';
+        if (!emirateObj) return '';
+        return language === 'ar' && emirateObj.nameInArrabic  ? emirateObj.nameInArrabic  : emirateObj.name;
     };
 
-    // Helper function to get center name
+    // Helper function to get center name with Arabic support
     const getCenterName = (centerId) => {
         const centerObj = centers.find(c => c.id === centerId);
-        return centerObj?.name || '';
+        if (!centerObj) return '';
+        return language === 'ar' && centerObj.nameInArrabic  ? centerObj.nameInArrabic  : centerObj.name;
     };
 
-    // Helper function to get location name
+    // Helper function to get location name with Arabic support
     const getLocationName = (locationId) => {
         const locationObj = locations.find(l => l.id === locationId);
-        return locationObj?.name || '';
+        if (!locationObj) return '';
+        return language === 'ar' && locationObj.nameInArrabic  ? locationObj.nameInArrabic  : locationObj.name;
     };
 
     // Download as PDF

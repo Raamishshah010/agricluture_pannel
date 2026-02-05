@@ -382,8 +382,8 @@ const Overview = () => {
                   <Grid3x3 className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-black text-gray-900 tracking-tight">Dashboard Overview</h1>
-                  <p className="text-sm text-gray-500 font-medium">Farm analytics & insights</p>
+                  <h1 className="text-xl font-black text-gray-900 tracking-tight">{t("translation.dashboardOverview")}</h1>
+                  <p className="text-sm text-gray-500 font-medium">{t("translation.farmanalytics&insights")}</p>
                 </div>
               </div>
             </div>

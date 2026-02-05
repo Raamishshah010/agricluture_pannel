@@ -622,51 +622,51 @@ const Emirates = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-3 flex-wrap flex-1">
+            <div className="flex items-center gap-3 flex-wrap flex-1 text-sm">
               <Dropdown
-                classes="w-[160px]"
+                classes="w-[180px]"
                 options={fruitTypes}
                 value={fruitType}
                 onChange={setFruitType}
                 placeholder={t("filters.fruit")}
               />
               <Dropdown
-                classes="w-[160px]"
+                classes="w-[180px]"
                 options={vegetableTypes}
                 value={vegetableType}
                 onChange={setVegetableType}
                 placeholder={t("filters.vegetable")}
               />
               <Dropdown
-                classes="w-[160px]"
+                classes="w-[180px]"
                 options={fodderTypes}
                 value={fodderType}
                 onChange={setFodderType}
                 placeholder={t("filters.fodder")}
               />
               <Dropdown
-                classes="w-[160px]"
+                classes="w-[180px]"
                 options={crops}
                 value={crop}
                 onChange={setCrop}
                 placeholder={t("filters.crop")}
               />
               <Dropdown
-                classes="w-[160px]"
+                classes="w-[180px]"
                 options={greenHouseTypes}
                 value={greenhouseType}
                 onChange={setGreenhouseType}
                 placeholder={t("filters.greenhouse")}
               />
               <Dropdown
-                classes="w-[160px]"
+                classes="w-[180px]"
                 options={farmingSystems}
                 value={farmingSystem}
                 onChange={setFarmingSystem}
                 placeholder={t("filters.farming")}
               />
               <Dropdown
-                classes="w-[160px]"
+                classes="w-[180px]"
                 options={irrigationSystems}
                 value={irrigationSystem}
                 onChange={setIrrigationSystem}

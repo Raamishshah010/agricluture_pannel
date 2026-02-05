@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, AreaChart, Area } from 'recharts';
-import { MapPin, TrendingUp, Droplets, Home, Leaf, BarChart3, Download, Filter, Activity, Layers, Grid3x3, Users } from 'lucide-react';
+import { MapPin, TrendingUp, Droplets, Home, Leaf, BarChart3, Download, Filter, Activity, Layers, Grid3x3, Users, X } from 'lucide-react';
 import useTranslation from '../../hooks/useTranslation';
 import useStore from '../../store/store';
 import Dropdown from '../../components/dropdown';
@@ -27,6 +27,26 @@ const FarmAnalytics = () => {
   const [isExporting, setIsExporting] = useState(false);
 
   const CHART_COLORS = ['#0078D4', '#00BCF2', '#0099BC', '#005A9E', '#004578', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+
+  // Filter centers based on selected emirate
+  const filteredCenters = useMemo(() => {
+    if (!selectedEmirate) return centers;
+    return centers.filter(c => c.emirateId === selectedEmirate.id);
+  }, [centers, selectedEmirate]);
+
+  // Reset center when emirate changes
+  const handleEmirateChange = (emirate) => {
+    setSelectedEmirate(emirate);
+    // Reset center if it doesn't belong to the new emirate
+    if (selectedCenter && emirate) {
+      const centerBelongsToEmirate = centers.find(
+        c => c.id === selectedCenter.id && c.emirateId === emirate.id
+      );
+      if (!centerBelongsToEmirate) {
+        setSelectedCenter(null);
+      }
+    }
+  };
 
   // Filter farms based on selections
   const filteredFarms = useMemo(() => {
@@ -289,6 +309,10 @@ const FarmAnalytics = () => {
         ['Farm Analytics Dashboard'],
         ['Generated on:', new Date().toLocaleString()],
         [],
+        ['Applied Filters:'],
+        ['Emirate:', selectedEmirate ? (isLTR ? selectedEmirate.name : selectedEmirate.nameInArrabic) : 'All'],
+        ['Center:', selectedCenter ? (isLTR ? selectedCenter.name : selectedCenter.nameInArrabic) : 'All'],
+        [],
         ['Metric', 'Value'],
         ['Total Farms', analytics.totalFarms],
         ['Total Cultivated Area (ha)', analytics.totalCultivatedArea],
@@ -454,6 +478,8 @@ const FarmAnalytics = () => {
     ? ((analytics.waterSources.desalinated + analytics.waterSources.both) / analytics.totalFarms * 100).toFixed(0) 
     : 0;
 
+  const hasActiveFilters = selectedEmirate || selectedCenter;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50">
       {/* Header */}
@@ -480,7 +506,7 @@ const FarmAnalytics = () => {
           </div>
 
           {/* Filters */}
-          <div className="flex items-center gap-3 mt-4">
+          <div className="flex items-center gap-3 mt-4 flex-wrap">
             <div className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg font-medium text-sm">
               <Filter className="w-4 h-4" />
               {t('filters.filters')}
@@ -488,25 +514,26 @@ const FarmAnalytics = () => {
             <Dropdown
               options={emirates}
               value={selectedEmirate}
-              onChange={setSelectedEmirate}
+              onChange={handleEmirateChange}
               placeholder={t('translation.allEmirates')}
               classes="min-w-[200px]"
             />
             <Dropdown
-              options={centers}
+              options={filteredCenters}
               value={selectedCenter}
               onChange={setSelectedCenter}
               placeholder={t('translation.allCenters')}
               classes="min-w-[200px]"
             />
-            {(selectedEmirate || selectedCenter) && (
+            {hasActiveFilters && (
               <button
                 onClick={() => {
                   setSelectedEmirate(null);
                   setSelectedCenter(null);
                 }}
-                className="text-sm text-red-600 hover:text-red-700 font-medium px-3 py-2 hover:bg-red-50 rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium transition-colors border border-red-200 text-sm"
               >
+                <X className="w-4 h-4" />
                 {t('filters.clearAll')}
               </button>
             )}
