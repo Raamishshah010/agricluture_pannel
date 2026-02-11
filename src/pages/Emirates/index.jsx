@@ -65,6 +65,13 @@ const Emirates = () => {
     centers,
     locations,
   } = useStore((st) => st);
+  
+  // Geographic filters
+  const [emirate, setEmirate] = useState(null);
+  const [center, setCenter] = useState(null);
+  const [location, setLocation] = useState(null);
+  
+  // Crop filters
   const [fruitType, setFruitType] = useState(null);
   const [vegetableType, setVegetableType] = useState(null);
   const [fodderType, setFodderType] = useState(null);
@@ -72,13 +79,65 @@ const Emirates = () => {
   const [greenhouseType, setGreenhouseType] = useState(null);
   const [farmingSystem, setFarmingSystem] = useState(null);
   const [irrigationSystem, setIrrigationSystem] = useState(null);
+  
   const [activeTab, setActiveTab] = useState("emirates");
   const [selectedFarm, setSelectedFarm] = useState(null);
   const t = useTranslation();
 
   const isLTR = lang.includes("en");
 
+  // Helper function to localize dropdown options
+  const getLocalizedOptions = useCallback((options) => {
+    if (!options) return [];
+    return options.map(option => ({
+      ...option,
+      name: isLTR ? option.name : (option.nameInArrabic || option.name),
+      originalName: option.name
+    }));
+  }, [isLTR]);
+
+  // Filtered options based on selections
+  const filteredCenters = useMemo(() => {
+    if (!emirate) return centers;
+    const emirateFarms = farms.filter(farm => farm.emirate === emirate.id);
+    const centerIds = [...new Set(emirateFarms.map(farm => farm.serviceCenter))];
+    return centers.filter(c => centerIds.includes(c.id));
+  }, [emirate, centers, farms]);
+
+  const filteredLocations = useMemo(() => {
+    if (!emirate && !center) return locations;
+    
+    let relevantFarms = farms;
+    
+    if (emirate) {
+      relevantFarms = relevantFarms.filter(farm => farm.emirate === emirate.id);
+    }
+    
+    if (center) {
+      relevantFarms = relevantFarms.filter(farm => farm.serviceCenter === center.id);
+    }
+    
+    const locationIds = [...new Set(relevantFarms.map(farm => farm.location))];
+    return locations.filter(l => locationIds.includes(l.id));
+  }, [emirate, center, locations, farms]);
+
+  // Handle emirate change - reset dependent filters
+  const handleEmirateChange = (value) => {
+    setEmirate(value);
+    setCenter(null);
+    setLocation(null);
+  };
+
+  // Handle center change - reset dependent filters
+  const handleCenterChange = (value) => {
+    setCenter(value);
+    setLocation(null);
+  };
+
   const activeFiltersCount = [
+    emirate,
+    center,
+    location,
     fruitType,
     vegetableType,
     fodderType,
@@ -122,6 +181,19 @@ const Emirates = () => {
 
   const transformFarms = useMemo(() => {
     let filteredFarms = farms;
+    
+    // Geographic filters
+    if (emirate) {
+      filteredFarms = filteredFarms.filter((it) => it.emirate === emirate?.id);
+    }
+    if (center) {
+      filteredFarms = filteredFarms.filter((it) => it.serviceCenter === center?.id);
+    }
+    if (location) {
+      filteredFarms = filteredFarms.filter((it) => it.location === location?.id);
+    }
+    
+    // Crop filters
     if (fruitType) {
       filteredFarms = filteredFarms.filter(
         (it) =>
@@ -175,6 +247,9 @@ const Emirates = () => {
     return filteredFarms;
   }, [
     farms,
+    emirate,
+    center,
+    location,
     fruitType,
     vegetableType,
     fodderType,
@@ -189,11 +264,11 @@ const Emirates = () => {
     // Count of Farms by Center
     const farmsByCenter = {};
     transformFarms.forEach((farm) => {
-      const center = centers.find((c) => c.id === farm.serviceCenter);
-      const centerName = center
+      const centerObj = centers.find((c) => c.id === farm.serviceCenter);
+      const centerName = centerObj
         ? isLTR
-          ? center.name
-          : center.nameInArrabic
+          ? centerObj.name
+          : centerObj.nameInArrabic
         : isLTR
         ? "Other"
         : "آخر";
@@ -492,6 +567,9 @@ const Emirates = () => {
   };
 
   const clearAllFilters = () => {
+    setEmirate(null);
+    setCenter(null);
+    setLocation(null);
     setFruitType(null);
     setVegetableType(null);
     setFodderType(null);
@@ -604,85 +682,124 @@ const Emirates = () => {
           </div>
 
           {/* Filters Row */}
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="flex items-center gap-2 mr-2">
-              <div className="p-1.5 bg-emerald-500 rounded-lg">
-                <SlidersHorizontal
-                  className="w-4 h-4 text-white"
-                  strokeWidth={2}
+          <div className="space-y-3">
+            {/* Geographic Filters */}
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 mr-2">
+                <div className="p-1.5 bg-blue-500 rounded-lg">
+                  <MapPin className="w-4 h-4 text-white" strokeWidth={2} />
+                </div>
+                <span className="text-sm font-semibold text-gray-900">
+                  {t("filters.geographic")}
+                </span>
+              </div>
+
+              <Dropdown
+                classes="w-[180px]"
+                options={getLocalizedOptions(emirates)}
+                value={emirate}
+                onChange={handleEmirateChange}
+                placeholder={t('overview.selectEmirate') || "Select Emirate"}
+              />
+              <Dropdown
+                classes="w-[180px]"
+                options={getLocalizedOptions(filteredCenters)}
+                value={center}
+                onChange={handleCenterChange}
+                placeholder={t('overview.selectCenter') || "Select Center"}
+                disabled={!emirate}
+              />
+              <Dropdown
+                classes="w-[180px]"
+                options={getLocalizedOptions(filteredLocations)}
+                value={location}
+                onChange={setLocation}
+                placeholder={t('overview.selectLocation') || "Select Location"}
+                disabled={!emirate && !center}
+              />
+            </div>
+
+            {/* Crop & System Filters */}
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2 mr-2">
+                <div className="p-1.5 bg-emerald-500 rounded-lg">
+                  <SlidersHorizontal
+                    className="w-4 h-4 text-white"
+                    strokeWidth={2}
+                  />
+                </div>
+                <span className="text-sm font-semibold text-gray-900">
+                  {t("filters.filters")}
+                </span>
+                {activeFiltersCount > 0 && (
+                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 flex-wrap flex-1 text-sm">
+                <Dropdown
+                  classes="w-[180px]"
+                  options={fruitTypes}
+                  value={fruitType}
+                  onChange={setFruitType}
+                  placeholder={t("filters.fruit")}
+                />
+                <Dropdown
+                  classes="w-[180px]"
+                  options={vegetableTypes}
+                  value={vegetableType}
+                  onChange={setVegetableType}
+                  placeholder={t("filters.vegetable")}
+                />
+                <Dropdown
+                  classes="w-[180px]"
+                  options={fodderTypes}
+                  value={fodderType}
+                  onChange={setFodderType}
+                  placeholder={t("filters.fodder")}
+                />
+                <Dropdown
+                  classes="w-[180px]"
+                  options={crops}
+                  value={crop}
+                  onChange={setCrop}
+                  placeholder={t("filters.crop")}
+                />
+                <Dropdown
+                  classes="w-[180px]"
+                  options={greenHouseTypes}
+                  value={greenhouseType}
+                  onChange={setGreenhouseType}
+                  placeholder={t("filters.greenhouse")}
+                />
+                <Dropdown
+                  classes="w-[180px]"
+                  options={farmingSystems}
+                  value={farmingSystem}
+                  onChange={setFarmingSystem}
+                  placeholder={t("filters.farming")}
+                />
+                <Dropdown
+                  classes="w-[180px]"
+                  options={irrigationSystems}
+                  value={irrigationSystem}
+                  onChange={setIrrigationSystem}
+                  placeholder={t("filters.irrigation")}
                 />
               </div>
-              <span className="text-sm font-semibold text-gray-900">
-                {t("filters.filters")}
-              </span>
+
               {activeFiltersCount > 0 && (
-                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
-                  {activeFiltersCount}
-                </span>
+                <button
+                  onClick={clearAllFilters}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-colors text-sm border border-red-200 shadow-sm"
+                >
+                  <X className="w-4 h-4" />
+                  <span>{t("filters.clearAll")}</span>
+                </button>
               )}
             </div>
-
-            <div className="flex items-center gap-3 flex-wrap flex-1 text-sm">
-              <Dropdown
-                classes="w-[180px]"
-                options={fruitTypes}
-                value={fruitType}
-                onChange={setFruitType}
-                placeholder={t("filters.fruit")}
-              />
-              <Dropdown
-                classes="w-[180px]"
-                options={vegetableTypes}
-                value={vegetableType}
-                onChange={setVegetableType}
-                placeholder={t("filters.vegetable")}
-              />
-              <Dropdown
-                classes="w-[180px]"
-                options={fodderTypes}
-                value={fodderType}
-                onChange={setFodderType}
-                placeholder={t("filters.fodder")}
-              />
-              <Dropdown
-                classes="w-[180px]"
-                options={crops}
-                value={crop}
-                onChange={setCrop}
-                placeholder={t("filters.crop")}
-              />
-              <Dropdown
-                classes="w-[180px]"
-                options={greenHouseTypes}
-                value={greenhouseType}
-                onChange={setGreenhouseType}
-                placeholder={t("filters.greenhouse")}
-              />
-              <Dropdown
-                classes="w-[180px]"
-                options={farmingSystems}
-                value={farmingSystem}
-                onChange={setFarmingSystem}
-                placeholder={t("filters.farming")}
-              />
-              <Dropdown
-                classes="w-[180px]"
-                options={irrigationSystems}
-                value={irrigationSystem}
-                onChange={setIrrigationSystem}
-                placeholder={t("filters.irrigation")}
-              />
-            </div>
-
-            {activeFiltersCount > 0 && (
-              <button
-                onClick={clearAllFilters}
-                className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-colors text-sm border border-red-200 shadow-sm"
-              >
-                <X className="w-4 h-4" />
-                <span>{t("filters.clearAll")}</span>
-              </button>
-            )}
           </div>
         </div>
       </div>
@@ -694,9 +811,6 @@ const Emirates = () => {
           <StatCard
             title={t("kpi.totalFarms")}
             value={analyticsData.totalFarms.toLocaleString()}
-            // subtitle={`${t("kpi.across")} ${
-            //   Object.keys(emiratesData).length
-            // } ${t("kpi.emirates")}`}
             icon={MapPin}
             gradient="from-blue-500 to-cyan-600"
             trend="+12% vs last month"

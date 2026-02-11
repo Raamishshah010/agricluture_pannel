@@ -1,15 +1,96 @@
-import React, { useState, useMemo } from 'react';
-import { Download, TrendingUp, MapPin, BarChart3, PieChart as PieChartIcon, Activity, Layers, Grid3x3 } from 'lucide-react';
+import React, { useState, useMemo, useCallback } from 'react';
+import { Download, TrendingUp, MapPin, BarChart3, PieChart as PieChartIcon, Activity, Layers, Grid3x3, X, SlidersHorizontal } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ComposedChart } from 'recharts';
 import useStore from '../../store/store';
 import useTranslation from '../../hooks/useTranslation';
+import Dropdown from '../../components/dropdown';
 import * as XLSX from 'xlsx';
 
 const Sizes = () => {
-    const { farms, emirates, centers, language: lang } = useStore(st => st);
+    const { farms, emirates, centers, locations, language: lang } = useStore(st => st);
     const t = useTranslation();
     const isLTR = lang.includes('en');
     const [isExporting, setIsExporting] = useState(false);
+    
+    // Geographic filters
+    const [emirate, setEmirate] = useState(null);
+    const [center, setCenter] = useState(null);
+    const [location, setLocation] = useState(null);
+
+    // Helper function to localize dropdown options
+    const getLocalizedOptions = useCallback((options) => {
+        if (!options) return [];
+        return options.map(option => ({
+            ...option,
+            name: isLTR ? option.name : (option.nameInArrabic || option.name),
+            originalName: option.name
+        }));
+    }, [isLTR]);
+
+    // Filtered options based on selections
+    const filteredCenters = useMemo(() => {
+        if (!emirate) return centers;
+        const emirateFarms = farms.filter(farm => farm.emirate === emirate.id);
+        const centerIds = [...new Set(emirateFarms.map(farm => farm.serviceCenter))];
+        return centers.filter(c => centerIds.includes(c.id));
+    }, [emirate, centers, farms]);
+
+    const filteredLocations = useMemo(() => {
+        if (!emirate && !center) return locations;
+        
+        let relevantFarms = farms;
+        
+        if (emirate) {
+            relevantFarms = relevantFarms.filter(farm => farm.emirate === emirate.id);
+        }
+        
+        if (center) {
+            relevantFarms = relevantFarms.filter(farm => farm.serviceCenter === center.id);
+        }
+        
+        const locationIds = [...new Set(relevantFarms.map(farm => farm.location))];
+        return locations.filter(l => locationIds.includes(l.id));
+    }, [emirate, center, locations, farms]);
+
+    // Handle emirate change - reset dependent filters
+    const handleEmirateChange = (value) => {
+        setEmirate(value);
+        setCenter(null);
+        setLocation(null);
+    };
+
+    // Handle center change - reset dependent filters
+    const handleCenterChange = (value) => {
+        setCenter(value);
+        setLocation(null);
+    };
+
+    const activeFiltersCount = [emirate, center, location].filter(Boolean).length;
+
+    const clearAllFilters = () => {
+        setEmirate(null);
+        setCenter(null);
+        setLocation(null);
+    };
+
+    // Filter farms based on geographic filters
+    const filteredFarms = useMemo(() => {
+        let result = farms;
+        
+        if (emirate) {
+            result = result.filter(farm => farm.emirate === emirate.id);
+        }
+        
+        if (center) {
+            result = result.filter(farm => farm.serviceCenter === center.id);
+        }
+        
+        if (location) {
+            result = result.filter(farm => farm.location === location.id);
+        }
+        
+        return result;
+    }, [farms, emirate, center, location]);
 
     const ranges = [
         { label: '0-500', min: 0, max: 500 },
@@ -34,20 +115,20 @@ const Sizes = () => {
     // Size Distribution Data
     const sizeDistributionData = useMemo(() => {
         return ranges.map(range => {
-            const count = farms.filter(f => {
+            const count = filteredFarms.filter(f => {
                 const size = Number(f.size);
                 return !isNaN(size) && size >= range.min && size < range.max;
             }).length;
             return { size: range.label, farms: count };
         });
-    }, [farms]);
+    }, [filteredFarms]);
 
     // Size by Emirate Data
     const sizeByEmirateData = useMemo(() => {
         const emirateData = {};
-        farms.forEach(farm => {
-            const emirate = emirates.find(e => e.id === farm.emirate);
-            const emirateName = emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : 'Other';
+        filteredFarms.forEach(farm => {
+            const emirateObj = emirates.find(e => e.id === farm.emirate);
+            const emirateName = emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : 'Other';
             const size = Number(farm.size) || 0;
             
             if (!emirateData[emirateName]) {
@@ -64,14 +145,14 @@ const Sizes = () => {
             }))
             .sort((a, b) => b.totalSize - a.totalSize)
             .slice(0, 7);
-    }, [farms, emirates, isLTR]);
+    }, [filteredFarms, emirates, isLTR]);
 
     // Size by Center Data
     const sizeByCenterData = useMemo(() => {
         const centerData = {};
-        farms.forEach(farm => {
-            const center = centers.find(c => c.id === farm.serviceCenter);
-            const centerName = center ? (isLTR ? center.name : center.nameInArrabic) : 'Other';
+        filteredFarms.forEach(farm => {
+            const centerObj = centers.find(c => c.id === farm.serviceCenter);
+            const centerName = centerObj ? (isLTR ? centerObj.name : centerObj.nameInArrabic) : 'Other';
             const size = Number(farm.size) || 0;
             
             if (!centerData[centerName]) {
@@ -88,14 +169,14 @@ const Sizes = () => {
             }))
             .sort((a, b) => b.totalSize - a.totalSize)
             .slice(0, 8);
-    }, [farms, centers, isLTR]);
+    }, [filteredFarms, centers, isLTR]);
 
     // Average Size by Emirate (Pie Chart)
     const avgSizeByEmirateData = useMemo(() => {
         const emirateData = {};
-        farms.forEach(farm => {
-            const emirate = emirates.find(e => e.id === farm.emirate);
-            const emirateName = emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : 'Other';
+        filteredFarms.forEach(farm => {
+            const emirateObj = emirates.find(e => e.id === farm.emirate);
+            const emirateName = emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : 'Other';
             const size = Number(farm.size) || 0;
             
             if (!emirateData[emirateName]) {
@@ -114,7 +195,7 @@ const Sizes = () => {
             .filter(item => item.value > 0)
             .sort((a, b) => b.value - a.value)
             .slice(0, 6);
-    }, [farms, emirates, isLTR]);
+    }, [filteredFarms, emirates, isLTR]);
 
     // Size Range Distribution (Pie Chart)
     const sizeRangePieData = useMemo(() => {
@@ -163,7 +244,7 @@ const Sizes = () => {
 
     // Size trend data (simulated distribution curve)
     const sizeTrendData = useMemo(() => {
-        const allSizes = farms.map(f => Number(f.size) || 0).filter(s => s > 0).sort((a, b) => a - b);
+        const allSizes = filteredFarms.map(f => Number(f.size) || 0).filter(s => s > 0).sort((a, b) => a - b);
         const step = Math.ceil(allSizes.length / 20);
         const trendData = [];
         
@@ -177,17 +258,17 @@ const Sizes = () => {
             });
         }
         return trendData;
-    }, [farms]);
+    }, [filteredFarms]);
 
     const totalFarms = sizeDistributionData.reduce((sum, item) => sum + item.farms, 0);
     const largestCategory = sizeDistributionData.reduce((max, item) => item.farms > max.farms ? item : max, sizeDistributionData[0]);
-    const totalArea = farms.reduce((sum, farm) => sum + (Number(farm.size) || 0), 0);
+    const totalArea = filteredFarms.reduce((sum, farm) => sum + (Number(farm.size) || 0), 0);
     const avgFarmSize = totalFarms > 0 ? (totalArea / totalFarms).toFixed(2) : 0;
     const medianSize = useMemo(() => {
-        const sizes = farms.map(f => Number(f.size) || 0).filter(s => s > 0).sort((a, b) => a - b);
+        const sizes = filteredFarms.map(f => Number(f.size) || 0).filter(s => s > 0).sort((a, b) => a - b);
         const mid = Math.floor(sizes.length / 2);
         return sizes.length > 0 ? (sizes.length % 2 !== 0 ? sizes[mid] : (sizes[mid - 1] + sizes[mid]) / 2).toFixed(2) : 0;
-    }, [farms]);
+    }, [filteredFarms]);
 
     // Export to Excel function
     const exportToExcel = () => {
@@ -200,6 +281,11 @@ const Sizes = () => {
             const summaryData = [
                 ['Farm Size Analytics Dashboard'],
                 ['Generated on:', new Date().toLocaleString()],
+                [],
+                ['Filters Applied:'],
+                ['Emirate:', emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : 'All'],
+                ['Center:', center ? (isLTR ? center.name : center.nameInArrabic) : 'All'],
+                ['Location:', location ? (isLTR ? location.name : location.nameInArrabic) : 'All'],
                 [],
                 ['Metric', 'Value', 'Unit'],
                 ['Total Farms', totalFarms, 'farms'],
@@ -282,13 +368,13 @@ const Sizes = () => {
                 ['All Farms Detailed Data'],
                 [],
                 ['Farm ID', 'Emirate', 'Service Center', 'Size (sqm)'],
-                ...farms.map(farm => {
-                    const emirate = emirates.find(e => e.id === farm.emirate);
-                    const center = centers.find(c => c.id === farm.serviceCenter);
+                ...filteredFarms.map(farm => {
+                    const emirateObj = emirates.find(e => e.id === farm.emirate);
+                    const centerObj = centers.find(c => c.id === farm.serviceCenter);
                     return [
                         farm.id || '',
-                        emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : 'N/A',
-                        center ? (isLTR ? center.name : center.nameInArrabic) : 'N/A',
+                        emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : 'N/A',
+                        centerObj ? (isLTR ? centerObj.name : centerObj.nameInArrabic) : 'N/A',
                         Number(farm.size) || 0
                     ];
                 })
@@ -332,29 +418,82 @@ const Sizes = () => {
     return (
         <div className="h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 flex flex-col overflow-hidden">
             {/* Header Bar */}
-            <div className="bg-white border-b border-gray-200 shadow-sm px-6 py-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-md">
-                            <BarChart3 className="w-5 h-5 text-white" strokeWidth={2} />
+            <div className="bg-white border-b border-gray-200 shadow-sm">
+                <div className="px-6 py-4">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-lg shadow-md">
+                                <BarChart3 className="w-5 h-5 text-white" strokeWidth={2} />
+                            </div>
+                            <div>
+                                <h2 className="text-base font-bold text-gray-900">
+                                    {t('sizes.title') || 'Farm Size Analytics Dashboard'}
+                                </h2>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                   {t('translation.summary')}
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-base font-bold text-gray-900">
-                                {t('sizes.title') || 'Farm Size Analytics Dashboard'}
-                            </h2>
-                            <p className="text-xs text-gray-500 mt-0.5">
-                               {t('translation.summary')}
-                            </p>
-                        </div>
+                        <button
+                            onClick={exportToExcel}
+                            disabled={isExporting}
+                            className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all text-sm border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <Download className="w-4 h-4" />
+                            <span>{isExporting ? 'Exporting...' : 'Export'}</span>
+                        </button>
                     </div>
-                    <button
-                        onClick={exportToExcel}
-                        disabled={isExporting}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all text-sm border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <Download className="w-4 h-4" />
-                        <span>{isExporting ? 'Exporting...' : 'Export'}</span>
-                    </button>
+
+                    {/* Filters Row */}
+                    <div className="flex items-center gap-4 flex-wrap">
+                        <div className="flex items-center gap-2 mr-2">
+                            <div className="p-1.5 bg-blue-500 rounded-lg">
+                                <MapPin className="w-4 h-4 text-white" strokeWidth={2} />
+                            </div>
+                            <span className="text-sm font-semibold text-gray-900">
+                                {t("filters.geographic") || "Filters"}
+                            </span>
+                            {activeFiltersCount > 0 && (
+                                <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                                    {activeFiltersCount}
+                                </span>
+                            )}
+                        </div>
+
+                        <Dropdown
+                            classes="w-[180px]"
+                            options={getLocalizedOptions(emirates)}
+                            value={emirate}
+                            onChange={handleEmirateChange}
+                            placeholder={t('overview.selectEmirate') || "Select Emirate"}
+                        />
+                        <Dropdown
+                            classes="w-[180px]"
+                            options={getLocalizedOptions(filteredCenters)}
+                            value={center}
+                            onChange={handleCenterChange}
+                            placeholder={t('overview.selectCenter') || "Select Center"}
+                            disabled={!emirate}
+                        />
+                        <Dropdown
+                            classes="w-[180px]"
+                            options={getLocalizedOptions(filteredLocations)}
+                            value={location}
+                            onChange={setLocation}
+                            placeholder={t('overview.selectLocation') || "Select Location"}
+                            disabled={!emirate && !center}
+                        />
+
+                        {activeFiltersCount > 0 && (
+                            <button
+                                onClick={clearAllFilters}
+                                className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-colors text-sm border border-red-200 shadow-sm"
+                            >
+                                <X className="w-4 h-4" />
+                                <span>{t("filters.clearAll") || "Clear All"}</span>
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
 

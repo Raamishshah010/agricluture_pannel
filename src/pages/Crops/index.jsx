@@ -11,6 +11,7 @@ import {
   Layers,
   Grid3x3,
   PieChart as PieChartIcon,
+  SlidersHorizontal,
 } from "lucide-react";
 import {
   BarChart,
@@ -54,8 +55,17 @@ const Emirates = () => {
     coverTypes,
     emirates,
     centers,
+    locations,
+    irrigationSystems,
     language: lang,
   } = useStore((st) => st);
+  
+  // Geographic filters
+  const [emirate, setEmirate] = useState(null);
+  const [center, setCenter] = useState(null);
+  const [location, setLocation] = useState(null);
+  
+  // Crop filters
   const [fruitType, setFruitType] = useState(null);
   const [vegetableType, setVegetableType] = useState(null);
   const [fodderType, setFodderType] = useState(null);
@@ -63,6 +73,7 @@ const Emirates = () => {
   const [greenhouseType, setGreenhouseType] = useState(null);
   const [farmingSystem, setFarmingSystem] = useState(null);
   const [coverType, setCoverType] = useState(null);
+  
   const [activeTab, setActiveTab] = useState("emirates");
   const [selectedFarm, setSelectedFarm] = useState(null);
   const [isExporting, setIsExporting] = useState(false);
@@ -89,8 +100,83 @@ const Emirates = () => {
     };
   }, []);
 
+  // Helper function to localize dropdown options
+  const getLocalizedOptions = useCallback((options) => {
+    if (!options) return [];
+    return options.map(option => ({
+      ...option,
+      name: isLTR ? option.name : (option.nameInArrabic || option.name),
+      originalName: option.name
+    }));
+  }, [isLTR]);
+
+  // Filtered options based on selections
+  const filteredCenters = useMemo(() => {
+    if (!emirate) return centers;
+    const emirateFarms = farms.filter(farm => farm.emirate === emirate.id);
+    const centerIds = [...new Set(emirateFarms.map(farm => farm.serviceCenter))];
+    return centers.filter(c => centerIds.includes(c.id));
+  }, [emirate, centers, farms]);
+
+  const filteredLocations = useMemo(() => {
+    if (!emirate && !center) return locations;
+    
+    let relevantFarms = farms;
+    
+    if (emirate) {
+      relevantFarms = relevantFarms.filter(farm => farm.emirate === emirate.id);
+    }
+    
+    if (center) {
+      relevantFarms = relevantFarms.filter(farm => farm.serviceCenter === center.id);
+    }
+    
+    const locationIds = [...new Set(relevantFarms.map(farm => farm.location))];
+    return locations.filter(l => locationIds.includes(l.id));
+  }, [emirate, center, locations, farms]);
+
+  // Handle emirate change - reset dependent filters
+  const handleEmirateChange = (value) => {
+    setEmirate(value);
+    setCenter(null);
+    setLocation(null);
+  };
+
+  // Handle center change - reset dependent filters
+  const handleCenterChange = (value) => {
+    setCenter(value);
+    setLocation(null);
+  };
+
+  // Count active filters
+  const activeFiltersCount = [
+    emirate,
+    center,
+    location,
+    fruitType,
+    vegetableType,
+    fodderType,
+    crop,
+    greenhouseType,
+    farmingSystem,
+    coverType,
+  ].filter(Boolean).length;
+
   const transformFarms = useMemo(() => {
     let filteredFarms = farms;
+    
+    // Geographic filters
+    if (emirate) {
+      filteredFarms = filteredFarms.filter((it) => it.emirate === emirate?.id);
+    }
+    if (center) {
+      filteredFarms = filteredFarms.filter((it) => it.serviceCenter === center?.id);
+    }
+    if (location) {
+      filteredFarms = filteredFarms.filter((it) => it.location === location?.id);
+    }
+    
+    // Crop filters
     if (fruitType) {
       filteredFarms = filteredFarms.filter(
         (it) =>
@@ -151,6 +237,9 @@ const Emirates = () => {
     return filteredFarms;
   }, [
     farms,
+    emirate,
+    center,
+    location,
     fruitType,
     vegetableType,
     fodderType,
@@ -433,6 +522,20 @@ const Emirates = () => {
     return { cropsStats };
   }, [transformFarms]);
 
+  // Clear all filters function
+  const clearAllFilters = () => {
+    setEmirate(null);
+    setCenter(null);
+    setLocation(null);
+    setFruitType(null);
+    setVegetableType(null);
+    setFodderType(null);
+    setFarmingSystem(null);
+    setCrop(null);
+    setGreenhouseType(null);
+    setCoverType(null);
+  };
+
   // Export to Excel function
   const exportToExcel = () => {
     setIsExporting(true);
@@ -694,15 +797,6 @@ const Emirates = () => {
     return null;
   };
 
-  const hasActiveFilters =
-    fruitType ||
-    vegetableType ||
-    fodderType ||
-    farmingSystem ||
-    crop ||
-    greenhouseType ||
-    coverType;
-
   return activeTab.includes("emirates") ? (
     <div className="h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 flex flex-col overflow-hidden">
       {/* Top Filter Bar */}
@@ -733,91 +827,119 @@ const Emirates = () => {
         </div>
 
         {/* Filters Row */}
-        <div className="flex items-center gap-3 flex-wrap mt-4">
-          <div className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg font-medium text-sm">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-              />
-            </svg>
-            Filters
+        <div className="space-y-3 mt-4">
+          {/* Geographic Filters */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 mr-2">
+              <div className="p-1.5 bg-blue-500 rounded-lg">
+                <MapPin className="w-4 h-4 text-white" strokeWidth={2} />
+              </div>
+              <span className="text-sm font-semibold text-gray-900">
+                {t("filters.geographic")}
+              </span>
+            </div>
+
+            <Dropdown
+              classes="w-[180px]"
+              options={getLocalizedOptions(emirates)}
+              value={emirate}
+              onChange={handleEmirateChange}
+              placeholder={t('overview.selectEmirate') || "Select Emirate"}
+            />
+            <Dropdown
+              classes="w-[180px]"
+              options={getLocalizedOptions(filteredCenters)}
+              value={center}
+              onChange={handleCenterChange}
+              placeholder={t('overview.selectCenter') || "Select Center"}
+              disabled={!emirate}
+            />
+            <Dropdown
+              classes="w-[180px]"
+              options={getLocalizedOptions(filteredLocations)}
+              value={location}
+              onChange={setLocation}
+              placeholder={t('overview.selectLocation') || "Select Location"}
+              disabled={!emirate && !center}
+            />
           </div>
 
-          <Dropdown
-            classes="min-w-[180px]"
-            options={fruitTypes}
-            value={fruitType}
-            onChange={setFruitType}
-            placeholder={t("cropFilters.fruitType")}
-          />
-          <Dropdown
-            classes="min-w-[180px]"
-            options={vegetableTypes}
-            value={vegetableType}
-            onChange={setVegetableType}
-            placeholder={t("cropFilters.vegetableType")}
-          />
-          <Dropdown
-            classes="min-w-[180px]"
-            options={fodderTypes}
-            value={fodderType}
-            onChange={setFodderType}
-            placeholder={t("cropFilters.fodderType")}
-          />
-          <Dropdown
-            classes="min-w-[180px]"
-            options={crops}
-            value={crop}
-            onChange={setCrop}
-            placeholder={t("cropFilters.crop")}
-          />
-          <Dropdown
-            classes="min-w-[180px]"
-            options={greenHouseTypes}
-            value={greenhouseType}
-            onChange={setGreenhouseType}
-            placeholder={t("cropFilters.greenhouse")}
-          />
-          <Dropdown
-            classes="min-w-[180px]"
-            options={farmingSystems}
-            value={farmingSystem}
-            onChange={setFarmingSystem}
-            placeholder={t("cropFilters.farmingSystem")}
-          />
-          <Dropdown
-            classes="min-w-[180px]"
-            options={coverTypes}
-            value={coverType}
-            onChange={setCoverType}
-            placeholder={t("cropFilters.coverType")}
-          />
+          {/* Crop Filters */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="flex items-center gap-2 mr-2">
+              <div className="p-1.5 bg-emerald-500 rounded-lg">
+                <SlidersHorizontal className="w-4 h-4 text-white" strokeWidth={2} />
+              </div>
+              <span className="text-sm font-semibold text-gray-900">
+                {t("filters.filters")}
+              </span>
+              {activeFiltersCount > 0 && (
+                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </div>
 
-          {hasActiveFilters && (
-            <button
-              className="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2 rounded-lg font-medium transition-colors border border-red-200 flex items-center gap-2 text-sm ml-auto"
-              onClick={() => {
-                setFruitType(null);
-                setVegetableType(null);
-                setFodderType(null);
-                setFarmingSystem(null);
-                setCrop(null);
-                setGreenhouseType(null);
-                setCoverType(null);
-              }}
-            >
-              <X className="w-4 h-4" />
-              Clear
-            </button>
-          )}
+            <Dropdown
+              classes="w-[180px]"
+              options={fruitTypes}
+              value={fruitType}
+              onChange={setFruitType}
+              placeholder={t("cropFilters.fruitType")}
+            />
+            <Dropdown
+              classes="w-[180px]"
+              options={vegetableTypes}
+              value={vegetableType}
+              onChange={setVegetableType}
+              placeholder={t("cropFilters.vegetableType")}
+            />
+            <Dropdown
+              classes="w-[180px]"
+              options={fodderTypes}
+              value={fodderType}
+              onChange={setFodderType}
+              placeholder={t("cropFilters.fodderType")}
+            />
+            <Dropdown
+              classes="w-[180px]"
+              options={crops}
+              value={crop}
+              onChange={setCrop}
+              placeholder={t("cropFilters.crop")}
+            />
+            <Dropdown
+              classes="w-[180px]"
+              options={greenHouseTypes}
+              value={greenhouseType}
+              onChange={setGreenhouseType}
+              placeholder={t("cropFilters.greenhouse")}
+            />
+            <Dropdown
+              classes="w-[180px]"
+              options={farmingSystems}
+              value={farmingSystem}
+              onChange={setFarmingSystem}
+              placeholder={t("cropFilters.farmingSystem")}
+            />
+            <Dropdown
+              classes="w-[180px]"
+              options={coverTypes}
+              value={coverType}
+              onChange={setCoverType}
+              placeholder={t("cropFilters.coverType")}
+            />
+
+            {activeFiltersCount > 0 && (
+              <button
+                onClick={clearAllFilters}
+                className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-colors text-sm border border-red-200 shadow-sm ml-auto"
+              >
+                <X className="w-4 h-4" />
+                <span>{t("filters.clearAll")}</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

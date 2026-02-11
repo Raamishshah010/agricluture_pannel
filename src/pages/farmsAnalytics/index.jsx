@@ -1,17 +1,19 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid, ComposedChart, Line, AreaChart, Area } from 'recharts';
-import { MapPin, TrendingUp, Droplets, Home, Leaf, BarChart3, Download, Filter, Activity, Layers, Grid3x3, Users, X } from 'lucide-react';
+import { MapPin, TrendingUp, Droplets, Home, Leaf, BarChart3, Download, Filter, Activity, Layers, Grid3x3, Users, X, SlidersHorizontal } from 'lucide-react';
 import useTranslation from '../../hooks/useTranslation';
 import useStore from '../../store/store';
-import Dropdown from '../../components/dropdown';
+import Dropdown from '../../components/dropdownWithSearch';
 import * as XLSX from 'xlsx';
 
 const FarmAnalytics = () => {
   const t = useTranslation();
   const {
     farms,
+    regions,
     emirates,
     centers,
+    locations,
     fruitTypes,
     vegetableTypes,
     fodderTypes,
@@ -22,43 +24,101 @@ const FarmAnalytics = () => {
   } = useStore((st) => st);
 
   const isLTR = lang.includes('en');
+  
+  // Geographic filters
+  const [region, setRegion] = useState(null);
   const [selectedEmirate, setSelectedEmirate] = useState(null);
   const [selectedCenter, setSelectedCenter] = useState(null);
+  const [location, setLocation] = useState(null);
+  
   const [isExporting, setIsExporting] = useState(false);
 
   const CHART_COLORS = ['#0078D4', '#00BCF2', '#0099BC', '#005A9E', '#004578', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
-  // Filter centers based on selected emirate
+  // Helper function to localize dropdown options
+  const getLocalizedOptions = useCallback((options) => {
+    if (!options) return [];
+    return options.map(option => ({
+      ...option,
+      name: isLTR ? option.name : (option.nameInArrabic || option.name),
+      originalName: option.name
+    }));
+  }, [isLTR]);
+
+  // Filtered centers based on emirate selection
   const filteredCenters = useMemo(() => {
     if (!selectedEmirate) return centers;
-    return centers.filter(c => c.emirateId === selectedEmirate.id);
-  }, [centers, selectedEmirate]);
+    const emirateFarms = farms.filter(farm => farm.emirate === selectedEmirate.id);
+    const centerIds = [...new Set(emirateFarms.map(farm => farm.serviceCenter))];
+    return centers.filter(c => centerIds.includes(c.id));
+  }, [selectedEmirate, centers, farms]);
 
-  // Reset center when emirate changes
+  // Filtered locations based on emirate and/or center selection
+  const filteredLocations = useMemo(() => {
+    if (!selectedEmirate && !selectedCenter) return locations;
+    
+    let relevantFarms = farms;
+    
+    if (selectedEmirate) {
+      relevantFarms = relevantFarms.filter(farm => farm.emirate === selectedEmirate.id);
+    }
+    
+    if (selectedCenter) {
+      relevantFarms = relevantFarms.filter(farm => farm.serviceCenter === selectedCenter.id);
+    }
+    
+    const locationIds = [...new Set(relevantFarms.map(farm => farm.location))];
+    return locations.filter(l => locationIds.includes(l.id));
+  }, [selectedEmirate, selectedCenter, locations, farms]);
+
+  // Handle emirate change - reset dependent filters
   const handleEmirateChange = (emirate) => {
     setSelectedEmirate(emirate);
-    // Reset center if it doesn't belong to the new emirate
-    if (selectedCenter && emirate) {
-      const centerBelongsToEmirate = centers.find(
-        c => c.id === selectedCenter.id && c.emirateId === emirate.id
-      );
-      if (!centerBelongsToEmirate) {
-        setSelectedCenter(null);
-      }
-    }
+    setSelectedCenter(null);
+    setLocation(null);
+  };
+
+  // Handle center change - reset dependent filters
+  const handleCenterChange = (value) => {
+    setSelectedCenter(value);
+    setLocation(null);
   };
 
   // Filter farms based on selections
   const filteredFarms = useMemo(() => {
     let filtered = farms;
+    
+    if (region) {
+      filtered = filtered.filter(f => f.region === region.id);
+    }
     if (selectedEmirate) {
       filtered = filtered.filter(f => f.emirate === selectedEmirate.id);
     }
     if (selectedCenter) {
       filtered = filtered.filter(f => f.serviceCenter === selectedCenter.id);
     }
+    if (location) {
+      filtered = filtered.filter(f => f.location === location.id);
+    }
+    
     return filtered;
-  }, [farms, selectedEmirate, selectedCenter]);
+  }, [farms, region, selectedEmirate, selectedCenter, location]);
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setRegion(null);
+    setSelectedEmirate(null);
+    setSelectedCenter(null);
+    setLocation(null);
+  };
+
+  // Count active filters
+  const activeFiltersCount = [
+    region,
+    selectedEmirate,
+    selectedCenter,
+    location,
+  ].filter(Boolean).length;
 
   // Calculate comprehensive analytics
   const analytics = useMemo(() => {
@@ -310,8 +370,10 @@ const FarmAnalytics = () => {
         ['Generated on:', new Date().toLocaleString()],
         [],
         ['Applied Filters:'],
+        ['Region:', region ? (isLTR ? region.name : region.nameInArrabic) : 'All'],
         ['Emirate:', selectedEmirate ? (isLTR ? selectedEmirate.name : selectedEmirate.nameInArrabic) : 'All'],
         ['Center:', selectedCenter ? (isLTR ? selectedCenter.name : selectedCenter.nameInArrabic) : 'All'],
+        ['Location:', location ? (isLTR ? location.name : location.nameInArrabic) : 'All'],
         [],
         ['Metric', 'Value'],
         ['Total Farms', analytics.totalFarms],
@@ -478,8 +540,6 @@ const FarmAnalytics = () => {
     ? ((analytics.waterSources.desalinated + analytics.waterSources.both) / analytics.totalFarms * 100).toFixed(0) 
     : 0;
 
-  const hasActiveFilters = selectedEmirate || selectedCenter;
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50">
       {/* Header */}
@@ -506,37 +566,59 @@ const FarmAnalytics = () => {
           </div>
 
           {/* Filters */}
-          <div className="flex items-center gap-3 mt-4 flex-wrap">
-            <div className="flex items-center gap-2 bg-emerald-500 text-white px-4 py-2 rounded-lg font-medium text-sm">
-              <Filter className="w-4 h-4" />
-              {t('filters.filters')}
+          <div className="space-y-3 mt-4">
+            {/* Geographic Filters */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="flex items-center gap-2 mr-2">
+                <div className="p-1.5 bg-blue-500 rounded-lg">
+                  <MapPin className="w-4 h-4 text-white" strokeWidth={2} />
+                </div>
+                <span className="text-sm font-semibold text-gray-900">
+                  {t("filters.geographic") || "Geographic"}
+                </span>
+              </div>
+
+              <Dropdown
+                options={getLocalizedOptions(regions)}
+                value={region}
+                classes='min-w-[180px]'
+                onChange={setRegion}
+                placeholder={t('analytics.greenhouseDashboard.selectRegion') || 'Select Region'}
+              />
+              <Dropdown
+                options={getLocalizedOptions(emirates)}
+                value={selectedEmirate}
+                classes='min-w-[180px]'
+                onChange={handleEmirateChange}
+                placeholder={t('analytics.greenhouseDashboard.selectEmirate') || 'Select Emirate'}
+              />
+              <Dropdown
+                options={getLocalizedOptions(filteredCenters)}
+                value={selectedCenter}
+                classes='min-w-[180px]'
+                onChange={handleCenterChange}
+                placeholder={t('analytics.greenhouseDashboard.selectCenter') || 'Select Center'}
+                disabled={!selectedEmirate}
+              />
+              <Dropdown
+                options={getLocalizedOptions(filteredLocations)}
+                value={location}
+                classes='min-w-[180px]'
+                onChange={setLocation}
+                placeholder={t('overview.selectLocation') || 'Select Location'}
+                disabled={!selectedEmirate && !selectedCenter}
+              />
+
+              {activeFiltersCount > 0 && (
+                <button
+                  onClick={clearAllFilters}
+                  className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-colors text-sm border border-red-200 shadow-sm ml-auto"
+                >
+                  <X className="w-4 h-4" />
+                  <span>{t("filters.clearAll") || 'Clear All'}</span>
+                </button>
+              )}
             </div>
-            <Dropdown
-              options={emirates}
-              value={selectedEmirate}
-              onChange={handleEmirateChange}
-              placeholder={t('translation.allEmirates')}
-              classes="min-w-[200px]"
-            />
-            <Dropdown
-              options={filteredCenters}
-              value={selectedCenter}
-              onChange={setSelectedCenter}
-              placeholder={t('translation.allCenters')}
-              classes="min-w-[200px]"
-            />
-            {hasActiveFilters && (
-              <button
-                onClick={() => {
-                  setSelectedEmirate(null);
-                  setSelectedCenter(null);
-                }}
-                className="flex items-center gap-2 px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg font-medium transition-colors border border-red-200 text-sm"
-              >
-                <X className="w-4 h-4" />
-                {t('filters.clearAll')}
-              </button>
-            )}
           </div>
         </div>
       </div>
