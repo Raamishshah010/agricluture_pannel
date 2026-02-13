@@ -934,6 +934,7 @@ const FarmAnalytics = () => {
                         <span className="inline-flex items-center px-3 py-1 rounded-lg bg-blue-50 text-sm font-semibold text-blue-700 border border-blue-200">
                           {farm.id}
                         </span>
+                        
                       </td>
                       <td className="py-4 px-4 text-sm text-gray-700 font-medium">{farm.emirate}</td>
                       <td className="py-4 px-4 text-sm text-gray-700">{farm.center}</td>
