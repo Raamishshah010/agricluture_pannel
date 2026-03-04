@@ -170,8 +170,9 @@ export default function IrrigationSystem() {
                                     </tr>
                                 ))}
                             </tbody>
-                        </table>
-                    </div>
+                            </table>
+                        </div>
+                    )}
 
                     {!loading && list.length === 0 && (
                         <div className="text-center py-12 text-gray-500">

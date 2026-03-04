@@ -173,7 +173,7 @@ export default function LiveStock() {
                         </table>
                     </div>
 
-                    {!loading && items.length === 0 && (
+                    )} {!loading && items.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             {t('livestock.noItemsFound')}
                         </div>

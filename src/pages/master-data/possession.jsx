@@ -173,7 +173,7 @@ export default function Poessessions() {
                         </table>
                     </div>
 
-                    {!loading && list.length === 0 && (
+                    )} {!loading && list.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             {t('possession.emptyState')}
                         </div>

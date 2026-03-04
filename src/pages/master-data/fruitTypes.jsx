@@ -241,7 +241,7 @@ export default function FruitTypes() {
                             </tbody>
                         </table>
                     </div>
-
+ )}
                     {!loading && filteredItems.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             <p className="text-sm">{t('fruitTypes.noItemsFound')}</p>
