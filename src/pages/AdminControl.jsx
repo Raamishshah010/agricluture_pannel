@@ -20,6 +20,7 @@ const AdminManagementFlow = () => {
   const [admins, setAdmins] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Auto-dismiss success popup after 2 seconds
   useEffect(() => {
@@ -77,19 +78,57 @@ const AdminManagementFlow = () => {
         setLoading(true);
         try {
           await adminService.deleteAdmin(id);
-          const updated = admins.filter(a => a.id !== id);
-          setAdmins(updated);
-          try { localStorage.setItem('admins', JSON.stringify(updated)); } catch (e) {}
         } catch (e) {
-          // fallback: remove locally
-          const updated = admins.filter(a => a.id !== id);
-          setAdmins(updated);
-          try { localStorage.setItem('admins', JSON.stringify(updated)); } catch (er) {}
-        } finally {
-          setLoading(false);
+          // ignore API error and proceed with local deletion
         }
+        const updated = admins.filter(a => a.id !== id);
+        setAdmins(updated);
+        try { localStorage.setItem('admins', JSON.stringify(updated)); } catch (er) {}
+        setSelectedIds(prev => prev.filter(pid => pid !== id));
+        setLoading(false);
       })();
     }
+  };
+
+  const toggleSelect = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === admins.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(admins.map(a => a.id));
+    }
+  };
+
+  const deleteSelected = async () => {
+    if (selectedIds.length === 0) return;
+    if (!window.confirm(t('admin.deleteSelectedConfirm') || `Delete ${selectedIds.length} selected admins?`)) return;
+    setLoading(true);
+    try {
+      await Promise.all(selectedIds.map(id => adminService.deleteAdmin(id).catch(() => null)));
+    } catch (e) {
+      // ignore
+    }
+    const updated = admins.filter(a => !selectedIds.includes(a.id));
+    setAdmins(updated);
+    try { localStorage.setItem('admins', JSON.stringify(updated)); } catch (er) {}
+    setSelectedIds([]);
+    setLoading(false);
+  };
+
+  const exportSelectedCSV = () => {
+    const rows = (selectedIds.length ? admins.filter(a => selectedIds.includes(a.id)) : admins).map(a => [a.name, a.email, a.emirate, a.type, a.mobile]);
+    const header = ['Name','Email','Emirate','Type','Mobile'];
+    const csv = [header, ...rows].map(r => r.map(cell => `"${(cell||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `admins_export_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleInputChange = (field, value) => {
@@ -457,24 +496,34 @@ const AdminManagementFlow = () => {
         <div className="mb-6">
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-semibold text-gray-900">{t('admin.adminManagement')}</h1>
-            <button
-              onClick={startNewAdmin}
-              className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              {t('admin.addAdminBtn')}
-            </button>
+            <div className="flex items-center gap-3">
+              {selectedIds.length > 0 && (
+                <div className="text-sm text-gray-600">{selectedIds.length} selected</div>
+              )}
+              <button onClick={exportSelectedCSV} className="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">{t('admin.export')}</button>
+              <button onClick={deleteSelected} className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">{t('admin.deleteSelected') || 'Delete selected'}</button>
+              <button
+                onClick={startNewAdmin}
+                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                {t('admin.addAdminBtn')}
+              </button>
+            </div>
           </div>
         </div>
 
         <div className="">
           <div className="px-6 py-4 border-b border-gray-200">
-            <div className="grid grid-cols-5 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider">
-              <div>{t('admin.adminName')}</div>
-              <div>{t('admin.email')}</div>
-              <div>{t('admin.emirate')}</div>
-              <div>{t('admin.adminType')}</div>
-              <div>{t('admin.mobileNumberHeader')}</div>
+            <div className="grid grid-cols-6 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider items-center">
+              <div className="w-4">
+                <input type="checkbox" checked={selectedIds.length === admins.length && admins.length>0} onChange={toggleSelectAll} />
+              </div>
+              <div className="col-span-1">{t('admin.adminName')}</div>
+              <div className="col-span-1">{t('admin.email')}</div>
+              <div className="col-span-1">{t('admin.emirate')}</div>
+              <div className="col-span-1">{t('admin.adminType')}</div>
+              <div className="col-span-1">{t('admin.mobileNumberHeader')}</div>
             </div>
           </div>
 
@@ -482,7 +531,10 @@ const AdminManagementFlow = () => {
             {admins.map((admin) => (
               <div key={admin.id} className="px-6 py-4 flex items-center justify-between">
                 <div className="w-full">
-                  <div className="grid grid-cols-5 gap-4 text-sm text-gray-900">
+                  <div className="grid grid-cols-6 gap-4 text-sm text-gray-900 items-center">
+                    <div>
+                      <input type="checkbox" checked={selectedIds.includes(admin.id)} onChange={() => toggleSelect(admin.id)} />
+                    </div>
                     <div className="font-medium">{admin.name}</div>
                     <div className="truncate">{admin.email}</div>
                     <div>{admin.emirate}</div>
