@@ -3,6 +3,7 @@ import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import service from '../../services/livestockService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
+import Loader from '../../components/Loader';
 
 export default function LiveStock() {
     const t = useTranslation();
@@ -11,12 +12,18 @@ export default function LiveStock() {
 
 
     useEffect(() => {
-        service.getAll().then(res => {
-            setItems(res.data)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const res = await service.getAll();
+                setItems(res.data);
+            } catch (err) {
                 toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -123,8 +130,11 @@ export default function LiveStock() {
                 </div>
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
+                    {loading ? (
+                        <Loader />
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
                             <thead className="bg-gray-100 border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('livestock.nameArabic')}</th>
@@ -163,7 +173,7 @@ export default function LiveStock() {
                         </table>
                     </div>
 
-                    {items.length === 0 && (
+                    {!loading && items.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             {t('livestock.noItemsFound')}
                         </div>

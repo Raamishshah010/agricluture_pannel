@@ -5,6 +5,7 @@ import cropTypeService from '../../services/cropTypeService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import useStore from '../../store/store';
+import Loader from '../../components/Loader';
 
 export default function Crops() {
     const [crops, setCrops] = useState([]);
@@ -16,21 +17,20 @@ export default function Crops() {
     const isLTR = lang.includes('en');
 
     useEffect(() => {
-        cropService.getCrops().then(res => {
-            setCrops(res.data)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const cropRes = await cropService.getCrops();
+                setCrops(cropRes.data);
+                const typeRes = await cropTypeService.getAll();
+                setCropTypes(typeRes.data);
+            } catch (err) {
                 toast.error(err.message);
-            })
-    }, []);
-
-    useEffect(() => {
-        cropTypeService.getAll().then(res => {
-            setCropTypes(res.data)
-        })
-            .catch(err => {
-                toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -248,7 +248,18 @@ export default function Crops() {
             {/* Results Section */}
             <div className="max-w-[1400px] mx-auto px-6 py-6">
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                    {loading ? (
+                        <Loader />
+                    ) : (
+                        <>
+                            <div className="px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                                <div className="flex items-center justify-between">
+                                    
+                                    <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">
+                                        {filteredCrops.length} {t('crops.found')}
+                                    </span>
+                                </div>
+                            </div>
                         <div className="flex items-center justify-between">
                             
                             <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-semibold">

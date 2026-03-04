@@ -17,16 +17,19 @@ import { Loader2 } from "lucide-react";
 function App() {
   const { setCrops, setFarms, setFarmers, setLoading, loading } = useStore((state) => state);
   useEffect(() => {
-
-    Promise.all([service.getMasterData(), farmService.getAllfarms(), farmerService.getAllFarmers()]).then(res => {
-      setCrops(res[0]);
-      setFarms(res[1].data);
-      setFarmers(res[2].data);
-      setLoading(false);
-    })
-      .catch(err => {
+    const fetch = async () => {
+      try {
+        const res = await Promise.all([service.getMasterData(), farmService.getAllfarms(), farmerService.getAllFarmers()]);
+        setCrops(res[0]);
+        setFarms(res[1].data);
+        setFarmers(res[2].data);
+      } catch (err) {
         toast.error(err.message);
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
   }, [setCrops, setFarms, setFarmers, setLoading]);
   return !loading ? (
     <Router>

@@ -3,6 +3,7 @@ import { X, Edit2, Trash2, Plus, Search } from 'lucide-react';
 import service from '../../services/fruitService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
+import Loader from '../../components/Loader';
 
 export default function FruitTypes() {
     const [items, setItems] = useState([]);
@@ -11,12 +12,18 @@ export default function FruitTypes() {
     const t = useTranslation();
 
     useEffect(() => {
-        service.getItems().then(res => {
-            setItems(res.data)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const res = await service.getItems();
+                setItems(res.data);
+            } catch (err) {
                 toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -184,8 +191,11 @@ export default function FruitTypes() {
 
                 {/* Table */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
+                    {loading ? (
+                        <Loader />
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
                             <thead className="bg-gray-50 border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -232,7 +242,7 @@ export default function FruitTypes() {
                         </table>
                     </div>
 
-                    {filteredItems.length === 0 && (
+                    {!loading && filteredItems.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             <p className="text-sm">{t('fruitTypes.noItemsFound')}</p>
                         </div>

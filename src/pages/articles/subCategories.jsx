@@ -2,10 +2,13 @@ import { useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import service from '../../services/articleService';
 import { toast } from 'react-toastify';
+import Loader from '../../components/Loader';
 
 export default function SubCategories() {
     const [list, setList] = useState([]);
     const [cats, setCats] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [catsLoading, setCatsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
@@ -17,22 +20,31 @@ export default function SubCategories() {
 
 
     useEffect(() => {
-        service.getSubCategories().then(res => {
-            setList(res.data.items)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const res = await service.getSubCategories();
+                setList(res.data.items);
+            } catch (err) {
                 toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
-    const openAddModal = () => {
+    const openAddModal = async () => {
         if (cats.length <= 0) {
-            service.getCategories().then(res => {
-                setCats(res.data)
-            })
-                .catch(err => {
-                    toast.error('fetching categories: ', err.message);
-                })
+            try {
+                setCatsLoading(true);
+                const res = await service.getCategories();
+                setCats(res.data);
+            } catch (err) {
+                toast.error('fetching categories: ' + err.message);
+            } finally {
+                setCatsLoading(false);
+            }
         }
         setEditingItem(null);
         setFormData({
@@ -44,14 +56,17 @@ export default function SubCategories() {
         setIsModalOpen(true);
     };
 
-    const openEditModal = (crop) => {
+    const openEditModal = async (crop) => {
         if (cats.length <= 0) {
-            service.getCategories().then(res => {
-                setCats(res.data)
-            })
-                .catch(err => {
-                    toast.error('fetching categories: ', err.message);
-                })
+            try {
+                setCatsLoading(true);
+                const res = await service.getCategories();
+                setCats(res.data);
+            } catch (err) {
+                toast.error('fetching categories: ' + err.message);
+            } finally {
+                setCatsLoading(false);
+            }
         }
         setEditingItem(crop);
         setFormData({
@@ -146,7 +161,12 @@ export default function SubCategories() {
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full">
+                        {loading ? (
+                            <div className="py-12">
+                                <Loader message={'Loading...'} />
+                            </div>
+                        ) : (
+                            <table className="w-full">
                             <thead className="bg-gray-100 border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Image</th>
@@ -194,10 +214,10 @@ export default function SubCategories() {
                                     </tr>
                                 ))}
                             </tbody>
-                        </table>
-                    </div>
+                            </table>
+                        )}
 
-                    {list.length === 0 && (
+                    {!loading && list.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             No data found. Add your first crop to get started.
                         </div>

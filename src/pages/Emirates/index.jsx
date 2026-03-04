@@ -529,41 +529,35 @@ const Emirates = () => {
     return { emiratesData, emirateData };
   }, [emirateColors, emirates, isLTR, transformFarms]);
 
-  const handleFarmClick = (farm) => {
-    farmService
-      .getfarmById(farm.id)
-      .then((res) => {
-        setSelectedFarm(res.data);
-        setActiveTab("farm-details");
-      })
-      .catch((err) => {
-        toast.error(err.response?.data?.message || err.message);
-      });
+  const handleFarmClick = async (farm) => {
+    try {
+      const res = await farmService.getfarmById(farm.id);
+      setSelectedFarm(res.data);
+      setActiveTab("farm-details");
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    }
   };
 
   const submitFarmHandler = useCallback(async (item, id) => {
-    farmService
-      .updateFarm(item, id)
-      .then(() => {
-        setSelectedFarm(null);
-        setActiveTab("emirates");
-        toast.success("Updated successfully");
-      })
-      .catch((err) => {
-        toast.error(err.response?.data?.message || err.message);
-      });
+    try {
+      await farmService.updateFarm(item, id);
+      setSelectedFarm(null);
+      setActiveTab("emirates");
+      toast.success("Updated successfully");
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    }
   }, []);
 
   const handleEdit = async (item) => {
-    farmService
-      .getFarmByIdWithoutPopulatingFields(item.id)
-      .then((res) => {
-        setSelectedFarm(res.data);
-        setActiveTab("farm-edit");
-      })
-      .catch((err) => {
-        toast.error(err.response?.data?.message || err.message);
-      });
+    try {
+      const res = await farmService.getFarmByIdWithoutPopulatingFields(item.id);
+      setSelectedFarm(res.data);
+      setActiveTab("farm-edit");
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    }
   };
 
   const clearAllFilters = () => {

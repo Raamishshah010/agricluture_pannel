@@ -41,14 +41,18 @@ export default function Coders() {
   const { farms, farmers } = useStore((st) => st);
 
   useEffect(() => {
-    service
-      .getCoders()
-      .then((res) => {
+    const fetch = async () => {
+      try {
+        setLoading(true);
+        const res = await service.getCoders();
         setList(res.data.coders);
-      })
-      .catch((err) => {
+      } catch (err) {
         toast.error(err.message);
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
   }, []);
 
   const openAddModal = () => {

@@ -3,6 +3,7 @@ import { X, Edit2, Trash2, Plus, Search } from 'lucide-react';
 import service from '../../services/vegetableService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
+import Loader from '../../components/Loader';
 
 export default function VegetableType() {
     const t = useTranslation();
@@ -11,12 +12,18 @@ export default function VegetableType() {
     const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
-        service.getItems().then(res => {
-            setItems(res.data)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const res = await service.getItems();
+                setItems(res.data);
+            } catch (err) {
                 toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -184,55 +191,59 @@ export default function VegetableType() {
 
                 {/* Table */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                        {t('vegetableTypes.table.headers.nameEnglish')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                        {t('vegetableTypes.table.headers.nameArabic')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                        {t('vegetableTypes.table.headers.createdAt')}
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                                        {t('vegetableTypes.table.headers.actions')}
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {filteredItems.map((item) => (
-                                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 text-sm text-gray-900">{item.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900">{item.nameInArrabic}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(item)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title={t('vegetableTypes.edit')}
-                                                >
-                                                    <Edit2 size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(item.id)}
-                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                    title={t('vegetableTypes.delete')}
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
+                    {loading ? (
+                        <Loader />
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                            {t('vegetableTypes.table.headers.nameEnglish')}
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                            {t('vegetableTypes.table.headers.nameArabic')}
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                            {t('vegetableTypes.table.headers.createdAt')}
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                            {t('vegetableTypes.table.headers.actions')}
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {filteredItems.map((item) => (
+                                        <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm text-gray-900">{item.name}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{item.nameInArrabic}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => openEditModal(item)}
+                                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title={t('vegetableTypes.edit')}
+                                                    >
+                                                        <Edit2 size={16} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(item.id)}
+                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                        title={t('vegetableTypes.delete')}
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
 
-                    {filteredItems.length === 0 && (
+                    {!loading && filteredItems.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             <p className="text-sm">{t('vegetableTypes.empty.noItems')}</p>
                         </div>

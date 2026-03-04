@@ -3,6 +3,7 @@ import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import service from '../../services/waterSource';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
+import Loader from '../../components/Loader';
 
 export default function WaterSources() {
     const t = useTranslation();
@@ -11,12 +12,18 @@ export default function WaterSources() {
 
 
     useEffect(() => {
-        service.getAll().then(res => {
-            setList(res.data)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const res = await service.getAll();
+                setList(res.data);
+            } catch (err) {
                 toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -123,47 +130,51 @@ export default function WaterSources() {
                 </div>
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-100 border-b border-gray-200">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('waterSources.nameEnglish')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('waterSources.nameArabic')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('common.createdAt')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('common.actions')}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {list.map((item) => (
-                                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.name}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.nameInArrabic}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(item)}
-                                                    className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title="Edit"
-                                                >
-                                                    <Edit2 size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(item.id)}
-                                                    className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
+                    {loading ? (
+                        <Loader />
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-100 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('waterSources.nameEnglish')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('waterSources.nameArabic')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('common.createdAt')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('common.actions')}</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {list.map((item) => (
+                                        <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.name}</td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.nameInArrabic}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => openEditModal(item)}
+                                                        className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title="Edit"
+                                                    >
+                                                        <Edit2 size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(item.id)}
+                                                        className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
+                                                        title="Delete"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
 
-                    {list.length === 0 && (
+                    {!loading && list.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             {t('waterSources.noItemsFound')}
                         </div>

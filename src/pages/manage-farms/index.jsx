@@ -67,25 +67,28 @@ export default function Index(props) {
     };
 
     const handleDetail = async (item) => {
-        service.getfarmById(item.id).then(res => {
+        try {
+            const res = await service.getfarmById(item.id);
             setSelectedFarm(res.data);
             setActiveTab('farm-details');
-        }).catch(err => {
+        } catch (err) {
             toast.error(err.response?.data?.message || err.message);
-        });
+        }
     };
 
     const handleEdit = async (item) => {
-        service.getFarmByIdWithoutPopulatingFields(item.id).then(res => {
+        try {
+            const res = await service.getFarmByIdWithoutPopulatingFields(item.id);
             setSelectedFarm(res.data);
             setActiveTab('farm-edit');
-        }).catch(err => {
+        } catch (err) {
             toast.error(err.response?.data?.message || err.message);
-        });
+        }
     };
 
     const submitFarmHandler = useCallback(async (item, id) => {
-        service.updateFarm(item, id).then((res) => {
+        try {
+            const res = await service.updateFarm(item, id);
             const farmIndex = farms.findIndex(f => f.id === id);
             farms[farmIndex] = res.data;
             setFarms(farms);
@@ -94,21 +97,22 @@ export default function Index(props) {
             sessionStorage.removeItem('selectedFarm');
             sessionStorage.removeItem('activeTab');
             toast.success(t('manageFarms.updatedSuccessfully'));
-        }).catch(err => {
+        } catch (err) {
             toast.error(err.response?.data?.message || err.message);
-        });
+        }
     }, [farms, setFarms, t]);
 
     const submitNewFarmHandler = useCallback(async (item) => {
-        service.addFarm(item).then((res) => {
+        try {
+            const res = await service.addFarm(item);
             setFarms([...farms, res.data]);
             setSelectedFarm(null);
             sessionStorage.removeItem('activeTab');
             setActiveTab('farms');
             toast.success(t('manageFarms.addSuccessfully'));
-        }).catch(err => {
+        } catch (err) {
             toast.error(err.response?.data?.message || err.message);
-        });
+        }
     }, [farms, setFarms, t]);
 
     const filteredFarms = useMemo(() => {

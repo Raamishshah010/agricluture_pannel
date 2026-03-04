@@ -4,24 +4,32 @@ import service from '../../services/centerService';
 import emirateService from '../../services/emirateService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
+import Loader from '../../components/Loader';
 import useStore from '../../store/store';
 
 export default function Centers() {
     const [items, setItems] = useState([]);
     const [emirates, setEmirates] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [optionsLoading, setOptionsLoading] = useState(false);
     const t = useTranslation();
     const { language } = useStore((state) => state);
     const isLTR = language === 'en';
 
 
     useEffect(() => {
-        service.getCenters().then(res => {
-            setItems(res.data)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const res = await service.getCenters();
+                setItems(res.data);
+            } catch (err) {
                 toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -32,14 +40,17 @@ export default function Centers() {
         emirateId: '',
     });
 
-    const openAddModal = () => {
+    const openAddModal = async () => {
         if (emirates.length <= 0) {
-            emirateService.getEmirates().then(res => {
+            try {
+                setOptionsLoading(true);
+                const res = await emirateService.getEmirates();
                 setEmirates(res.data);
-            })
-                .catch(err => {
-                    toast.error(err.message);
-                })
+            } catch (err) {
+                toast.error(err.message);
+            } finally {
+                setOptionsLoading(false);
+            }
         }
         setEditingEmirate(null);
         setFormData({
@@ -50,14 +61,17 @@ export default function Centers() {
         setIsModalOpen(true);
     };
 
-    const openEditModal = (center) => {
+    const openEditModal = async (center) => {
         if (emirates.length <= 0) {
-            emirateService.getEmirates().then(res => {
+            try {
+                setOptionsLoading(true);
+                const res = await emirateService.getEmirates();
                 setEmirates(res.data);
-            })
-                .catch(err => {
-                    toast.error(err.message);
-                })
+            } catch (err) {
+                toast.error(err.message);
+            } finally {
+                setOptionsLoading(false);
+            }
         }
         setEditingEmirate(center);
         setFormData({
@@ -147,8 +161,11 @@ export default function Centers() {
                 </div>
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
+                    {loading ? (
+                        <Loader />
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
                             <thead className="bg-gray-100 border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.nameArabic')}</th>
@@ -189,7 +206,7 @@ export default function Centers() {
                         </table>
                     </div>
 
-                    {items.length === 0 && (
+                    {!loading && items.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             {t('analytics.center.noItemsFound')}
                         </div>
@@ -252,18 +269,25 @@ export default function Centers() {
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         {t('analytics.center.emirateLabel')}
                                     </label>
-                                    <select
-                                        name="emirateId"
-                                        value={formData.emirateId}
-                                        onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    >
-                                        {
-                                            emirates.map(it => (
-                                                <option key={it.id} value={it.id}>{isLTR ? it.name : it.nameInArrabic}</option>
-                                            ))
-                                        }
-                                    </select>
+                                    {optionsLoading ? (
+                                        <div className="p-3">
+                                            <Loader message={t('common.loading')} />
+                                        </div>
+                                    ) : (
+                                        <select
+                                            name="emirateId"
+                                            value={formData.emirateId}
+                                            onChange={handleInputChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        >
+                                            <option value="">{t('analytics.center.selectEmirate')}</option>
+                                            {
+                                                emirates.map(it => (
+                                                    <option key={it.id} value={it.id}>{isLTR ? it.name : it.nameInArrabic}</option>
+                                                ))
+                                            }
+                                        </select>
+                                    )}
                                 </div>
                             </div>
 

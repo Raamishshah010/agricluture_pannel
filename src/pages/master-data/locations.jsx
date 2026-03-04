@@ -5,6 +5,7 @@ import emirateService from '../../services/emirateService';
 import centerService from '../../services/centerService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
+import Loader from '../../components/Loader';
 import useStore from '../../store/store';
 
 export default function Locations() {
@@ -15,15 +16,23 @@ export default function Locations() {
     const [emirates, setEmirates] = useState([]);
     const [centers, setCenters] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [emiratesLoading, setEmiratesLoading] = useState(false);
+    const [centersLoading, setCentersLoading] = useState(false);
 
 
     useEffect(() => {
-        service.getAll().then(res => {
-            setList(res.data)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const res = await service.getAll();
+                setList(res.data);
+            } catch (err) {
                 toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,14 +44,17 @@ export default function Locations() {
         centerId: ''
     });
 
-    const openAddModal = () => {
+    const openAddModal = async () => {
         if (emirates.length <= 0) {
-            emirateService.getEmirates().then(res => {
+            try {
+                setEmiratesLoading(true);
+                const res = await emirateService.getEmirates();
                 setEmirates(res.data);
-            })
-                .catch(err => {
-                    toast.error(err.message);
-                })
+            } catch (err) {
+                toast.error(err.message);
+            } finally {
+                setEmiratesLoading(false);
+            }
         }
         setEditingItem(null);
         setFormData({
@@ -54,22 +66,28 @@ export default function Locations() {
         setIsModalOpen(true);
     };
 
-    const openEditModal = (item) => {
+    const openEditModal = async (item) => {
         if (emirates.length <= 0) {
-            emirateService.getEmirates().then(res => {
+            try {
+                setEmiratesLoading(true);
+                const res = await emirateService.getEmirates();
                 setEmirates(res.data);
-            })
-                .catch(err => {
-                    toast.error(err.message);
-                })
+            } catch (err) {
+                toast.error(err.message);
+            } finally {
+                setEmiratesLoading(false);
+            }
         }
         if (formData.emirateId !== item.center?.emirate?.id) {
-            centerService.getCentersByEmirate(item.center?.emirate?.id).then(res => {
+            try {
+                setCentersLoading(true);
+                const res = await centerService.getCentersByEmirate(item.center?.emirate?.id);
                 setCenters(res.data);
-            })
-                .catch(err => {
-                    toast.error(err.message);
-                })
+            } catch (err) {
+                toast.error(err.message);
+            } finally {
+                setCentersLoading(false);
+            }
         }
         setEditingItem(item);
         setFormData({
@@ -86,15 +104,18 @@ export default function Locations() {
         setEditingItem(null);
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = async (e) => {
         const { name, value, type, checked } = e.target;
         if (name === "emirateId" && value?.length && formData.emirateId !== value) {
-            centerService.getCentersByEmirate(value).then(res => {
+            try {
+                setCentersLoading(true);
+                const res = await centerService.getCentersByEmirate(value);
                 setCenters(res.data);
-            })
-                .catch(err => {
-                    toast.error(err.message);
-                })
+            } catch (err) {
+                toast.error(err.message);
+            } finally {
+                setCentersLoading(false);
+            }
         }
         setFormData(prev => ({
             ...prev,
@@ -169,50 +190,56 @@ export default function Locations() {
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-100 border-b border-gray-200">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.nameArabic')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.nameEnglish')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.emirate')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.center')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.createdAt')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.actions')}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {list.map((item) => (
-                                    <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.nameInArrabic}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.name}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.center?.emirate?.nameInArrabic}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.center?.nameInArrabic}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(item)}
-                                                    className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title={t('locations.edit')}
-                                                >
-                                                    <Edit2 size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(item.id)}
-                                                    className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
-                                                    title={t('locations.delete')}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
+                        {loading ? (
+                            <div className="py-12">
+                                <Loader message={t('common.loading')} />
+                            </div>
+                        ) : (
+                            <table className="w-full">
+                                <thead className="bg-gray-100 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.nameArabic')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.nameEnglish')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.emirate')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.center')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.createdAt')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('locations.actions')}</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {list.map((item) => (
+                                        <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.nameInArrabic}</td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.name}</td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.center?.emirate?.nameInArrabic}</td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.center?.nameInArrabic}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => openEditModal(item)}
+                                                        className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title={t('locations.edit')}
+                                                    >
+                                                        <Edit2 size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(item.id)}
+                                                        className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
+                                                        title={t('locations.delete')}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
                     </div>
 
-                    {list.length === 0 && (
+                    {!loading && list.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             {t('locations.emptyState')}
                         </div>
@@ -276,44 +303,54 @@ export default function Locations() {
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         {t('locations.emirate')}
                                     </label>
-                                    <select
-                                        name="emirateId"
-                                        value={formData.emirateId}
-                                        onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    >
-                                        {
-                                            emirates.map(it => (
-                                                <option key={it.id} value={it.id}>{isLTR ? it.name : it.nameInArrabic}</option>
-                                            ))
-                                        }
-                                    </select>
+                                    {emiratesLoading ? (
+                                        <div className="py-3">
+                                            <Loader message={t('common.loading')} />
+                                        </div>
+                                    ) : (
+                                        <select
+                                            name="emirateId"
+                                            value={formData.emirateId}
+                                            onChange={handleInputChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        >
+                                            <option value="">{t('locations.selectEmirate')}</option>
+                                            {
+                                                emirates.map(it => (
+                                                    <option key={it.id} value={it.id}>{isLTR ? it.name : it.nameInArrabic}</option>
+                                                ))
+                                            }
+                                        </select>
+                                    )}
                                 </div>
                             </div>
 
-                            {
-                                centers.length ? (
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                                {t('locations.center')}
-                                            </label>
-                                            <select
-                                                name="centerId"
-                                                value={formData.centerId}
-                                                onChange={handleInputChange}
-                                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                            >
-                                                {
-                                                    centers.map(it => (
-                                                        <option key={it.id} value={it.id}>{isLTR ? it.name : it.nameInArrabic}</option>
-                                                    ))
-                                                }
-                                            </select>
-                                        </div>
+                            {centersLoading ? (
+                                <div className="py-3">
+                                    <Loader message={t('common.loading')} />
+                                </div>
+                            ) : (centers.length ? (
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            {t('locations.center')}
+                                        </label>
+                                        <select
+                                            name="centerId"
+                                            value={formData.centerId}
+                                            onChange={handleInputChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        >
+                                            <option value="">{t('locations.selectCenter')}</option>
+                                            {
+                                                centers.map(it => (
+                                                    <option key={it.id} value={it.id}>{isLTR ? it.name : it.nameInArrabic}</option>
+                                                ))
+                                            }
+                                        </select>
                                     </div>
-                                ) : ''
-                            }
+                                </div>
+                            ) : null)}
 
                             <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
                                 <button

@@ -5,6 +5,7 @@ import cropService from '../../services/cropService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import useStore from '../../store/store';
+import Loader from '../../components/Loader';
 
 export default function Varieties() {
     const [varities, setVarieties] = useState([]);
@@ -16,12 +17,18 @@ export default function Varieties() {
 
 
     useEffect(() => {
-        service.getAll().then(res => {
-            setVarieties(res.data.items)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const res = await service.getAll();
+                setVarieties(res.data.items);
+            } catch (err) {
                 toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,14 +37,18 @@ export default function Varieties() {
         name: '',
         cropId: ''
     });
+    const [optionsLoading, setOptionsLoading] = useState(false);
 
-    const openAddModal = () => {
-        cropService.getCrops().then(res => {
-            setCrops(res.data)
-        })
-            .catch(err => {
-                toast.error("Error fetching crops: ", err.message);
-            })
+    const openAddModal = async () => {
+        try {
+            setOptionsLoading(true);
+            const res = await cropService.getCrops();
+            setCrops(res.data);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setOptionsLoading(false);
+        }
         setEditingEmirate(null);
         setFormData({
             name: '',
@@ -46,14 +57,17 @@ export default function Varieties() {
         setIsModalOpen(true);
     };
 
-    const openEditModal = (variety) => {
+    const openEditModal = async (variety) => {
         setEditingEmirate(variety);
-        cropService.getCrops().then(res => {
-            setCrops(res.data)
-        })
-            .catch(err => {
-                toast.error("Error fetching crops: ", err.message);
-            })
+        try {
+            setOptionsLoading(true);
+            const res = await cropService.getCrops();
+            setCrops(res.data);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setOptionsLoading(false);
+        }
         setFormData({
             name: variety.name,
             cropId: variety.cropId,
@@ -139,45 +153,49 @@ export default function Varieties() {
                 </div>
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-100 border-b border-gray-200">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('varieties.table.headers.name')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('varieties.table.headers.createdAt')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('varieties.table.headers.actions')}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {varities.map((variety) => (
-                                    <tr key={variety.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{variety.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{formatDate(variety.createdAt)}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(variety)}
-                                                    className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title={t('varieties.edit')}
-                                                >
-                                                    <Edit2 size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(variety.id)}
-                                                    className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
-                                                    title={t('varieties.delete')}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
+                    {loading ? (
+                        <Loader />
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-100 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('varieties.table.headers.name')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('varieties.table.headers.createdAt')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('varieties.table.headers.actions')}</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {varities.map((variety) => (
+                                        <tr key={variety.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{variety.name}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{formatDate(variety.createdAt)}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => openEditModal(variety)}
+                                                        className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title={t('varieties.edit')}
+                                                    >
+                                                        <Edit2 size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(variety.id)}
+                                                        className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
+                                                        title={t('varieties.delete')}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
 
-                    {varities.length === 0 && (
+                    {!loading && varities.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             {t('varieties.empty.noVarieties')}
                         </div>
@@ -223,19 +241,25 @@ export default function Varieties() {
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         {t('varieties.modal.labels.crop')}
                                     </label>
-                                    <select
-                                        name="cropId"
-                                        value={formData.cropId}
-                                        onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
-                                    >
-                                        <option value="">{t('varieties.modal.selectCrop')}</option>
-                                        {crops.map((crop) => (
-                                            <option key={crop.id} value={crop.id}>
-                                                {isLTR ? crop.name : crop.nameInArrabic}
-                                            </option>
-                                        ))}
-                                    </select>
+                                    {optionsLoading ? (
+                                        <div className="p-3">
+                                            <Loader message={t('common.loading')} />
+                                        </div>
+                                    ) : (
+                                        <select
+                                            name="cropId"
+                                            value={formData.cropId}
+                                            onChange={handleInputChange}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                                        >
+                                            <option value="">{t('varieties.modal.selectCrop')}</option>
+                                            {crops.map((crop) => (
+                                                <option key={crop.id} value={crop.id}>
+                                                    {isLTR ? crop.name : crop.nameInArrabic}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
                                 </div>
                             </div>
 

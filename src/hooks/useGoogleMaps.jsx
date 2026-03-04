@@ -55,12 +55,16 @@ export const useGoogleMaps = (includeDrawing = false) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    loadGoogleMapsScript(includeDrawing)
-      .then(() => setApiLoaded(true))
-      .catch((err) => {
+    const load = async () => {
+      try {
+        await loadGoogleMapsScript(includeDrawing);
+        setApiLoaded(true);
+      } catch (err) {
         console.error('Google Maps loading error:', err);
         setError(err);
-      });
+      }
+    };
+    load();
   }, [includeDrawing]);
 
   return { apiLoaded, error };

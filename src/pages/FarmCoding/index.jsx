@@ -209,12 +209,13 @@ const FarmCodingRequest = () => {
   };
 
   const handleDetail = async (item) => {
-    service.getfarmById(item.id).then(res => {
+    try {
+      const res = await service.getfarmById(item.id);
       setSelectedFarm(res.data);
       setActiveTab('farm-details');
-    }).catch(err => {
+    } catch (err) {
       toast.error(err.response?.data?.message || err.message);
-    });
+    }
   };
 
   const openStatusModal = (farm) => {

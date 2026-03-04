@@ -2,11 +2,15 @@ import { useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import service from '../../services/articleService';
 import { toast } from 'react-toastify';
+import Loader from '../../components/Loader';
 
 export default function Articles() {
     const [list, setList] = useState([]);
     const [cats, setCats] = useState([]);
     const [subCats, setSubCats] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [catsLoading, setCatsLoading] = useState(false);
+    const [subCatsLoading, setSubCatsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
@@ -20,22 +24,31 @@ export default function Articles() {
 
 
     useEffect(() => {
-        service.getArticles().then(res => {
-            setList(res.data.items)
-        })
-            .catch(err => {
+        const fetch = async () => {
+            try {
+                setLoading(true);
+                const res = await service.getArticles();
+                setList(res.data.items);
+            } catch (err) {
                 toast.error(err.message);
-            })
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetch();
     }, []);
 
-    const openAddModal = () => {
+    const openAddModal = async () => {
         if (cats.length <= 0) {
-            service.getCategories().then(res => {
-                setCats(res.data)
-            })
-                .catch(err => {
-                    toast.error('fetching categories: ', err.message);
-                })
+            try {
+                setCatsLoading(true);
+                const res = await service.getCategories();
+                setCats(res.data);
+            } catch (err) {
+                toast.error('fetching categories: ' + err.message);
+            } finally {
+                setCatsLoading(false);
+            }
         }
         setEditingItem(null);
         setFormData({
@@ -49,22 +62,28 @@ export default function Articles() {
         setIsModalOpen(true);
     };
 
-    const openEditModal = (article) => {
+    const openEditModal = async (article) => {
         if (cats.length <= 0) {
-            service.getCategories().then(res => {
-                setCats(res.data)
-            })
-                .catch(err => {
-                    toast.error('fetching categories: ', err.message);
-                })
+            try {
+                setCatsLoading(true);
+                const res = await service.getCategories();
+                setCats(res.data);
+            } catch (err) {
+                toast.error('fetching categories: ' + err.message);
+            } finally {
+                setCatsLoading(false);
+            }
         }
         if (subCats.length <= 0) {
-            service.getSubCategoriesByCategory(article.categoryId).then(res => {
-                setSubCats(res.data.items)
-            })
-                .catch(err => {
-                    toast.error('fetching sub categories: ', err.message);
-                })
+            try {
+                setSubCatsLoading(true);
+                const res = await service.getSubCategoriesByCategory(article.categoryId);
+                setSubCats(res.data.items);
+            } catch (err) {
+                toast.error('fetching sub categories: ' + err.message);
+            } finally {
+                setSubCatsLoading(false);
+            }
         }
         setEditingItem(article);
         setFormData({
@@ -90,15 +109,18 @@ export default function Articles() {
             setImagePreview(URL.createObjectURL(e.target.files[0]));
         }
     };
-    const handleInputChange = (e) => {
+    const handleInputChange = async (e) => {
         const { name, value, type, checked } = e.target;
         if (name.includes("categoryId") && value.length > 0) {
-            service.getSubCategoriesByCategory(value).then(res => {
-                setSubCats(res.data.items)
-            })
-                .catch(err => {
-                    toast.error('fetching sub categories: ', err.message);
-                })
+            try {
+                setSubCatsLoading(true);
+                const res = await service.getSubCategoriesByCategory(value);
+                setSubCats(res.data.items);
+            } catch (err) {
+                toast.error('fetching sub categories: ' + err.message);
+            } finally {
+                setSubCatsLoading(false);
+            }
         }
         setFormData(prev => ({
             ...prev,
@@ -177,7 +199,12 @@ export default function Articles() {
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
                     <div className="overflow-x-auto">
-                        <table className="w-full">
+                        {loading ? (
+                            <div className="py-12">
+                                <Loader message={'Loading...'} />
+                            </div>
+                        ) : (
+                            <table className="w-full">
                             <thead className="bg-gray-100 border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Image</th>
@@ -260,15 +287,15 @@ export default function Articles() {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Image
-                                    </label>
-                                    <input
+                                    </table>
+                                )}
+                        
                                         type="file"
-                                        accept='image/*'
-                                        onChange={handleFile}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    />
-                                    {imagePreview && (
-                                        <div className="mt-3 p-2 border border-gray-200 rounded-lg bg-gray-50">
+                            {!loading && list.length === 0 && (
+                                <div className="text-center py-12 text-gray-500">
+                                    No articles yet
+                                </div>
+                            )}
                                             <div className="w-32 h-24 mx-auto rounded-lg overflow-hidden bg-white flex items-center justify-center">
                                                 <img
                                                     src={imagePreview}

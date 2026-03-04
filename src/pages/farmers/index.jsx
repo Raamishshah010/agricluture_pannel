@@ -65,28 +65,36 @@ export default function Index(props) {
   }, [randomNumber]);
 
   useEffect(() => {
-    service
-      .getFarmers(1, 50)
-      .then((res) => {
+    const fetch = async () => {
+      try {
+        setLoading(true);
+        const res = await service.getFarmers(1, 50);
         setList(res.data);
         setCount(res.pagination.totalPages);
-      })
-      .catch((err) => {
+      } catch (err) {
         toast.error(err.response?.data?.message || err.message);
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetch();
   }, []);
 
   useEffect(() => {
     if (!query.trim()) {
-      service
-        .getFarmers(1, 50)
-        .then((res) => {
+      const fetch = async () => {
+        try {
+          setLoading(true);
+          const res = await service.getFarmers(1, 50);
           setList(res.data);
           setCount(res.pagination.totalPages);
-        })
-        .catch((err) => {
+        } catch (err) {
           toast.error(err.response?.data?.message || err.message);
-        });
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetch();
       return;
     }
 
@@ -118,33 +126,30 @@ export default function Index(props) {
   }, [props.number, randomNumber]);
 
   const loadMore = async (currentPage) => {
-    setLoading(true);
-    service
-      .getFarmers(currentPage, 50)
-      .then((res) => {
-        setList(res.data);
-        setCount(res.pagination.totalPages);
-        setPage(currentPage);
-        setLoading(false);
-      })
-      .catch((err) => {
-        toast.error(err.response?.data?.message || err.message);
-      });
+    try {
+      setLoading(true);
+      const res = await service.getFarmers(currentPage, 50);
+      setList(res.data);
+      setCount(res.pagination.totalPages);
+      setPage(currentPage);
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleFarms = async (item) => {
     setActiveTab("farms");
     setSelectedFarmer(item);
-    service
-      .getFarmerFarms(item.id)
-      .then((res) => {
-        setActiveTab("farms");
-        setSelectedFarmer(item);
-        setFarms(res.data);
-      })
-      .catch((err) => {
-        toast.error(err.response?.data?.message || err.message);
-      });
+    try {
+      const res = await service.getFarmerFarms(item.id);
+      setActiveTab("farms");
+      setSelectedFarmer(item);
+      setFarms(res.data);
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    }
   };
 
   const formatDate = (dateString) => {

@@ -338,33 +338,36 @@ const Overview = () => {
     ])
   }, [t, transformFarms]);
 
-  const handleFarmClick = (farm) => {
-    farmService.getfarmById(farm.id).then(res => {
+  const handleFarmClick = async (farm) => {
+    try {
+      const res = await farmService.getfarmById(farm.id);
       setSelectedFarm(res.data);
       setActiveTab('farm-details');
-    }).catch(err => {
+    } catch (err) {
       toast.error(err.response?.data?.message || err.message);
-    });
+    }
   };
 
   const submitFarmHandler = useCallback(async (item, id) => {
-    farmService.updateFarm(item, id).then(() => {
+    try {
+      await farmService.updateFarm(item, id);
       setSelectedFarm(null);
       setActiveTab('overview');
       toast.success('Updated successfully');
       sessionStorage.removeItem('selectedFarm');
-    }).catch(err => {
+    } catch (err) {
       toast.error(err.response?.data?.message || err.message);
-    });
+    }
   }, []);
 
   const handleEdit = async (item) => {
-    farmService.getFarmByIdWithoutPopulatingFields(item.id).then(res => {
+    try {
+      const res = await farmService.getFarmByIdWithoutPopulatingFields(item.id);
       setSelectedFarm(res.data);
       setActiveTab('farm-edit');
-    }).catch(err => {
+    } catch (err) {
       toast.error(err.response?.data?.message || err.message);
-    });
+    }
   };
 
   const activeFiltersCount = [emirate, center, location, irrigationSystem, farmingSystem].filter(Boolean).length;
