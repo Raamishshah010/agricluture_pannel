@@ -120,7 +120,7 @@ const AdminManagementFlow = () => {
 
   const exportSelectedCSV = () => {
     const rows = (selectedIds.length ? admins.filter(a => selectedIds.includes(a.id)) : admins).map(a => [a.name, a.email, a.emirate, a.type, a.mobile]);
-    const header = ['Name','Email','Emirate','Type','Mobile'];
+    const header = [t('admin.adminName'), t('admin.email'), t('admin.emirate'), t('admin.adminType'), t('admin.mobileNumberHeader')];
     const csv = [header, ...rows].map(r => r.map(cell => `"${(cell||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -370,7 +370,7 @@ const AdminManagementFlow = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.lastName')}</label>
             <input
               type="text"
               value={formData.lastName}
@@ -416,7 +416,7 @@ const AdminManagementFlow = () => {
               onChange={(e) => handleInputChange('emirates', e.target.value)}
               className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
             >
-              <option value="">Select which emirates for the new admin</option>
+              <option value="">{t('admin.selectEmirates')}</option>
               <option value="Abu Dhabi">Abu Dhabi</option>
               <option value="Dubai">Dubai</option>
               <option value="Sharjah">Sharjah</option>
@@ -435,7 +435,7 @@ const AdminManagementFlow = () => {
             onChange={(e) => handleInputChange('type', e.target.value)}
             className="w-full max-w-sm px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
           >
-            <option value="">Select the type for the admin</option>
+            <option value="">{t('admin.selectType')}</option>
             <option value="Admin">Admin</option>
             <option value="Super Admin">Super Admin</option>
             <option value="Moderator">Moderator</option>
@@ -498,10 +498,10 @@ const AdminManagementFlow = () => {
             <h1 className="text-2xl font-semibold text-gray-900">{t('admin.adminManagement')}</h1>
             <div className="flex items-center gap-3">
               {selectedIds.length > 0 && (
-                <div className="text-sm text-gray-600">{selectedIds.length} selected</div>
+                <div className="text-sm text-gray-600">{selectedIds.length} {t('common.selected')}</div>
               )}
-              <button onClick={exportSelectedCSV} className="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">{t('admin.export')}</button>
-              <button onClick={deleteSelected} className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">{t('admin.deleteSelected') || 'Delete selected'}</button>
+              <button onClick={exportSelectedCSV} className="px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">{t('common.export')}</button>
+              <button onClick={deleteSelected} className="px-3 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200">{t('admin.deleteSelected')}</button>
               <button
                 onClick={startNewAdmin}
                 className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"

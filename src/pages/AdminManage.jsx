@@ -58,7 +58,7 @@ export default function AdminManage() {
 
   const exportSelectedCSV = () => {
     const rows = (selectedIds.length ? admins.filter(a => selectedIds.includes(a.id)) : admins).map(a => [a.name, a.email, a.emirate, a.type, a.mobile]);
-    const header = ['Name','Email','Emirate','Type','Mobile'];
+    const header = [t('admin.adminName'), t('admin.email'), t('admin.emirate'), t('admin.adminType'), t('admin.mobileNumberHeader')];
     const csv = [header, ...rows].map(r => r.map(cell => `"${(cell||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -72,9 +72,9 @@ export default function AdminManage() {
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-900">{t('admin.adminManagement')}</h1>
         <div className="flex items-center gap-3">
-          {selectedIds.length > 0 && <div className="text-sm text-gray-600">{selectedIds.length} selected</div>}
-          <button onClick={exportSelectedCSV} className="px-3 py-2 bg-gray-100 rounded-lg">{t('admin.export')}</button>
-          <button onClick={deleteSelected} className="px-3 py-2 bg-red-100 text-red-600 rounded-lg">{t('admin.deleteSelected') || 'Delete selected'}</button>
+          {selectedIds.length > 0 && <div className="text-sm text-gray-600">{selectedIds.length} {t('common.selected')}</div>}
+          <button onClick={exportSelectedCSV} className="px-3 py-2 bg-gray-100 rounded-lg">{t('common.export')}</button>
+          <button onClick={deleteSelected} className="px-3 py-2 bg-red-100 text-red-600 rounded-lg">{t('admin.deleteSelected')}</button>
           <button onClick={() => navigate('/dashboard/addAdmin')} className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg"><Plus className="h-4 w-4 mr-2"/>{t('admin.addAdminBtn')}</button>
         </div>
       </div>

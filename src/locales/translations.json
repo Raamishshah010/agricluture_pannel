@@ -26,6 +26,9 @@
     "emirate": "EMIRATE",
     "adminType": "TYPE",
     "mobileNumberHeader": "MOBILE NUMBER",
+    "deleteConfirm": "Are you sure you want to delete this admin?",
+    "deleteSelected": "Delete selected",
+    "deleteSelectedConfirm": "Are you sure you want to delete the selected admins?",
     "noAdmins": "No administrators added yet",
     "clickAddAdmin": "Click \"Add Admin\" to get started",
     "notSaved": "Not saved"
@@ -340,6 +343,7 @@
     "search": "Search",
     "download": "Download",
     "export": "Export",
+    "selected": "selected",
     "import": "Import",
     "add": "Add",
     "update": "Update",

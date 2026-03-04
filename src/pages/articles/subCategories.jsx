@@ -3,8 +3,10 @@ import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import articleService from '../../services/articleService';
 import { toast } from 'react-toastify';
 import Loader from '../../components/Loader';
+import useTranslation from '../../hooks/useTranslation';
 
 export default function SubCategories() {
+    const t = useTranslation();
     const [subCategories, setSubCategories] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);

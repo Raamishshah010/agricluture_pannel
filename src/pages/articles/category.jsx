@@ -3,8 +3,10 @@ import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import service from '../../services/articleService';
 import { toast } from 'react-toastify';
 import Loader from '../../components/Loader';
+import useTranslation from '../../hooks/useTranslation';
 
 export default function ArticleCategories() {
+    const t = useTranslation();
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(false);
 
