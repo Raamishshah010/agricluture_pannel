@@ -3,11 +3,12 @@ import { Plus, Edit2, Trash2 } from 'lucide-react';
 import useTranslation from '../hooks/useTranslation';
 import Loader from '../components/Loader';
 import adminService from '../services/adminService';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function AdminManage() {
   const t = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -66,6 +67,24 @@ export default function AdminManage() {
   };
 
   if (loading) return <Loader />;
+
+  // Apply updated admin if navigated back from add/edit
+  useEffect(() => {
+    if (location && location.state && location.state.updatedAdmin) {
+      const { updatedAdmin, isEdit } = location.state;
+      setAdmins(prev => {
+        if (!updatedAdmin) return prev;
+        if (isEdit) {
+          return prev.map(a => a.id === updatedAdmin.id ? updatedAdmin : a);
+        }
+        // avoid duplicate
+        if (prev.some(a => a.id === updatedAdmin.id)) return prev;
+        return [...prev, updatedAdmin];
+      });
+      // clear the navigation state so it doesn't reapply
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   return (
     <div className="p-6">

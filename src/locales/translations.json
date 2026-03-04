@@ -20,6 +20,8 @@
     "addAdminBtn": "Add Admin",
     "adminAdded": "Admin Added Successfully",
     "adminAddedDesc": "The new admin has been invited and will receive instructions to set up their account",
+    "editAdmin": "Edit Admin",
+    "save": "Save",
     "adminManagement": "Admin Management",
     "adminName": "ADMIN NAME",
     "email": "EMAIL",

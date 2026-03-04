@@ -54,43 +54,48 @@ export default function AdminAdd() {
       password: formData.password
     };
     setLoading(true);
+    let savedItem = null;
     try {
       if (editAdmin && editAdmin.id) {
         const saved = await adminService.updateAdmin(editAdmin.id, payload);
+        savedItem = saved || { id: editAdmin.id, ...payload };
         // best-effort local update
         try {
           const raw = localStorage.getItem('admins');
           const arr = raw ? JSON.parse(raw) : [];
-          const updated = arr.map(a => a.id === editAdmin.id ? (saved || { ...a, ...payload }) : a);
+          const updated = arr.map(a => a.id === editAdmin.id ? (savedItem) : a);
           localStorage.setItem('admins', JSON.stringify(updated));
         } catch (e) {}
       } else {
         const saved = await adminService.createAdmin(payload);
+        savedItem = saved || { id: Date.now(), ...payload };
         try {
           const raw = localStorage.getItem('admins');
           const arr = raw ? JSON.parse(raw) : [];
-          arr.push(saved || payload);
+          arr.push(savedItem);
           localStorage.setItem('admins', JSON.stringify(arr));
         } catch (e) {}
       }
       setShowSuccessPopup(true);
-      setTimeout(() => navigate('/dashboard/manageAdmins'), 800);
+      setTimeout(() => navigate('/dashboard/manageAdmins', { state: { updatedAdmin: savedItem, isEdit: !!editAdmin } }), 800);
     } catch (e) {
-      // fallback: persist locally and navigate
+      // fallback: persist locally and navigate with created item
       try {
         const raw = localStorage.getItem('admins');
         const arr = raw ? JSON.parse(raw) : [];
         if (editAdmin && editAdmin.id) {
-          const updated = arr.map(a => a.id === editAdmin.id ? ({ ...a, ...payload }) : a);
+          const updated = arr.map(a => a.id === editAdmin.id ? ({ id: editAdmin.id, ...payload }) : a);
+          savedItem = { id: editAdmin.id, ...payload };
           localStorage.setItem('admins', JSON.stringify(updated));
         } else {
           const item = { id: Date.now(), ...payload };
+          savedItem = item;
           arr.push(item);
           localStorage.setItem('admins', JSON.stringify(arr));
         }
       } catch (er) {}
       setShowSuccessPopup(true);
-      setTimeout(() => navigate('/dashboard/manageAdmins'), 800);
+      setTimeout(() => navigate('/dashboard/manageAdmins', { state: { updatedAdmin: savedItem, isEdit: !!editAdmin } }), 800);
     } finally {
       setLoading(false);
     }
