@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight, BarChart3, MapPin, Layers, Wheat, Sprout, TrendingUp, Settings, HelpCircle, User, Globe, X, Maximize2, Search, Bell, TrendingUpDown, Grid2X2Plus, List, Newspaper, Users, Flag, ListMusic, ShieldHalf, Footprints, ArrowUp01, Ship, SunSnow, AudioWaveform, Dam, House, LogOut, Sticker, BarChart2 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
+import { useLocation } from 'react-router-dom';
 import Overview from '../Overview';
 import Emirates from '../Emirates/index';
 import Sizes from '../Sizes/index';
@@ -49,6 +50,7 @@ const DashboardLayout = () => {
   const { language, setLanguage } = useStore(st => st);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const isRTL = language.includes('ar');
   const directionClass = isRTL ? 'rtl' : 'ltr';
@@ -249,13 +251,46 @@ const DashboardLayout = () => {
     );
   };
 
+  // slug helper for URL paths
+  const slug = (id) => encodeURIComponent(String(id).trim().replace(/\s+/g, '-').toLowerCase());
+
+  // build slug -> id map for easy lookup
+  const buildSlugMap = () => {
+    const map = {};
+    const collect = (it) => {
+      if (!it) return;
+      if (it.id) map[slug(it.id)] = it.id;
+      if (it.submenuItems) it.submenuItems.forEach(s => map[slug(s.id)] = s.id);
+    };
+    menuItems.forEach(collect);
+    otherItems.forEach(collect);
+    return map;
+  };
+
+  const slugMap = buildSlugMap();
+
   const menuClickedHandler = (item) => {
     if (item.hasSubmenu) {
       toggleSection(item.id);
     } else {
-      setSelectedPage(item.id);
+      const to = slug(item.id);
+      navigate(`/dashboard/${to}`);
     }
   }
+
+  // sync selectedPage from URL
+  useEffect(() => {
+    const parts = location.pathname.split('/').filter(Boolean);
+    const last = parts.length > 1 ? parts.slice(1).join('/') : (parts[0] || 'overview');
+    const key = slug(last.replace(/\//g, '-'));
+    const found = slugMap[key] || slugMap[last] || null;
+    if (found) {
+      setSelectedPage(found);
+    } else if (parts[0] === 'dashboard' && parts.length === 1) {
+      setSelectedPage('overview');
+      navigate('/dashboard/overview', { replace: true });
+    }
+  }, [location.pathname]);
 
   return (
     <div className={`flex h-screen bg-gray-100 ${directionClass}`} dir={isRTL ? 'rtl' : 'ltr'}>
@@ -320,7 +355,7 @@ const DashboardLayout = () => {
                     {item.submenuItems.map((subItem) => (
                       <button
                         key={subItem.id}
-                        onClick={() => setSelectedPage(subItem.id)}
+                        onClick={() => { navigate(`/dashboard/${slug(subItem.id)}`); setSelectedPage(subItem.id); }}
                         className={`w-full flex cursor-pointer items-center px-2 md:px-3 py-2 text-xs md:text-sm rounded-lg transition-colors 
                           ${isRTL ? 'space-x-reverse space-x-2 md:space-x-3' : 'space-x-2 md:space-x-3'}
                           ${selectedPage === subItem.id ? 'bg-green-600 text-white' : 'text-gray-600 hover:bg-gray-100'}
@@ -368,7 +403,7 @@ const DashboardLayout = () => {
                       {item.submenuItems.map((subItem) => (
                         <button
                           key={subItem.id}
-                          onClick={() => setSelectedPage(subItem.id)}
+                          onClick={() => { navigate(`/dashboard/${slug(subItem.id)}`); setSelectedPage(subItem.id); }}
                           className={`w-full flex cursor-pointer items-center px-2 md:px-3 py-2 text-xs md:text-sm rounded-lg transition-colors
                             ${isRTL ? 'space-x-reverse space-x-2 md:space-x-3' : 'space-x-2 md:space-x-3'}
                             ${selectedPage === subItem.id ? 'bg-green-600 text-white' : 'text-gray-600 hover:bg-gray-100'}

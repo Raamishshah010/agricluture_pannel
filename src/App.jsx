@@ -39,7 +39,7 @@ function App() {
         <Route path="/conform" element={<Conform />} />
         <Route path="/reset-password" element={<ResetPassword />} />
 
-        <Route path="/dashboard" element={<DashboardLayout />} />
+        <Route path="/dashboard/*" element={<DashboardLayout />} />
 
         <Route path="*" element={<h2>Page not found</h2>} />
       </Routes>

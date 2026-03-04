@@ -18,6 +18,7 @@ import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import useStore from "../../store/store";
 import { amiriFontBase64 } from "../../assets/AmiriFont";
+import Loader from "../../components/Loader";
 
 export default function Coders() {
   const t = useTranslation();
@@ -456,8 +457,11 @@ const downloadPDF = () => {
 
         {/* Table Section */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          {loading ? (
+            <Loader />
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
               <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
@@ -557,10 +561,11 @@ const downloadPDF = () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
-          </div>
+              </table>
+            </div>
+          )}
 
-          {list.length === 0 && (
+          {!loading && list.length === 0 && (
             <div className="text-center py-16">
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                 <svg

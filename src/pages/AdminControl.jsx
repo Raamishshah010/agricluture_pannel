@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Check, X, Plus } from 'lucide-react';
-import { useTranslation } from '../hooks/useTranslation';
+import { Check, X, Plus, Edit2, Trash2 } from 'lucide-react';
+import useTranslation from '../hooks/useTranslation';
 
 const AdminManagementFlow = () => {
   const t = useTranslation();
@@ -16,6 +16,7 @@ const AdminManagementFlow = () => {
     type: ''
   });
   const [admins, setAdmins] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
   // Auto-dismiss success popup after 2 seconds
   useEffect(() => {
@@ -26,6 +27,41 @@ const AdminManagementFlow = () => {
       return () => clearTimeout(timer);
     }
   }, [showSuccessPopup]);
+
+  // load persisted admins
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('admins');
+      if (raw) setAdmins(JSON.parse(raw));
+    } catch (e) {
+      // ignore
+    }
+  }, []);
+
+  const handleEdit = (admin) => {
+    const [firstName, ...last] = admin.name.split(' ');
+    setFormData({
+      firstName,
+      lastName: last.join(' '),
+      email: admin.email,
+      mobile: admin.mobile,
+      password: '',
+      emirates: admin.emirate,
+      type: admin.type
+    });
+    setEditingId(admin.id);
+    setCurrentScreen(2);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm(t('admin.deleteConfirm') || 'Delete this admin?')) {
+      setAdmins(prev => {
+        const updated = prev.filter(a => a.id !== id);
+        localStorage.setItem('admins', JSON.stringify(updated));
+        return updated;
+      });
+    }
+  };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -41,17 +77,22 @@ const AdminManagementFlow = () => {
 
   const handleAddAdmin = () => {
     if (isFormValid()) {
-      // Add admin to list
       const newAdmin = {
-        id: Date.now(),
+        id: editingId || Date.now(),
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         emirate: formData.emirates,
         type: formData.type,
         mobile: formData.mobile
       };
-      
-      setAdmins(prev => [...prev, newAdmin]);
+
+      setAdmins(prev => {
+        const updated = editingId ? prev.map(a => a.id === editingId ? newAdmin : a) : [...prev, newAdmin];
+        localStorage.setItem('admins', JSON.stringify(updated));
+        return updated;
+      });
+
+      setEditingId(null);
       setCurrentScreen(3);
       setShowSuccessPopup(true);
     }
@@ -387,17 +428,23 @@ const AdminManagementFlow = () => {
 
           <div className="divide-y divide-gray-200">
             {admins.map((admin) => (
-              <div key={admin.id} className="px-6 py-4">
-                <div className="grid grid-cols-5 gap-4 text-sm text-gray-900">
-                  <div className="font-medium">{admin.name}</div>
-                  <div className="truncate">{admin.email}</div>
-                  <div>{admin.emirate}</div>
-                  <div>{admin.type}</div>
-                  <div>{admin.mobile}</div>
+              <div key={admin.id} className="px-6 py-4 flex items-center justify-between">
+                <div className="w-full">
+                  <div className="grid grid-cols-5 gap-4 text-sm text-gray-900">
+                    <div className="font-medium">{admin.name}</div>
+                    <div className="truncate">{admin.email}</div>
+                    <div>{admin.emirate}</div>
+                    <div>{admin.type}</div>
+                    <div>{admin.mobile}</div>
+                  </div>
+                </div>
+                <div className="ml-4 flex gap-2">
+                  <button onClick={() => handleEdit(admin)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit2 size={16} /></button>
+                  <button onClick={() => handleDelete(admin.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
                 </div>
               </div>
             ))}
-            
+
             {admins.length === 0 && (
               <div className="px-6 py-12 text-center text-gray-500">
                 <p>{t('admin.noAdmins')}</p>
