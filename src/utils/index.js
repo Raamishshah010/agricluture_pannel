@@ -1,5 +1,12 @@
-// export const API_BASE_URL = 'http://localhost:5000';
-export const API_BASE_URL = 'http://3.28.62.38';
+// Determine API base URL from Vite env or runtime hostname.
+// Set `VITE_API_BASE_URL` when building (recommended for live builds).
+const viteApiBase = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL;
+
+export const API_BASE_URL = viteApiBase || (typeof window !== 'undefined' && (
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+    ? 'http://localhost:3000'
+    : 'http://138.68.134.217'
+);
 
 
 export function generateOTP(length = 6) {
