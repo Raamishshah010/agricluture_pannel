@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Check, X, Plus, Edit2, Trash2 } from 'lucide-react';
 import useTranslation from '../hooks/useTranslation';
+import Loader from '../components/Loader';
+import adminService from '../services/adminService';
 
 const AdminManagementFlow = () => {
   const t = useTranslation();
@@ -17,6 +19,7 @@ const AdminManagementFlow = () => {
   });
   const [admins, setAdmins] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // Auto-dismiss success popup after 2 seconds
   useEffect(() => {
@@ -30,12 +33,27 @@ const AdminManagementFlow = () => {
 
   // load persisted admins
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('admins');
-      if (raw) setAdmins(JSON.parse(raw));
-    } catch (e) {
-      // ignore
-    }
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const data = await adminService.getAdmins();
+        if (mounted && Array.isArray(data)) {
+          setAdmins(data);
+          try { localStorage.setItem('admins', JSON.stringify(data)); } catch (e) {}
+        }
+      } catch (e) {
+        // fallback to localStorage when API unavailable
+        try {
+          const raw = localStorage.getItem('admins');
+          if (raw && mounted) setAdmins(JSON.parse(raw));
+        } catch (err) {}
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    load();
+    return () => { mounted = false; };
   }, []);
 
   const handleEdit = (admin) => {
@@ -55,11 +73,22 @@ const AdminManagementFlow = () => {
 
   const handleDelete = (id) => {
     if (window.confirm(t('admin.deleteConfirm') || 'Delete this admin?')) {
-      setAdmins(prev => {
-        const updated = prev.filter(a => a.id !== id);
-        localStorage.setItem('admins', JSON.stringify(updated));
-        return updated;
-      });
+      (async () => {
+        setLoading(true);
+        try {
+          await adminService.deleteAdmin(id);
+          const updated = admins.filter(a => a.id !== id);
+          setAdmins(updated);
+          try { localStorage.setItem('admins', JSON.stringify(updated)); } catch (e) {}
+        } catch (e) {
+          // fallback: remove locally
+          const updated = admins.filter(a => a.id !== id);
+          setAdmins(updated);
+          try { localStorage.setItem('admins', JSON.stringify(updated)); } catch (er) {}
+        } finally {
+          setLoading(false);
+        }
+      })();
     }
   };
 
@@ -83,18 +112,37 @@ const AdminManagementFlow = () => {
         email: formData.email,
         emirate: formData.emirates,
         type: formData.type,
-        mobile: formData.mobile
+        mobile: formData.mobile,
+        password: formData.password
       };
 
-      setAdmins(prev => {
-        const updated = editingId ? prev.map(a => a.id === editingId ? newAdmin : a) : [...prev, newAdmin];
-        localStorage.setItem('admins', JSON.stringify(updated));
-        return updated;
-      });
-
-      setEditingId(null);
-      setCurrentScreen(3);
-      setShowSuccessPopup(true);
+      (async () => {
+        setLoading(true);
+        try {
+          let saved;
+          if (editingId) {
+            saved = await adminService.updateAdmin(editingId, newAdmin);
+            setAdmins(prev => prev.map(a => a.id === editingId ? (saved || newAdmin) : a));
+          } else {
+            saved = await adminService.createAdmin(newAdmin);
+            setAdmins(prev => [...prev, (saved || newAdmin)]);
+          }
+          try { localStorage.setItem('admins', JSON.stringify(editingId ? admins.map(a => a.id === editingId ? (saved || newAdmin) : a) : [...admins, (saved || newAdmin)])); } catch (e) {}
+          setEditingId(null);
+          setCurrentScreen(3);
+          setShowSuccessPopup(true);
+        } catch (e) {
+          // fallback to local storage update
+          const updated = editingId ? admins.map(a => a.id === editingId ? newAdmin : a) : [...admins, newAdmin];
+          setAdmins(updated);
+          try { localStorage.setItem('admins', JSON.stringify(updated)); } catch (er) {}
+          setEditingId(null);
+          setCurrentScreen(3);
+          setShowSuccessPopup(true);
+        } finally {
+          setLoading(false);
+        }
+      })();
     }
   };
 
@@ -137,6 +185,10 @@ const AdminManagementFlow = () => {
     });
     setCurrentScreen(2);
   };
+
+  if (loading) {
+    return <Loader />;
+  }
 
   if (currentScreen === 1) {
     return (

@@ -22,6 +22,22 @@ export const adminService = {
     const response = await apiClient.get('/api/admin/master-data');
     return response.data;
   },
+  getAdmins: async () => {
+    const response = await apiClient.get('/api/admin/admins');
+    return response.data;
+  },
+  createAdmin: async (payload) => {
+    const response = await apiClient.post('/api/admin/admins', payload);
+    return response.data;
+  },
+  updateAdmin: async (id, payload) => {
+    const response = await apiClient.put(`/api/admin/admins/${id}`, payload);
+    return response.data;
+  },
+  deleteAdmin: async (id) => {
+    const response = await apiClient.delete(`/api/admin/admins/${id}`);
+    return response.data;
+  },
 };
 
 export default adminService;

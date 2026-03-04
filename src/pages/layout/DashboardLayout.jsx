@@ -207,6 +207,8 @@ const DashboardLayout = () => {
           return <FarmCodingRequest />;
         case 'addAdmin':
           return <AdminControl />;
+        case 'manageAdmins':
+          return <AdminControl />;
         case 'manageCoders':
           return <Coders />;
         case 'manageFarms':
