@@ -14,7 +14,8 @@ import ArticleCategories from '../articles/category';
 import SubCategories from '../articles/subCategories';
 import Articles from '../articles/articles';
 import FarmCodingRequest from '../FarmCoding';
-import AdminControl from '../AdminControl';
+import AdminAdd from '../AdminAdd';
+import AdminManage from '../AdminManage';
 import Coders from '../coders';
 import Farmers from '../farmers';
 import ManageFarms from '../manage-farms';
@@ -206,9 +207,9 @@ const DashboardLayout = () => {
         case 'codingRequests':
           return <FarmCodingRequest />;
         case 'addAdmin':
-          return <AdminControl />;
+          return <AdminAdd />;
         case 'manageAdmins':
-          return <AdminControl />;
+          return <AdminManage />;
         case 'manageCoders':
           return <Coders />;
         case 'manageFarms':
