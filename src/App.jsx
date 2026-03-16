@@ -6,6 +6,7 @@ import DashboardLayout from "./pages/layout/DashboardLayout.jsx";
 import { ForgotPassword } from "./pages/auth/ForgotPassword";
 import { Conform } from "./pages/auth/ConformEmail";
 import { ResetPassword } from "./pages/auth/ResetPassword";
+import { UaePassLogin } from "./pages/auth/UaePassLogin";
 import useStore from './store/store.js'
 import service from './services/adminService.js'
 import farmService from './services/farmService.js'
@@ -38,6 +39,7 @@ function App() {
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/conform" element={<Conform />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/ue-pass" element={<UaePassLogin />} />
 
         <Route path="/dashboard/*" element={<DashboardLayout />} />
 
