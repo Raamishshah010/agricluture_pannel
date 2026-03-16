@@ -56,11 +56,19 @@ const DashboardLayout = () => {
   const isRTL = language.includes('ar');
   const directionClass = isRTL ? 'rtl' : 'ltr';
 
+  const clearAuthStorage = () => {
+    const authKeys = ['adminToken', 'admin', 'token', 'user'];
+    authKeys.forEach((key) => {
+      sessionStorage.removeItem(key);
+      localStorage.removeItem(key);
+    });
+  };
+
   const handleLogout = () => {
     if (window.confirm(t('common.components.dashboard.logout') + "?")) {
-      sessionStorage.removeItem("adminToken");
-      navigate('/');
+      clearAuthStorage();
       setAdminToken(null);
+      navigate('/');
     }
   };
 

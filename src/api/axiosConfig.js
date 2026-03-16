@@ -1,6 +1,14 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../utils';
 
+const AUTH_KEYS = ['adminToken', 'admin', 'token', 'user'];
+const clearAuthStorage = () => {
+  AUTH_KEYS.forEach((key) => {
+    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
+  });
+};
+
 axios.defaults.baseURL = API_BASE_URL;
 
 axios.interceptors.request.use(
@@ -20,8 +28,7 @@ axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      sessionStorage.removeItem('adminToken');
-      sessionStorage.removeItem('admin');
+      clearAuthStorage();
       window.location.href = '/login';
     }
     return Promise.reject(error);
