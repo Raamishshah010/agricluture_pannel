@@ -1,6 +1,6 @@
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { API_BASE_URL } from '../utils';
+import { API_BASE_URL } from "../../utils";
 
 const AUTH_BASE = "https://stg-id.uaepass.ae/idshub";
 const CLIENT_ID = "sandbox_stage";
