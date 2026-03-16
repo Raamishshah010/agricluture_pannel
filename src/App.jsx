@@ -16,10 +16,14 @@ import { Loader2 } from "lucide-react";
 
 
 function App() {
-  const { setCrops, setFarms, setFarmers, setLoading, loading } = useStore((state) => state);
-  const adminToken = sessionStorage.getItem('adminToken');
+  const { setCrops, setFarms, setFarmers, setLoading, loading, adminToken, setAdminToken } = useStore((state) => state);
   useEffect(() => {
     if (!adminToken) {
+      const token = sessionStorage.getItem('adminToken');
+      if (token) {
+        setAdminToken(token);
+        return;
+      }
       setLoading(false);
       return;
     }

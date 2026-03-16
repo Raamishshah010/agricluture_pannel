@@ -20,6 +20,7 @@ const useStore = create((set) => ({
     livestocks: [],
     language: 'en',
     loading: true,
+    adminToken: sessionStorage.getItem('adminToken'),
     setCrops: (fruitTypes) => {
         set({ ...fruitTypes });
     },
@@ -41,6 +42,11 @@ const useStore = create((set) => ({
     setFarmers: (payload) => {
         set({
             farmers: payload
+        })
+    },
+    setAdminToken: (token) => {
+        set({
+            adminToken: token
         })
     }
 }));

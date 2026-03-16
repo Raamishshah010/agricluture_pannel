@@ -14,7 +14,7 @@ export const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
-  const { language } = useStore((state) => state);
+  const { language, setAdminToken } = useStore((state) => state);
   const t = useTranslation();
 
   const navigate = useNavigate();
@@ -48,6 +48,7 @@ export const LoginPage = () => {
       try {
         const res = await adminService.login({ email, password });
         sessionStorage.setItem("adminToken", res.token);
+        setAdminToken(res.token);
         navigate("/dashboard");
       } catch (error) {
         toast.error(error?.response?.data?.message || error.message);

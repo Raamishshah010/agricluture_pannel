@@ -48,7 +48,7 @@ const DashboardLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [farmsNumber, setFarmsNumber] = useState(1);
-  const { language, setLanguage } = useStore(st => st);
+  const { language, setLanguage, setAdminToken } = useStore(st => st);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,6 +60,7 @@ const DashboardLayout = () => {
     if (window.confirm(t('common.components.dashboard.logout') + "?")) {
       sessionStorage.removeItem("adminToken");
       navigate('/');
+      setAdminToken(null);
     }
   };
 
