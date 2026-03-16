@@ -17,9 +17,16 @@ import { Loader2 } from "lucide-react";
 
 function App() {
   const { setCrops, setFarms, setFarmers, setLoading, loading } = useStore((state) => state);
+  const adminToken = sessionStorage.getItem('adminToken');
   useEffect(() => {
+    if (!adminToken) {
+      setLoading(false);
+      return;
+    }
+
     const fetch = async () => {
       try {
+        setLoading(true);
         const res = await Promise.all([service.getMasterData(), farmService.getAllfarms(), farmerService.getAllFarmers()]);
         setCrops(res[0]);
         setFarms(res[1].data);
@@ -31,7 +38,7 @@ function App() {
       }
     };
     fetch();
-  }, [setCrops, setFarms, setFarmers, setLoading]);
+  }, [adminToken, setCrops, setFarms, setFarmers, setLoading]);
   return !loading ? (
     <Router>
       <Routes>
@@ -41,7 +48,10 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/ue-pass" element={<UaePassLogin />} />
 
-        <Route path="/dashboard/*" element={<DashboardLayout />} />
+        <Route
+          path="/dashboard/*"
+          element={adminToken ? <DashboardLayout /> : <Navigate to="/" replace />}
+        />
 
         <Route path="*" element={<h2>Page not found</h2>} />
       </Routes>

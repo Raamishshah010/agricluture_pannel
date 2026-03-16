@@ -38,7 +38,6 @@ export default function Coders() {
     image: "",
     password: "",
   });
-  const token = sessionStorage.getItem("adminToken");
   const { farms, farmers } = useStore((st) => st);
 
   useEffect(() => {
@@ -126,7 +125,7 @@ export default function Coders() {
       fd.append("password", formData.password);
 
       if (editingItem) {
-        const res = await service.update(editingItem.id, fd, token);
+      const res = await service.update(editingItem.id, fd);
         setList((prev) =>
           prev.map((coder) =>
             coder.id === editingItem.id ? res.data.farmer : coder,
@@ -147,7 +146,7 @@ export default function Coders() {
 
   const handleDelete = async (id) => {
     if (window.confirm(t("coders.deleteConfirm"))) {
-      await service.delete(id, token);
+      await service.delete(id);
       setList((prev) => prev.filter((coder) => coder.id !== id));
     }
   };

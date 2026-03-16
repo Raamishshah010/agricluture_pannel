@@ -19,7 +19,6 @@ export default function Farmers({ list, handleFarms, setList }) {
         image: '',
         password: ''
     });
-    const token = sessionStorage.getItem("adminToken");
 
     const openAddModal = () => {
         setEditingItem(null);
@@ -81,7 +80,7 @@ export default function Farmers({ list, handleFarms, setList }) {
             fd.append('password', formData.password);
 
             if (editingItem) {
-                const res = await service.update(editingItem.id, fd, token);
+                const res = await service.update(editingItem.id, fd);
                 setList(prev => prev.map(coder =>
                     coder.id === editingItem.id
                         ? res.data.farmer
@@ -102,7 +101,7 @@ export default function Farmers({ list, handleFarms, setList }) {
 
     const handleDelete = async (id) => {
         if (window.confirm(t('farmers.farmers.deleteConfirm'))) {
-            await service.delete(id, token);
+            await service.delete(id);
             setList(prev => prev.filter(coder => coder.id !== id));
         }
     };

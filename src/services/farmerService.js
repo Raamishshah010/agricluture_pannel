@@ -50,21 +50,16 @@ export const farmerService = {
         });
         return response.data;
     },
-    update: async (id, payload, token) => {
+    update: async (id, payload) => {
         const response = await apiClient.put('/api/farmer/' + id, payload, {
             headers: {
                 'Content-Type': 'multipart/form-data',
-                "Authorization": "Bearer " + token
             },
         });
         return response.data;
     },
-    delete: async (id, token) => {
-        const response = await apiClient.delete('/api/farmer/' + id, {
-            headers: {
-                "Authorization": "Bearer " + token
-            }
-        });
+    delete: async (id) => {
+        const response = await apiClient.delete('/api/farmer/' + id);
         return response.data;
     },
     assignFarm: async (id, payload) => {
