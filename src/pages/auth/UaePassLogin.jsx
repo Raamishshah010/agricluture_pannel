@@ -11,7 +11,7 @@ const SCOPES = [
 const ACR_VALUES = "urn:safelayer:tws:policies:authentication:level:low";
 const STATE_KEY = "uae-pass-state";
 
-const BACKEND_BASE = import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
+const BACKEND_BASE = import.meta.env.API_BASE_URL || "http://localhost:3000";
 const CALLBACK_PATH =
   import.meta.env.VITE_UAE_PASS_CALLBACK_PATH || "/ue-pass/callback";
 const REDIRECT_URI = `${BACKEND_BASE}${CALLBACK_PATH}`;
