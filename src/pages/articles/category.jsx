@@ -10,20 +10,19 @@ export default function ArticleCategories() {
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(false);
 
-
     useEffect(() => {
-        const fetch = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
                 const res = await service.getCategories();
-                setList(res.data);
+                setList(res.data || []);
             } catch (err) {
-                toast.error(err.message);
+                toast.error(err?.message || 'Error fetching categories');
             } finally {
                 setLoading(false);
             }
         };
-        fetch();
+        fetchData();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,10 +34,7 @@ export default function ArticleCategories() {
 
     const openAddModal = () => {
         setEditingData(null);
-        setFormData({
-            name: '',
-            nameInArabic: ''
-        });
+        setFormData({ name: '', nameInArabic: '' });
         setIsModalOpen(true);
     };
 
@@ -57,215 +53,190 @@ export default function ArticleCategories() {
     };
 
     const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: value
         }));
     };
 
     const handleSubmit = async () => {
-        if (!formData.name || !formData.nameInArabic.trim()) {
-            alert('Please fill in all required fields in both languages');
+        if (!formData.name.trim() || !formData.nameInArabic.trim()) {
+            toast.error('Please fill all fields');
             return;
         }
 
         try {
             setLoading(true);
+
             if (editingData) {
                 await service.updateCategory(editingData.id, formData);
-                setList(prev => prev.map(category =>
-                    category.id === editingData.id
-                        ? { ...category, ...formData, updatedAt: new Date().toISOString() }
-                        : category
-                ));
+                setList(prev =>
+                    prev.map(item =>
+                        item.id === editingData.id
+                            ? { ...item, ...formData }
+                            : item
+                    )
+                );
             } else {
                 const res = await service.addCategory(formData);
                 setList(prev => [...prev, res.data]);
             }
-            setLoading(false);
 
+            closeModal();
         } catch (error) {
+            toast.error(error?.message || 'Error saving category');
+        } finally {
             setLoading(false);
-            toast.error(error.message);
         }
-        closeModal();
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this category?')) {
-            try {
-                await service.deleteCategory(id);
-                setList(prev => prev.filter(category => category.id !== id));
-            } catch (error) {
-                setLoading(false);
-                toast.error(error.message);
-            }
+        if (!window.confirm('Delete this category?')) return;
+
+        try {
+            await service.deleteCategory(id);
+            setList(prev => prev.filter(item => item.id !== id));
+        } catch (error) {
+            toast.error(error?.message || 'Delete failed');
         }
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+    const formatDate = (dateString) =>
+        new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric'
         });
-    };
-
 
     return (
-       <div className="min-h-screen bg-gray-50 p-0 md:p-8">
+        <div className="min-h-screen bg-gray-50 p-0 md:p-8">
             <div className="max-w-7xl mx-auto">
-                <div className="mb-8 flex flex-col-reverse md:flex-row mt-2 justify-between items-center">
-                    <div>
-                        <h1 className="text-xl md:text-3xl font-bold text-gray-900">Article Categories</h1>
-                    </div>
+
+                {/* Header */}
+                <div className="mb-8 flex flex-col-reverse md:flex-row justify-between items-center">
+                    <h1 className="text-xl md:text-3xl font-bold">
+                        {t('articles.category.title')}
+                    </h1>
+
                     <button
                         onClick={openAddModal}
-                        className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
+                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2"
                     >
                         <Plus size={20} />
-                        Add
+                        {t('articles.category.add')}
                     </button>
                 </div>
 
+                {/* Table */}
                 <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="overflow-x-auto">
-                        {loading ? (
-                            <div className="py-12">
-                                <Loader message={'Loading...'} />
-                            </div>
-                        ) : (
+                    {loading ? (
+                        <div className="py-12">
+                            <Loader message="Loading..." />
+                        </div>
+                    ) : (
+                        <>
                             <table className="w-full">
-                            <thead className="bg-gray-100 border-b border-gray-200">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Name</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Arabic Name</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Created At</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {list.map((category) => (
-                                    <tr key={category.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{category.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-700">{category.nameInArabic || '—'}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{formatDate(category.createdAt)}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(category)}
-                                                    className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title={t('common.edit')}
-                                                >
+                                <thead className="bg-gray-100">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left">{t('articles.category.table.name')}</th>
+                                        <th className="px-6 py-4 text-left">{t('articles.category.table.nameArabic')}</th>
+                                        <th className="px-6 py-4 text-left">{t('articles.category.table.createdAt')}</th>
+                                        <th className="px-6 py-4 text-left">{t('articles.category.table.actions')}</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {list.map(cat => (
+                                        <tr key={cat.id} className="border-t">
+                                            <td className="px-6 py-4">{cat.name}</td>
+                                            <td className="px-6 py-4">{cat.nameInArabic || '—'}</td>
+                                            <td className="px-6 py-4">{formatDate(cat.createdAt)}</td>
+                                            <td className="px-6 py-4 flex gap-2">
+                                                <button onClick={() => openEditModal(cat)}>
                                                     <Edit2 size={18} />
                                                 </button>
-                                                <button
-                                                    onClick={() => handleDelete(category.id)}
-                                                    className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
-                                                    title={t('common.delete')}
-                                                >
+                                                <button onClick={() => handleDelete(cat.id)}>
                                                     <Trash2 size={18} />
                                                 </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
                             </table>
-                        )}
 
-                    {!loading && list.length === 0 && (
-                        <div className="text-center py-12 text-gray-500">
-                            <p>{t('articles.category.empty') || 'No categories found. Add your first category to get started.'}</p>
-                        </div>
+                            {list.length === 0 && (
+                                <div className="text-center py-10 text-gray-500">
+                                    {t('articles.category.empty')}
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 
-                <div className="mt-4 text-sm text-gray-600">
-                    Total Categories: {list.length}
+                <div className="mt-4 text-sm">
+                    Total: {list.length}
                 </div>
             </div>
 
+            {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black/50 bg-opacity-50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
-                        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
-                            <h2 className="text-xl font-semibold text-gray-900">
-                                {editingData ? 'Edit Emirate' : 'Add New Emirate'}
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+                    <div className="bg-white rounded-lg w-full max-w-md">
+
+                        {/* Modal Header */}
+                        <div className="flex justify-between p-4 border-b">
+                            <h2>
+                                {editingData
+                                    ? t('articles.category.modal.editTitle')
+                                    : t('articles.category.modal.addTitle')}
                             </h2>
-                            <button
-                                onClick={closeModal}
-                                className="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors"
-                            >
-                                <X size={24} />
+                            <button onClick={closeModal}>
+                                <X />
                             </button>
                         </div>
 
-                        <div className="px-6 py-4">
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Name *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                        placeholder="e.g., Weats"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Arabic Name *
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="nameInArabic"
-                                        value={formData.nameInArabic}
-                                        onChange={handleInputChange}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                        placeholder="مثال: مهارات الزراعة"
-                                    />
-                                </div>
-                            </div>
+                        {/* Modal Body */}
+                        <div className="p-4 space-y-4">
+                            <input
+                                name="name"
+                                value={formData.name}
+                                onChange={handleInputChange}
+                                placeholder="Name"
+                                className="w-full border p-2 rounded"
+                            />
 
-                            <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-                                <button
-                                    onClick={closeModal}
-                                    className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    onClick={handleSubmit}
-                                    className="px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
-                                >
-                                    {
-                                        loading ? (
-                                            <>
-                                                <div>
-                                                    <svg aria-hidden="true" className="inline w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-green-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
-                                                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
-                                                    </svg>
-                                                    <span className="sr-only">Loading...</span>
-                                                </div>
-                                            </>
-                                        ) : (<>
-                                            {editingData ? 'Update' : 'Add'}
-                                        </>)
-                                    }
-
-                                </button>
-                            </div>
+                            <input
+                                name="nameInArabic"
+                                value={formData.nameInArabic}
+                                onChange={handleInputChange}
+                                placeholder="Arabic Name"
+                                className="w-full border p-2 rounded"
+                            />
                         </div>
+
+                        {/* Modal Footer */}
+                        <div className="flex justify-end gap-2 p-4 border-t">
+                            <button onClick={closeModal} className="px-4 py-2 bg-gray-200 rounded">
+                                {t('common.cancel')}
+                            </button>
+
+                            <button
+                                onClick={handleSubmit}
+                                className="px-4 py-2 bg-green-600 text-white rounded"
+                                disabled={loading}
+                            >
+                                {loading
+                                    ? 'Saving...'
+                                    : editingData
+                                        ? t('common.update')
+                                        : t('common.add')}
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             )}
-        </div>
         </div>
     );
 }

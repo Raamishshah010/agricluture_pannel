@@ -66,7 +66,7 @@ export default function IrrigationSystem() {
 
     const handleSubmit = async () => {
         if (!formData.name) {
-            alert(t('irrigationSystem.pleaseFillRequiredFields'));
+            toast.error(t('irrigationSystem.pleaseFillRequiredFields'));
             return;
         }
 

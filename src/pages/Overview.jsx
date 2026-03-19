@@ -400,7 +400,7 @@ const Overview = () => {
               }`}
             >
               <Filter className="w-4 h-4" />
-              <span className="hidden sm:inline">Filters</span>
+              <span className="hidden sm:inline">{t('filters.filters')}</span>
               {activeFiltersCount > 0 && (
                 <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs font-bold">
                   {activeFiltersCount}

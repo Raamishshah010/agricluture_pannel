@@ -16,7 +16,7 @@ const FarmDetails = ({ farm, handleBack }) => {
     } = useStore((state) => state);
 
     const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
+        if (!dateString) return t('common.nA');
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -42,7 +42,7 @@ const FarmDetails = ({ farm, handleBack }) => {
         <div className={`flex justify-between items-start py-2 hover:bg-white/50 px-2 rounded transition-colors ${isLTR ? "flex-row" : "flex-row-reverse"}`}>
             <span className="text-sm text-gray-600 font-semibold">{isLTR ? `${label}:` : `:${label}`}</span>
             <span className={`text-sm text-gray-900 text-right max-w-xs font-medium ${valueClass}`}>
-                {value || 'N/A'}
+                {value || t('common.nA')}
             </span>
         </div>
     );

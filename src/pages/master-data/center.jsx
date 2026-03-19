@@ -97,7 +97,7 @@ export default function Centers() {
 
     const handleSubmit = async () => {
         if (!formData.name || !formData.nameInArrabic || !formData.emirateId) {
-            alert(t('analytics.center.fillRequiredFields'));
+            toast.error(t('analytics.center.fillRequiredFields'));
             return;
         }
 

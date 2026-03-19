@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import useTranslation from '../../hooks/useTranslation';
 import { Plus, Minus } from 'lucide-react';
 
 // Separated Map Component
@@ -49,6 +50,8 @@ const FarmMap = ({ farms, emirates, emirateColors }) => {
       updateMarkers();
     }
   }, [farms, emirates, emirateColors, isLeafletLoaded]);
+
+  const t = useTranslation();
 
   const initializeMap = () => {
     if (!window.L || !mapRef.current || mapInstanceRef.current) return;
@@ -114,11 +117,13 @@ const FarmMap = ({ farms, emirates, emirateColors }) => {
           icon: createCustomIcon(emirateColor)
         }).addTo(mapInstanceRef.current);
 
+        const unknownLabel = t('common.unknown');
+        const zoneLabel = t('map.agriculturalZone');
         marker.bindPopup(`
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
             <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold;">${farm.farmName}</h3>
-            <p style="margin: 0; font-size: 12px; color: #666;">${emirateName || 'Unknown'}</p>
-            <p style="margin: 4px 0 0 0; font-size: 12px; color: #666;">Agricultural Zone</p>
+            <p style="margin: 0; font-size: 12px; color: #666;">${emirateName || unknownLabel}</p>
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #666;">${zoneLabel}</p>
           </div>
         `);
 
@@ -160,8 +165,8 @@ const FarmMap = ({ farms, emirates, emirateColors }) => {
       
       {!isLeafletLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 rounded-md">
-          <div className="text-gray-600">Loading map...</div>
-        </div>
+            <div className="text-gray-600">{t('map.loading')}</div>
+          </div>
       )}
       
       <div className="absolute bottom-6 left-6 flex flex-col gap-2 z-[1000]">

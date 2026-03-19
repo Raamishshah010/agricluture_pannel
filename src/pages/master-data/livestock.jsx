@@ -66,7 +66,7 @@ export default function LiveStock() {
 
     const handleSubmit = async () => {
         if (!formData.name) {
-            alert(t('livestock.pleaseFillRequiredFields'));
+            toast.error(t('livestock.pleaseFillRequiredFields'));
             return;
         }
 

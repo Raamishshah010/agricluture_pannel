@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import useTranslation from '../../hooks/useTranslation';
 import { CgArrowLeft } from 'react-icons/cg';
 import {Globe,ChevronDown ,CircleHelp } from "lucide-react"
 
@@ -6,7 +7,8 @@ import logo from '../../assets/logo.png'
 import { Link } from 'react-router-dom';
 export const Conform = () => {
       const [language, setLanguage] = useState('العربية');
-  
+      const t = useTranslation();
+
   return (
 
    <>
@@ -27,11 +29,11 @@ export const Conform = () => {
                    alt="Mazraty Logo"
                    className="w-20 h-20 "
                  />
-                 <h1 className="text-3xl md:my-8  my-4 font-semibold text-gray-800">Check Your Email</h1>
+                 <h1 className="text-3xl md:my-8  my-4 font-semibold text-gray-800">{t('auth.confirm.title')}</h1>
                </div>
-        <p className="mt-2 text-gray-900 md:mb-8 mb-4">
-            We have sent a confirmation link to your email address. Please check your inbox [ and spam/junk folder ] to proceed
-        </p>
+            <p className="mt-2 text-gray-900 md:mb-8 mb-4">
+              {t('auth.confirm.description')}
+            </p>
         <div className='flex flex-col gap-4 w-full justify-center items-center'>
            {/* <div> */}
            <Link to="/">
@@ -46,7 +48,7 @@ export const Conform = () => {
         </div>
         <div>
             <p className=" text-gray-900 md:mb-10 mt-6">
-                Didn't receive the email?<a href="#" className="text-green-700">resend link</a>.
+              {t('auth.confirm.didNotReceive')}<a href="#" className="text-green-700">{t('auth.confirm.resendLink')}</a>.
             </p>
         </div>
       </div>

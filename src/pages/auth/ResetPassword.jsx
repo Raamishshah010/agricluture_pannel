@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import useTranslation from '../../hooks/useTranslation';
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { Link } from "react-router-dom";
 import logo from '../../assets/logo.png'
@@ -11,6 +12,7 @@ export const ResetPassword = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
       const [language, setLanguage] = useState('العربية');
 
+  const t = useTranslation();
   const [errors, setErrors] = useState({});
 
   const handleSubmit = (e) => {
@@ -18,12 +20,12 @@ export const ResetPassword = () => {
 
     let newErrors = {};
     if (!newPassword) {
-      newErrors.newPassword = "Please enter a new password";
+      newErrors.newPassword = t('auth.reset.errors.newPasswordRequired');
     }
     if (!confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
+      newErrors.confirmPassword = t('auth.reset.errors.confirmPasswordRequired');
     } else if (newPassword !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords don't match, Please try again";
+      newErrors.confirmPassword = t('auth.reset.errors.passwordsMismatch');
     }
 
     setErrors(newErrors);
@@ -53,8 +55,8 @@ export const ResetPassword = () => {
             alt="Mazraty Logo"
             className="w-20 h-20 mb-2"
           />
-          <h1 className="text-4xl my-8 font-semibold text-gray-800">Reset Your Password</h1>
-          <p className="text-center mb-4 text-gray-800 text-md">Create a new password for your <br /> account.</p>
+          <h1 className="text-4xl my-8 font-semibold text-gray-800">{t('auth.reset.title')}</h1>
+          <p className="text-center mb-4 text-gray-800 text-md">{t('auth.reset.description')}</p>
         </div>
 
         {/* Form */}
@@ -64,7 +66,7 @@ export const ResetPassword = () => {
             <div className="relative">
               <input
                 type={showNewPassword ? "text" : "password"}
-                placeholder="New Password"
+                placeholder={t('auth.reset.newPasswordPlaceholder')}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className={`w-full px-4 py-2 border rounded-md focus:outline-none ${
@@ -94,7 +96,7 @@ export const ResetPassword = () => {
             <div className="relative">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                placeholder="Confirm New Password"
+                placeholder={t('auth.reset.confirmPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className={`w-full px-4 py-2 border rounded-md focus:outline-none ${
@@ -121,11 +123,11 @@ export const ResetPassword = () => {
 
           {/* Login Button */}
        <Link to="/">
-           <button
+             <button
              type="submit"
              className="w-full py-2 cursor-pointer text-white bg-green-600 rounded-md hover:bg-green-700 transition"
            >
-             Save Password
+             {t('auth.reset.saveButton')}
            </button>
        </Link>
         </form>

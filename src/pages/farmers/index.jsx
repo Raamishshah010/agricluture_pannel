@@ -236,9 +236,9 @@ const downloadPDF = async () => {
       // 2. DATA MAPPING (Reverse row for Arabic)
       let tableData = allFarmers.map(farmer => {
         const row = [
-          farmer.name || "N/A",
-          farmer.phoneNumber || "N/A",
-          farmer.emirateId || "N/A",
+          farmer.name || t('common.nA'),
+          farmer.phoneNumber || t('common.nA'),
+          farmer.emirateId || t('common.nA'),
           formatDate(farmer.createdAt)
         ];
         return isArabic ? row.reverse() : row;
@@ -246,16 +246,14 @@ const downloadPDF = async () => {
 
       // 3. TITLES (Forcing RTL Position)
       doc.setFontSize(22);
-      const titleText = isArabic ? "قائمة المزارعين" : 'Farmers List';
+      const titleText = t('farmers.pdfTitle');
       // Agar Arabic hai to Right side (pageWidth - margin) se shuru karein
       doc.text(titleText, isArabic ? pageWidth - 15 : 15, 20, { 
         align: isArabic ? 'right' : 'left' 
       });
       
       doc.setFontSize(12);
-      const totalLabel = isArabic 
-        ? `إجمالي السجلات: ${allFarmers.length}` 
-        : `Total Records: ${allFarmers.length}`;
+      const totalLabel = `${t('farmers.pdfTotalRecords')} ${allFarmers.length}`;
       doc.text(totalLabel, isArabic ? pageWidth - 15 : 15, 30, { 
         align: isArabic ? 'right' : 'left' 
       });
@@ -314,7 +312,7 @@ const downloadPDF = async () => {
     );
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Farmers");
+    XLSX.utils.book_append_sheet(workbook, worksheet, t('farmers.sheetName'));
 
     // Add metadata
     const metadataRow = query.trim()
@@ -434,12 +432,12 @@ const downloadPDF = async () => {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                <span>Downloading...</span>
+                <span>{t("farmers.downloading")}</span>
               </>
             ) : (
               <>
                 <Download size={20} />
-                Download
+                {t("common.download")}
                 <ChevronDown
                   size={16}
                   className={`transition-transform ${isDownloadOpen ? "rotate-180" : ""}`}
@@ -457,7 +455,7 @@ const downloadPDF = async () => {
               <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
                 <div className="px-4 py-2 border-b border-gray-100 bg-gray-50">
                   <p className="text-xs text-gray-600 font-medium">
-                    Download All Pages
+                    {t("farmers.downloadAllPages")}
                   </p>
                 </div>
                 <button
@@ -465,21 +463,21 @@ const downloadPDF = async () => {
                   className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-2 text-gray-700"
                 >
                   <Download size={16} />
-                  Download PDF
+                  {t("farmers.downloadOptions.pdf")}
                 </button>
                 <button
                   onClick={downloadExcel}
                   className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-2 text-gray-700 border-t border-gray-100"
                 >
                   <Download size={16} />
-                  Download Excel
+                  {t("farmers.downloadOptions.excel")}
                 </button>
                 <button
                   onClick={downloadCSV}
                   className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors flex items-center gap-2 text-gray-700 border-t border-gray-100 rounded-b-lg"
                 >
                   <Download size={16} />
-                  Download CSV
+                  {t("farmers.downloadOptions.csv")}
                 </button>
               </div>
             </>

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Loader } from 'lucide-react';
+import useTranslation from '../../hooks/useTranslation';
 
-const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
+  const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
+  const t = useTranslation();
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const markersRef = useRef([]);
@@ -93,7 +95,7 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
               ${farm.farmName}
             </h3>
             <p style="margin: 4px 0; color: #374151; font-size: 14px;">
-              <strong>Size:</strong> ${farm.totalArea || 'N/A'} acres
+              <strong>${t('sizes.map.sizeLabel')}:</strong> ${farm.totalArea || t('nA')} ${t('sizes.map.unit')}
             </p>
             <p style="margin: 4px 0; color: #374151; font-size: 14px;">
               <strong>Range:</strong> ${rangeLabel}
@@ -101,7 +103,7 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
             <p style="margin: 4px 0; color: #6b7280; font-size: 12px;">
               Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}
             </p>
-            <button 
+              <button 
               id="view-farm-${farm.id}"
               style="
                 margin-top: 12px;
@@ -119,7 +121,7 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
               onmouseover="this.style.opacity='0.8'"
               onmouseout="this.style.opacity='1'"
             >
-              View Details
+              ${t('sizes.map.viewDetails')}
             </button>
           </div>
         `

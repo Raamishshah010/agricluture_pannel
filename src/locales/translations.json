@@ -275,20 +275,20 @@
       "selectUser": "Please select user",
       "coder": "Coder",
       "deletedSuccessfully": "Deleted Successfully"
-      },
-      "downloadSuccess": "Download Success",
-      "download": "Download",
-      "downloadOptions": {
-        "csv": "CSV Format",
-        "csvHint": "Comma-separated",
-        "excel": "Excel Format",
-        "excelHint": "Spreadsheet file",
-        "pdf": "PDF Format",
-        "pdfHint": "Printable document"
-      },
-      "minSize": "Min Size",
-      "maxSize": "Max Size"
     },
+    "downloadSuccess": "Download Success",
+    "download": "Download",
+    "downloadOptions": {
+      "csv": "CSV Format",
+      "csvHint": "Comma-separated",
+      "excel": "Excel Format",
+      "excelHint": "Spreadsheet file",
+      "pdf": "PDF Format",
+      "pdfHint": "Printable document"
+    },
+    "minSize": "Min Size",
+    "maxSize": "Max Size"
+  },
   "overview": {
     "selectEmirate": "Select Emirate",
     "selectCenter": "Select Center",
@@ -400,6 +400,7 @@
       "drawPolygon": "Draw Polygon",
       "cancelDrawing": "Cancel Drawing",
       "clear": "Clear",
+      "unknown": "Unknown",
       "saveArea": "Save Area",
       "clickToDrawPoints": "Click on the map to draw polygon points",
       "searchForEmirate": "Search for emirate...",
@@ -494,8 +495,7 @@
         "statusUnchanged": "Status is unchanged.",
         "statusUpdatedSuccess": "Farm status updated to {status} successfully",
         "nA": "N/A",
-        "statusUpdatedSuccessfully": "Status Updated Successfully"
-        ,
+        "statusUpdatedSuccessfully": "Status Updated Successfully",
         "download": "Download",
         "downloadOptions": {
           "csv": "CSV Format",
@@ -506,6 +506,10 @@
           "pdfHint": "Printable document"
         }
       }
+    },
+    "map": {
+      "agriculturalZone": "Agricultural Zone",
+      "loading": "Loading map..."
     },
     "nA": "N/A",
     "clear": "Clear",
@@ -733,7 +737,20 @@
     },
     "toast": {
       "loginFailed": "Login failed"
-    }
+    },
+    "passwordResetSuccessful": "Password Reset Successful",
+    "passwordResetSuccessDesc": "Your password has been reset successfully. You can now log in with your new password.",
+    "goToLogin": "Go to Login",
+    "uaePassDemo": "UAE Pass Demo",
+    "loginWithUaePass": "Login with UAE Pass",
+    "uaePassDescription": "Click the login button to start the UAE Pass sandbox. The backend handles the callback and returns an encoded user profile which will be displayed here.",
+    "redirectUri": "Redirect URI:",
+    "status": "Status",
+    "stateMismatch": "The backend returned a state that does not match the one stored before redirecting.",
+    "userProfile": "User Profile",
+    "retrievedAttributes": "Retrieved attributes",
+    "startOver": "Start over",
+    "readyToStart": "Ready to start the handshake"
   },
   "center": {
     "title": "Centers Management",
@@ -841,7 +858,21 @@
   },
   "articles": {
     "category": {
-      "empty": "No categories found. Add your first category to get started."
+      "title": "Article Categories",
+      "add": "Add Category",
+      "empty": "No categories found. Add your first category to get started.",
+      "table": {
+        "name": "Name",
+        "nameArabic": "Name (Arabic)",
+        "createdAt": "Created At",
+        "actions": "Actions"
+      },
+      "modal": {
+        "addTitle": "Add New Category",
+        "editTitle": "Edit Category",
+        "namePlaceholder": "e.g. Agricultural Skills",
+        "nameArabicPlaceholder": "e.g. Agricultural Skills (Arabic)"
+      }
     },
     "title": "Articles",
     "subtitle": "Manage your articles and blog posts",
@@ -860,9 +891,32 @@
       "cta": "Click \"Add Article\" to create your first post"
     },
     "subCategories": {
+      "title": "Article Sub-Categories",
+      "subtitle": "Manage the sub-categories used by articles",
+      "add": "Add Sub-Category",
       "empty": {
         "noItems": "No sub-categories yet",
         "cta": "Click \"Add Sub-Category\" to create one"
+      },
+      "modal": {
+        "addTitle": "Add New Sub-Category",
+        "editTitle": "Edit Sub-Category",
+        "imageLabel": "Image",
+        "imageOptional": "Optional - leave to keep current",
+        "nameLabel": "Name",
+        "namePlaceholder": "e.g. Tech News, Health Tips",
+        "nameArabicLabel": "Name (Arabic)",
+        "parentCategoryLabel": "Parent Category",
+        "loadingCategories": "Loading categories...",
+        "parentCategoryPlaceholder": "Select parent category"
+      },
+      "toast": {
+        "selectImage": "Please select an image for the new sub-category",
+        "deleteSuccess": "Sub-category deleted",
+        "deleteFail": "Failed to delete sub-category"
+      },
+      "confirm": {
+        "delete": "Are you sure you want to delete this sub-category?"
       }
     },
     "stats": {

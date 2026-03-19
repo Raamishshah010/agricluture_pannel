@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X, Edit2, Trash2, Plus, Search, FileText } from 'lucide-react';
 import useTranslation from '../../hooks/useTranslation';
+import { toast } from 'react-toastify';
 
 export default function CoverTypes() {
     const t = useTranslation();
@@ -56,7 +57,7 @@ export default function CoverTypes() {
 
     const handleSubmit = async () => {
         if (!formData.name) {
-            alert(t('coverTypes.fillRequiredFields'));
+            toast.error(t('coverTypes.fillRequiredFields'));
             return;
         }
 

@@ -66,7 +66,7 @@ export default function Seasons() {
 
     const handleSubmit = async () => {
         if (!formData.name.trim()) {
-            alert(t('seasons.validation.allFieldsRequired'));
+            toast.error(t('seasons.validation.allFieldsRequired'));
             return;
         }
 

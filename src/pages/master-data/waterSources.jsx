@@ -66,7 +66,7 @@ export default function WaterSources() {
 
     const handleSubmit = async () => {
         if (!formData.name) {
-            alert(t('common.required'));
+            toast.error(t('common.required'));
             return;
         }
 

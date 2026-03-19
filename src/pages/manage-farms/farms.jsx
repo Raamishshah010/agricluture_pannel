@@ -24,11 +24,11 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
 
     const handleSubmit = async () => {
         if (!selectedFarm) {
-            alert(t('manageFarms.farms.selectFarm'));
+            toast.error(t('manageFarms.farms.selectFarm'));
             return;
         }
         if (!selectedUser) {
-            alert(t('manageFarms.farms.selectUser'));
+            toast.error(t('manageFarms.farms.selectUser'));
             return;
         }
         try {

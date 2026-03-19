@@ -3,6 +3,7 @@ import { Download, TrendingUp, MapPin, BarChart3, PieChart as PieChartIcon, Acti
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, LineChart, Line, AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ComposedChart } from 'recharts';
 import useStore from '../../store/store';
 import useTranslation from '../../hooks/useTranslation';
+import { toast } from 'react-toastify';
 import Dropdown from '../../components/dropdown';
 import * as XLSX from 'xlsx';
 
@@ -128,7 +129,7 @@ const Sizes = () => {
         const emirateData = {};
         filteredFarms.forEach(farm => {
             const emirateObj = emirates.find(e => e.id === farm.emirate);
-            const emirateName = emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : 'Other';
+            const emirateName = emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : t('translation.other');
             const size = Number(farm.size) || 0;
             
             if (!emirateData[emirateName]) {
@@ -152,7 +153,7 @@ const Sizes = () => {
         const centerData = {};
         filteredFarms.forEach(farm => {
             const centerObj = centers.find(c => c.id === farm.serviceCenter);
-            const centerName = centerObj ? (isLTR ? centerObj.name : centerObj.nameInArrabic) : 'Other';
+            const centerName = centerObj ? (isLTR ? centerObj.name : centerObj.nameInArrabic) : t('translation.other');
             const size = Number(farm.size) || 0;
             
             if (!centerData[centerName]) {
@@ -176,7 +177,7 @@ const Sizes = () => {
         const emirateData = {};
         filteredFarms.forEach(farm => {
             const emirateObj = emirates.find(e => e.id === farm.emirate);
-            const emirateName = emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : 'Other';
+            const emirateName = emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : t('translation.other');
             const size = Number(farm.size) || 0;
             
             if (!emirateData[emirateName]) {
@@ -279,34 +280,34 @@ const Sizes = () => {
 
             // Sheet 1: Summary Statistics
             const summaryData = [
-                ['Farm Size Analytics Dashboard'],
-                ['Generated on:', new Date().toLocaleString()],
+                [t('sizes.export.title')],
+                [t('sizes.export.generatedOn'), new Date().toLocaleString()],
                 [],
-                ['Filters Applied:'],
-                ['Emirate:', emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : 'All'],
-                ['Center:', center ? (isLTR ? center.name : center.nameInArrabic) : 'All'],
-                ['Location:', location ? (isLTR ? location.name : location.nameInArrabic) : 'All'],
+                [t('sizes.export.filtersApplied')],
+                [t('overview.emirate') + ':', emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : t('common.all')],
+                [t('overview.center') + ':', center ? (isLTR ? center.name : center.nameInArrabic) : t('common.all')],
+                [t('overview.location') + ':', location ? (isLTR ? location.name : location.nameInArrabic) : t('common.all')],
                 [],
-                ['Metric', 'Value', 'Unit'],
-                ['Total Farms', totalFarms, 'farms'],
-                ['Total Area', totalArea.toFixed(2), 'sqm'],
-                ['Average Farm Size', avgFarmSize, 'sqm'],
-                ['Median Farm Size', medianSize, 'sqm'],
-                ['Most Common Size Range', largestCategory.size, ''],
-                ['Farms in Most Common Range', largestCategory.farms, 'farms'],
+                [t('sizes.export.metric'), t('sizes.export.value'), t('sizes.export.unit')],
+                [t('translation.totalFarms'), totalFarms, t('sizes.export.unitFarms')],
+                [t('translation.totalArea'), totalArea.toFixed(2), t('translation.sqmUnit')],
+                [t('sizes.avgFarmSize'), avgFarmSize, t('translation.sqmUnit')],
+                [t('sizes.medianSize'), medianSize, t('translation.sqmUnit')],
+                [t('sizes.mostCommonRange'), largestCategory.size, ''],
+                [t('sizes.farmsInCommonRange'), largestCategory.farms, t('sizes.export.unitFarms')],
             ];
             const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
             
             // Set column widths
             ws1['!cols'] = [{ wch: 30 }, { wch: 20 }, { wch: 10 }];
             
-            XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+            XLSX.utils.book_append_sheet(wb, ws1, t('sizes.export.sheetSummary'));
 
             // Sheet 2: Size Distribution
             const sizeDistData = [
-                ['Farm Size Distribution'],
+                [t('sizes.export.sheetSizeDistribution')],
                 [],
-                ['Size Range', 'Number of Farms', 'Percentage'],
+                [t('sizes.export.sizeRange'), t('sizes.export.numberOfFarms'), t('sizes.export.percentage')],
                 ...sizeDistributionData.map(item => {
                     const percentage = totalFarms > 0 ? ((item.farms / totalFarms) * 100).toFixed(2) : 0;
                     return [item.size, item.farms, percentage + '%'];
@@ -314,13 +315,13 @@ const Sizes = () => {
             ];
             const ws2 = XLSX.utils.aoa_to_sheet(sizeDistData);
             ws2['!cols'] = [{ wch: 15 }, { wch: 20 }, { wch: 15 }];
-            XLSX.utils.book_append_sheet(wb, ws2, 'Size Distribution');
+            XLSX.utils.book_append_sheet(wb, ws2, t('sizes.export.sheetSizeDistribution'));
 
             // Sheet 3: Emirate Analysis
             const emirateData = [
-                ['Farm Size Analysis by Emirate'],
+                [t('sizes.export.sheetEmirateAnalysis')],
                 [],
-                ['Emirate', 'Total Size (sqm)', 'Number of Farms', 'Average Size (sqm)'],
+                [t('overview.emirate'), t('sizes.export.totalSize'), t('sizes.export.numberOfFarms'), t('sizes.export.avgSize')],
                 ...sizeByEmirateData.map(item => [
                     item.name,
                     item.totalSize.toFixed(2),
@@ -330,13 +331,13 @@ const Sizes = () => {
             ];
             const ws3 = XLSX.utils.aoa_to_sheet(emirateData);
             ws3['!cols'] = [{ wch: 25 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
-            XLSX.utils.book_append_sheet(wb, ws3, 'Emirate Analysis');
+            XLSX.utils.book_append_sheet(wb, ws3, t('sizes.export.sheetEmirateAnalysis'));
 
             // Sheet 4: Service Center Analysis
             const centerData = [
-                ['Farm Size Analysis by Service Center'],
+                [t('sizes.export.sheetCenterAnalysis')],
                 [],
-                ['Service Center', 'Total Size (sqm)', 'Number of Farms', 'Average Size (sqm)'],
+                [t('overview.center'), t('sizes.export.totalSize'), t('sizes.export.numberOfFarms'), t('sizes.export.avgSize')],
                 ...sizeByCenterData.map(item => [
                     item.name,
                     item.totalSize.toFixed(2),
@@ -346,13 +347,13 @@ const Sizes = () => {
             ];
             const ws4 = XLSX.utils.aoa_to_sheet(centerData);
             ws4['!cols'] = [{ wch: 30 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
-            XLSX.utils.book_append_sheet(wb, ws4, 'Service Center Analysis');
+            XLSX.utils.book_append_sheet(wb, ws4, t('sizes.export.sheetCenterAnalysis'));
 
             // Sheet 5: Cumulative Distribution
             const cumulativeData = [
-                ['Cumulative Farm Size Distribution'],
+                [t('sizes.export.sheetCumulative')],
                 [],
-                ['Size Range', 'Farms in Range', 'Cumulative Farms'],
+                [t('sizes.export.sizeRange'), t('sizes.export.farmsInRange'), t('sizes.export.cumulativeFarms')],
                 ...cumulativeSizeData.map(item => [
                     item.size,
                     item.farms,
@@ -361,36 +362,36 @@ const Sizes = () => {
             ];
             const ws5 = XLSX.utils.aoa_to_sheet(cumulativeData);
             ws5['!cols'] = [{ wch: 15 }, { wch: 20 }, { wch: 20 }];
-            XLSX.utils.book_append_sheet(wb, ws5, 'Cumulative Distribution');
+            XLSX.utils.book_append_sheet(wb, ws5, t('sizes.export.sheetCumulative'));
 
             // Sheet 6: All Farms Detail
             const farmsDetail = [
-                ['All Farms Detailed Data'],
+                [t('sizes.export.allFarmsTitle')],
                 [],
-                ['Farm ID', 'Emirate', 'Service Center', 'Size (sqm)'],
+                [t('sizes.export.farmId'), t('overview.emirate'), t('overview.center'), t('sizes.export.sizeSqrt')],
                 ...filteredFarms.map(farm => {
                     const emirateObj = emirates.find(e => e.id === farm.emirate);
                     const centerObj = centers.find(c => c.id === farm.serviceCenter);
                     return [
                         farm.id || '',
-                        emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : 'N/A',
-                        centerObj ? (isLTR ? centerObj.name : centerObj.nameInArrabic) : 'N/A',
+                        emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : t('nA'),
+                        centerObj ? (isLTR ? centerObj.name : centerObj.nameInArrabic) : t('nA'),
                         Number(farm.size) || 0
                     ];
                 })
             ];
             const ws6 = XLSX.utils.aoa_to_sheet(farmsDetail);
             ws6['!cols'] = [{ wch: 15 }, { wch: 25 }, { wch: 30 }, { wch: 15 }];
-            XLSX.utils.book_append_sheet(wb, ws6, 'All Farms Detail');
+            XLSX.utils.book_append_sheet(wb, ws6, t('sizes.export.sheetAllFarms'));
 
             // Generate and download
             const timestamp = new Date().toISOString().split('T')[0];
-            const filename = `Farm_Size_Analytics_${timestamp}.xlsx`;
+            const filename = `${t('sizes.export.filenamePrefix')}_${timestamp}.xlsx`;
             XLSX.writeFile(wb, filename);
             
         } catch (error) {
             console.error('Export failed:', error);
-            alert('Failed to export data. Please try again.');
+            toast.error(t('sizes.export.exportFailed'));
         } finally {
             setIsExporting(false);
         }
@@ -440,7 +441,7 @@ const Sizes = () => {
                             className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all text-sm border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Download className="w-4 h-4" />
-                            <span>{isExporting ? 'Exporting...' : 'Export'}</span>
+                            <span>{isExporting ? t('sizes.export.exporting') : t('sizes.export.export')}</span>
                         </button>
                     </div>
 

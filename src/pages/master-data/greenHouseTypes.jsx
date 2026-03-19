@@ -66,7 +66,7 @@ export default function GreenHouseTypes() {
 
     const handleSubmit = async () => {
         if (!formData.name) {
-            alert(t('greenHouseTypes.validation.requiredFields'));
+            toast.error(t('greenHouseTypes.validation.requiredFields'));
             return;
         }
 

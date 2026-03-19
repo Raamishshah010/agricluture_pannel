@@ -8,6 +8,7 @@ import PolygonDisplayComponent from '../../components/displayPolygon';
 import { anyPolygonsOverlap, errorMessages, isPolygonInsidePolygon } from '../../utils';
 import Dropdown from '../../components/dropdownWithSearch';
 import useTranslation from '../../hooks/useTranslation';
+import { toast } from 'react-toastify';
 
 export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
     const t = useTranslation();
@@ -316,7 +317,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             setFormData(prev => ({ ...prev, mapData: coords }));
         } else {
             if (!isPolygonInsidePolygon(coords, formData.mapData)) {
-                alert("Your selection is outside the designated farm area. Kindly choose a point within the farm boundaries.");
+                toast.error(t('farms.selectionOutsideFarmArea'));
                 return;
             }
             if (selectedCropIndex < 0) return;
@@ -328,7 +329,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             const polygons = [...fruits, ...vegetables, ...fodders, ...greenhouses, ...stocks];
             const isOverlap = anyPolygonsOverlap([...polygons, coords]);
             if (isOverlap) {
-                alert("Your selection is overlaped  with some other crops.");
+                toast.error(t('farms.selectionOverlapped'));
                 return;
             }
             const updateFunctions = {
@@ -879,7 +880,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                         <button
                                             onClick={() => {
                                                 if (!formData.mapData || !formData.mapData.length) {
-                                                    alert("A farm area selection is required before you proceed.");
+                                                    toast.error(t('farms.farmAreaSelectionRequired'));
                                                     return;
                                                 }
                                                 setOpen(true);
@@ -970,7 +971,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                         <button
                                             onClick={() => {
                                                 if (!formData.mapData || !formData.mapData.length) {
-                                                    alert("A farm area selection is required before you proceed.");
+                                                    toast.error(t('farms.farmAreaSelectionRequired'));
                                                     return;
                                                 }
                                                 setOpen(true);
@@ -1098,7 +1099,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                     <button
                                         onClick={() => {
                                             if (!formData.mapData || !formData.mapData.length) {
-                                                alert("A farm area selection is required before you proceed.");
+                                                toast.error(t('farms.farmAreaSelectionRequired'));
                                                 return;
                                             }
                                             setOpen(true);
@@ -1197,7 +1198,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                     <button
                                         onClick={() => {
                                             if (!formData.mapData || !formData.mapData.length) {
-                                                alert("A farm area selection is required before you proceed.");
+                                                toast.error(t('farms.farmAreaSelectionRequired'));
                                                 return;
                                             }
                                             setOpen(true);
@@ -1297,7 +1298,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                     <button
                                         onClick={() => {
                                             if (!formData.mapData || !formData.mapData.length) {
-                                                alert("A farm area selection is required before you proceed.");
+                                                toast.error(t('farms.farmAreaSelectionRequired'));
                                                 return;
                                             }
                                             setOpen(true);

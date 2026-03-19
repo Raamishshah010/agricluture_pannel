@@ -66,7 +66,7 @@ export default function Poessessions() {
 
     const handleSubmit = async () => {
         if (!formData.name) {
-            alert(t('possession.validation.requiredFields'));
+            toast.error(t('possession.validation.requiredFields'));
             return;
         }
 

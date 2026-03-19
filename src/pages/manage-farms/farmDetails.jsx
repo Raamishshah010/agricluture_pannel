@@ -25,7 +25,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     const [isDownloadOpen, setIsDownloadOpen] = useState(false);
 
     const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
+        if (!dateString) return t('common.nA');
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -51,7 +51,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         <div className={`flex justify-between items-start py-2 hover:bg-white/50 px-2 rounded transition-colors ${isLTR ? "flex-row" : "flex-row"}`}>
             <span className="text-sm text-gray-600 font-semibold">{isLTR ? `${label}:` : `${label}:`}</span>
             <span className={`text-sm text-gray-900 text-right max-w-xs font-medium ${valueClass}`}>
-                {value || 'N/A'}
+                {value || t('common.nA')}
             </span>
         </div>
     );
@@ -100,13 +100,13 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
     // Helper to get localized possession style name
     const getPossessionStyleName = () => {
-        if (!farm.possessionStyle) return 'N/A';
+        if (!farm.possessionStyle) return t('common.nA');
         return isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic;
     };
 
     // Helper to get localized farming system names
     const getFarmingSystemNames = () => {
-        if (!farm.farmingSystem || farm.farmingSystem.length === 0) return 'N/A';
+        if (!farm.farmingSystem || farm.farmingSystem.length === 0) return t('common.nA');
         return farm.farmingSystem.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ');
     };
 
@@ -138,11 +138,11 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         yPosition += 10;
 
         const basicInfo = [
-            [isLTR ? 'Agriculture ID' : 'معرف الزراعة', farm.agricultureId || 'N/A'],
-            [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.phoneNumber || 'N/A'],
-            [isLTR ? 'Farm Number' : 'رقم المزرعة', farm.farmNo || 'N/A'],
-            [isLTR ? 'Farm Serial' : 'مسلسل المزرعة', farm.farmSerial || 'N/A'],
-            [isLTR ? 'Status' : 'الحالة', farm.status || 'N/A'],
+            [isLTR ? 'Agriculture ID' : 'معرف الزراعة', farm.agricultureId || t('common.nA')],
+            [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.phoneNumber || t('common.nA')],
+            [isLTR ? 'Farm Number' : 'رقم المزرعة', farm.farmNo || t('common.nA')],
+            [isLTR ? 'Farm Serial' : 'مسلسل المزرعة', farm.farmSerial || t('common.nA')],
+            [isLTR ? 'Status' : 'الحالة', farm.status || t('common.nA')],
             [isLTR ? 'Total Area' : 'المساحة الإجمالية', `${Math.round(farm.totalArea)} ${isLTR ? 'ha' : 'هكتار'}`],
             [isLTR ? 'Size' : 'الحجم', `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
             [isLTR ? 'Possession Style' : 'أسلوب الاستحواذ', getPossessionStyleName()],
@@ -170,9 +170,9 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         yPosition += 10;
 
         const ownerInfo = [
-            [isLTR ? 'Name' : 'الاسم', farm.owner?.name || 'N/A'],
-            [isLTR ? 'Email' : 'البريد الإلكتروني', farm.owner?.email || 'N/A'],
-            [isLTR ? 'Emirates ID' : 'الهوية الإماراتية', farm.emiratesID || 'N/A'],
+            [isLTR ? 'Name' : 'الاسم', farm.owner?.name || t('common.nA')],
+            [isLTR ? 'Email' : 'البريد الإلكتروني', farm.owner?.email || t('common.nA')],
+            [isLTR ? 'Emirates ID' : 'الهوية الإماراتية', farm.emiratesID || t('common.nA')],
             [isLTR ? 'Email Verified' : 'تم التحقق من البريد الإلكتروني', farm.owner?.isEmailVerified ? (isLTR ? 'Yes' : 'نعم') : (isLTR ? 'No' : 'لا')],
         ];
 
@@ -285,9 +285,9 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
             const waterInfo = [
                 [isLTR ? 'Water Sources' : 'مصادر المياه', farm.waterSources.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ')],
-                [isLTR ? 'Irrigation Systems' : 'أنظمة الري', farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || 'N/A'],
-                [isLTR ? 'Production Wells' : 'آبار الإنتاج', farm.numberOfProductionWells || 'N/A'],
-                [isLTR ? 'Desalination Units' : 'وحدات تحلية المياه', farm.desalinationUnits || 'N/A'],
+                [isLTR ? 'Irrigation Systems' : 'أنظمة الري', farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || t('common.nA')],
+                [isLTR ? 'Production Wells' : 'آبار الإنتاج', farm.numberOfProductionWells || t('common.nA')],
+                [isLTR ? 'Desalination Units' : 'وحدات تحلية المياه', farm.desalinationUnits || t('common.nA')],
             ];
 
             autoTable(doc, {
@@ -315,7 +315,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             const fruitsData = farm.crops.fruits.map(fruit => [
                 fruitType(fruit),
                 `${fruit.area} ${isLTR ? 'm²' : 'م²'}`,
-                fruit.totalTrees || 'N/A',
+                fruit.totalTrees || t('common.nA'),
                 `${fruit.productionPercent} ${isLTR ? 'kg' : 'كجم'}`
             ]);
 

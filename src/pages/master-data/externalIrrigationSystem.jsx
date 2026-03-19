@@ -66,7 +66,7 @@ export default function ExternalIrrigationSystem() {
 
     const handleSubmit = async () => {
         if (!formData.name.trim()) {
-            alert(t('externalIrrigationSystem.pleaseFillRequiredFields'));
+            toast.error(t('externalIrrigationSystem.pleaseFillRequiredFields'));
             return;
         }
 

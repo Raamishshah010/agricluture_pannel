@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import useTranslation from '../../hooks/useTranslation';
 import { CgArrowLeft, CgArrowRight } from 'react-icons/cg';
 import {Globe,ChevronDown ,CircleHelp } from "lucide-react"
 
 import logo from '../../assets/logo.png'
 import { Link, useNavigate } from 'react-router-dom';
 export const ForgotPassword = () => {
+  const t = useTranslation();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
@@ -14,9 +16,9 @@ export const ForgotPassword = () => {
 
   const handleSend = () => {
     if (!email) {
-      setError("Please enter your email address.");
+      setError(t('auth.forgot.errors.emailRequired'));
     } else if (!emailRegex.test(email)) {
-      setError("Please enter a correct email address.");
+      setError(t('auth.forgot.errors.emailInvalid'));
     } else {
       setError("");
       // ...send reset link logic...
@@ -42,13 +44,13 @@ export const ForgotPassword = () => {
                                alt="Mazraty Logo"
                                className="h-[100px] w-auto object-contain"
                              />
-                 <h1 className="text-3xl mb-4 mt-10 font-semibold text-gray-800">Forgot Passwaord</h1>
+                 <h1 className="text-3xl mb-4 mt-10 font-semibold text-gray-800">{t('auth.forgot.title')}</h1>
                </div>
-        <p className="mt-2 text-gray-900 md:mb-10 mb-4">Enter the email associated with your account, and we'll send you a link to reset your password.</p>
+        <p className="mt-2 text-gray-900 md:mb-10 mb-4">{t('auth.forgot.description')}</p>
         <div className='flex flex-col gap-4 w-full justify-center items-center'>
           <input
             type="email"
-            placeholder="Email address"
+            placeholder={t('auth.forgot.placeholder')}
             value={email}
             onChange={e => setEmail(e.target.value)}
             className="p-2 border rounded-md w-full md:max-w-[400px]"
@@ -62,7 +64,7 @@ export const ForgotPassword = () => {
             type="button"
             onClick={handleSend}
           >
-            Send reset link
+            {t('auth.forgot.sendButton')}
           </button>
        
           <div>

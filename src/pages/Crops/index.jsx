@@ -337,11 +337,11 @@ const Emirates = () => {
     const cropsByEmirate = {};
     transformFarms.forEach((farm) => {
       const emirate = emirates.find((e) => e.id === farm.emirate);
-      const emirateName = emirate
-        ? isLTR
-          ? emirate.name
-          : emirate.nameInArrabic
-        : "Other";
+        const emirateName = emirate
+          ? isLTR
+            ? emirate.name
+            : emirate.nameInArrabic
+          : t('common.components.unknown');
 
       if (!cropsByEmirate[emirateName]) {
         cropsByEmirate[emirateName] = {
@@ -376,7 +376,7 @@ const Emirates = () => {
         ? isLTR
           ? center.name
           : center.nameInArrabic
-        : "Other";
+        : t('common.components.unknown');
 
       if (!cropsByCenter[centerName]) {
         cropsByCenter[centerName] = {
@@ -545,19 +545,19 @@ const Emirates = () => {
 
       // Sheet 1: Summary Statistics
       const summaryData = [
-        ["Farm Crop Analytics Dashboard"],
-        ["Generated on:", new Date().toLocaleString()],
+        [t('analytics.crops.export.title')],
+        [t('analytics.crops.export.generatedOn'), new Date().toLocaleString()],
         [],
-        ["Metric", "Value"],
-        ["Total Farms", transformFarms.length],
-        ["Farms with Fruits", cropsStats.fruits],
-        ["Farms with Vegetables", cropsStats.vegetables],
-        ["Farms with Fodders", cropsStats.fodders],
-        ["Farms with Greenhouses", cropsStats.greenhouses],
+        [t('analytics.crops.export.metric'), t('analytics.crops.export.value')],
+        [t('analytics.crops.export.totalFarms'), transformFarms.length],
+        [t('analytics.crops.export.farmsWithFruits'), cropsStats.fruits],
+        [t('analytics.crops.export.farmsWithVegetables'), cropsStats.vegetables],
+        [t('analytics.crops.export.farmsWithFodders'), cropsStats.fodders],
+        [t('analytics.crops.export.farmsWithGreenhouses'), cropsStats.greenhouses],
       ];
       const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
       ws1["!cols"] = [{ wch: 30 }, { wch: 20 }];
-      XLSX.utils.book_append_sheet(wb, ws1, "Summary");
+      XLSX.utils.book_append_sheet(wb, ws1, t('analytics.crops.export.sheetSummary'));
 
       // Sheet 2: Crop Type Distribution
       const cropTypeSheetData = [
@@ -574,27 +574,27 @@ const Emirates = () => {
       ];
       const ws2 = XLSX.utils.aoa_to_sheet(cropTypeSheetData);
       ws2["!cols"] = [{ wch: 20 }, { wch: 20 }, { wch: 15 }];
-      XLSX.utils.book_append_sheet(wb, ws2, "Crop Types");
+      XLSX.utils.book_append_sheet(wb, ws2, t('analytics.crops.export.sheetCropTypes'));
 
       // Sheet 3: Top Fruits
       if (analyticsData.topFruitData.length > 0) {
         const fruitsData = [
-          ["Top Fruit Types"],
+          [t('analytics.crops.export.sheetTopFruits')],
           [],
-          ["Fruit Type", "Number of Farms"],
+          [t('analytics.crops.export.colFruitType'), t('analytics.crops.export.colNumberOfFarms')],
           ...analyticsData.topFruitData.map((item) => [item.name, item.count]),
         ];
         const ws3 = XLSX.utils.aoa_to_sheet(fruitsData);
         ws3["!cols"] = [{ wch: 25 }, { wch: 20 }];
-        XLSX.utils.book_append_sheet(wb, ws3, "Top Fruits");
+        XLSX.utils.book_append_sheet(wb, ws3, t('analytics.crops.export.sheetTopFruits'));
       }
 
       // Sheet 4: Top Vegetables
       if (analyticsData.topVegetableData.length > 0) {
         const vegetablesData = [
-          ["Top Vegetable Types"],
+          [t('analytics.crops.export.sheetTopVegetables')],
           [],
-          ["Vegetable Type", "Number of Farms"],
+          [t('analytics.crops.export.colVegetableType'), t('analytics.crops.export.colNumberOfFarms')],
           ...analyticsData.topVegetableData.map((item) => [
             item.name,
             item.count,
@@ -602,33 +602,33 @@ const Emirates = () => {
         ];
         const ws4 = XLSX.utils.aoa_to_sheet(vegetablesData);
         ws4["!cols"] = [{ wch: 25 }, { wch: 20 }];
-        XLSX.utils.book_append_sheet(wb, ws4, "Top Vegetables");
+        XLSX.utils.book_append_sheet(wb, ws4, t('analytics.crops.export.sheetTopVegetables'));
       }
 
       // Sheet 5: Top Fodders
       if (analyticsData.topFodderData.length > 0) {
         const foddersData = [
-          ["Top Fodder Types"],
+          [t('analytics.crops.export.sheetTopFodders')],
           [],
-          ["Fodder Type", "Number of Farms"],
+          [t('analytics.crops.export.colFodderType'), t('analytics.crops.export.colNumberOfFarms')],
           ...analyticsData.topFodderData.map((item) => [item.name, item.count]),
         ];
         const ws5 = XLSX.utils.aoa_to_sheet(foddersData);
         ws5["!cols"] = [{ wch: 25 }, { wch: 20 }];
-        XLSX.utils.book_append_sheet(wb, ws5, "Top Fodders");
+        XLSX.utils.book_append_sheet(wb, ws5, t('analytics.crops.export.sheetTopFodders'));
       }
 
       // Sheet 6: Crops by Emirate
       const emirateData = [
-        ["Farms by Emirate"],
+        [t('analytics.crops.export.sheetByEmirate')],
         [],
         [
-          "Emirate",
-          "Total Farms",
-          "With Fruits",
-          "With Vegetables",
-          "With Fodders",
-          "With Greenhouses",
+          t('analytics.crops.export.colEmirate'),
+          t('analytics.crops.export.colTotalFarms'),
+          t('analytics.crops.export.farmsWithFruits'),
+          t('analytics.crops.export.farmsWithVegetables'),
+          t('analytics.crops.export.farmsWithFodders'),
+          t('analytics.crops.export.farmsWithGreenhouses'),
         ],
         ...analyticsData.cropsByEmirateData.map((item) => [
           item.name,
@@ -648,19 +648,19 @@ const Emirates = () => {
         { wch: 15 },
         { wch: 18 },
       ];
-      XLSX.utils.book_append_sheet(wb, ws6, "By Emirate");
+      XLSX.utils.book_append_sheet(wb, ws6, t('analytics.crops.export.sheetByEmirate'));
 
       // Sheet 7: Crops by Service Center
       const centerData = [
-        ["Farms by Service Center"],
+        [t('analytics.crops.export.sheetByCenter')],
         [],
         [
-          "Service Center",
-          "Total Farms",
-          "With Fruits",
-          "With Vegetables",
-          "With Fodders",
-          "With Greenhouses",
+          t('analytics.crops.export.colServiceCenter'),
+          t('analytics.crops.export.colTotalFarms'),
+          t('analytics.crops.export.farmsWithFruits'),
+          t('analytics.crops.export.farmsWithVegetables'),
+          t('analytics.crops.export.farmsWithFodders'),
+          t('analytics.crops.export.farmsWithGreenhouses'),
         ],
         ...analyticsData.cropsByCenterData.map((item) => [
           item.name,
@@ -680,14 +680,14 @@ const Emirates = () => {
         { wch: 15 },
         { wch: 18 },
       ];
-      XLSX.utils.book_append_sheet(wb, ws7, "By Service Center");
+      XLSX.utils.book_append_sheet(wb, ws7, t('analytics.crops.export.sheetByCenter'));
 
       // Sheet 8: Greenhouse Types
       if (analyticsData.greenhouseTypeData.length > 0) {
         const greenhouseData = [
-          ["Greenhouse Types Distribution"],
+          [t('analytics.crops.export.sheetGreenhouseTypes')],
           [],
-          ["Greenhouse Type", "Count"],
+          [t('analytics.crops.export.colGreenhouseType'), t('analytics.crops.export.colCount')],
           ...analyticsData.greenhouseTypeData.map((item) => [
             item.name,
             item.count,
@@ -695,28 +695,28 @@ const Emirates = () => {
         ];
         const ws8 = XLSX.utils.aoa_to_sheet(greenhouseData);
         ws8["!cols"] = [{ wch: 30 }, { wch: 15 }];
-        XLSX.utils.book_append_sheet(wb, ws8, "Greenhouse Types");
+        XLSX.utils.book_append_sheet(wb, ws8, t('analytics.crops.export.sheetGreenhouseTypes'));
       }
 
       // Sheet 9: Cover Types
       if (analyticsData.coverTypeData.length > 0) {
         const coverData = [
-          ["Cover Types Distribution"],
+          [t('analytics.crops.export.sheetCoverTypes')],
           [],
-          ["Cover Type", "Count"],
+          [t('analytics.crops.export.colCoverType'), t('analytics.crops.export.colCount')],
           ...analyticsData.coverTypeData.map((item) => [item.name, item.count]),
         ];
         const ws9 = XLSX.utils.aoa_to_sheet(coverData);
         ws9["!cols"] = [{ wch: 30 }, { wch: 15 }];
-        XLSX.utils.book_append_sheet(wb, ws9, "Cover Types");
+        XLSX.utils.book_append_sheet(wb, ws9, t('analytics.crops.export.sheetCoverTypes'));
       }
 
       // Sheet 10: Farming Systems
       if (analyticsData.farmingSystemData.length > 0) {
         const farmingData = [
-          ["Farming Systems Distribution"],
+          [t('analytics.crops.export.sheetFarmingSystems')],
           [],
-          ["Farming System", "Count"],
+          [t('analytics.crops.export.colFarmingSystem'), t('analytics.crops.export.colCount')],
           ...analyticsData.farmingSystemData.map((item) => [
             item.name,
             item.count,
@@ -724,16 +724,17 @@ const Emirates = () => {
         ];
         const ws10 = XLSX.utils.aoa_to_sheet(farmingData);
         ws10["!cols"] = [{ wch: 30 }, { wch: 15 }];
-        XLSX.utils.book_append_sheet(wb, ws10, "Farming Systems");
+        XLSX.utils.book_append_sheet(wb, ws10, t('analytics.crops.export.sheetFarmingSystems'));
       }
 
       // Generate and download
       const timestamp = new Date().toISOString().split("T")[0];
-      const filename = `Farm_Crop_Analytics_${timestamp}.xlsx`;
+      const filenamePrefix = t('analytics.crops.export.filenamePrefix') || 'Farm_Crop_Analytics';
+      const filename = `${filenamePrefix}_${timestamp}.xlsx`;
       XLSX.writeFile(wb, filename);
-    } catch (error) {
+      } catch (error) {
       console.error("Export failed:", error);
-      alert("Failed to export data. Please try again.");
+      toast.error(t('analytics.crops.export.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -754,7 +755,7 @@ const Emirates = () => {
       await farmService.updateFarm(item, id);
       setSelectedFarm(null);
       setActiveTab("emirates");
-      toast.success("Updated successfully");
+      toast.success(t('analytics.crops.updatedSuccessfully'));
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);
     }
@@ -816,7 +817,7 @@ const Emirates = () => {
             className="flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-all text-sm border bg-white text-gray-700 border-gray-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Download className="w-4 h-4" />
-            <span>{isExporting ? "Exporting..." : "Export"}</span>
+            <span>{isExporting ? t('analytics.crops.export.exporting') : t('common.export')}</span>
           </button>
         </div>
 

@@ -66,7 +66,7 @@ export default function Regions() {
 
     const handleSubmit = async () => {
         if (!formData.name || !formData.nameInArrabic) {
-            alert(t('regions.validation.allFieldsRequired'));
+            toast.error(t('regions.validation.allFieldsRequired'));
             return;
         }
 

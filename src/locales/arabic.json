@@ -36,6 +36,34 @@
     "deleteSelectedConfirm": "هل أنت متأكد من أنك تريد حذف المسؤولين المحددين؟",
     "deleteSelected": "حذف المحددين"
   },
+  "sizes": {
+    "title": "إجمالي مسارات المزارع المسجلة في الإمارات!",
+    "farmSizes": "أحجام المزارع",
+    "downloadReport": "تنزيل التقرير",
+    "avgFarmSize": "متوسط الحجم",
+    "medianSize": "الحجم الوسيط",
+    "mostCommonRange": "نطاق الحجم الأكثر شيوعًا",
+    "farmsInCommonRange": "المزارع في النطاق الأكثر شيوعًا",
+    "export": {
+      "title": "لوحة تحليلات أحجام المزارع",
+      "generatedOn": "تم إنشاؤه في:",
+      "filtersApplied": "المرشحات المطبقة:",
+      "metric": "المؤشر",
+      "value": "القيمة",
+      "unit": "الوحدة",
+      "unitFarms": "مزرعة",
+      "allFarmsTitle": "تفاصيل جميع المزارع",
+      "farmId": "معرّف المزرعة",
+      "sizeSqrt": "المساحة (م²)",
+      "export": "تصدير",
+      "exporting": "جارٍ التصدير..."
+    },
+    "map": {
+      "sizeLabel": "الحجم",
+      "unit": "فدان",
+      "viewDetails": "عرض التفاصيل"
+    }
+  },
   "translation": {
     "emiratesAnalytics": "تحليلات الإمارات",
     "emiratesAnalyticsSub": "رؤى شاملة لبيانات المزرعة",
@@ -102,26 +130,18 @@
     "farmanalytics&insights": "تحليلات المزرعة والرؤى",
     "selectGreenhouseType": "اختر نوع البيت المحمي",
     "selectCoverType": "اختر نوع الغطاء",
-    "avgAreaPerGreenhouse": "متوسط المساحة لكل دفيئة"
+    "avgAreaPerGreenhouse": "متوسط المساحة لكل دفيئة",
+    "other": "أخرى"
   },
-  "status": {
-    "download": "تحميل",
-    "all": "الكل",
-    "active": "نشط",
-    "pending": "قيد الانتظار",
-    "assigned": "تم التعيين",
-    "suspended": "معلق",
-    "drafts": "مسودات",
-    "rejected": "مرفوض"
-  },
+  "status": "الحالة",
   "kpi": {
     "totalFarms": "إجمالي المزارع",
     "totalArea": "إجمالي المساحة",
     "totalWells": "إجمالي الآبار",
     "avgAreaPerFarm": "متوسط مساحة المزرعة",
     "hectaresPerFarm": "الهكتارات لكل مزرعة",
-    "productionWells": "آبار الإنتاج"
-    ,"nA": "غير متوفر"
+    "productionWells": "آبار الإنتاج",
+    "nA": "غير متوفر"
   },
   "stats": {
     "totalFarms": "إجمالي المزارع",
@@ -300,6 +320,7 @@
   },
   "common": {
     "loading": "جاري التحميل...",
+    "processing": "جاري المعالجة...",
     "noDataToExport": "لا توجد بيانات للتصدير",
     "save": "حفظ",
     "edit": "تعديل",
@@ -356,6 +377,7 @@
       "noResultsFound": "لم يتم العثور على نتائج",
       "pleaseDrawPolygon": "الرجاء رسم مضلع أولاً",
       "moreThanOnePolygon": "تم اختيار أكثر من مضلع، سيتم تقديم المضلع الأول فقط",
+      "unknown": "غير معروف",
       "dashboard": {
         "logout": "تسجيل الخروج",
         "others": "أخرى",
@@ -444,8 +466,7 @@
         "statusUnchanged": "الحالة لم تتغير.",
         "statusUpdatedSuccess": "تم تحديث حالة المزرعة إلى {status} بنجاح",
         "nA": "غير متوفر",
-        "statusUpdatedSuccessfully": "تم تحديث الحالة بنجاح"
-        ,
+        "statusUpdatedSuccessfully": "تم تحديث الحالة بنجاح",
         "download": "تنزيل",
         "downloadOptions": {
           "csv": "تنسيق CSV",
@@ -458,6 +479,7 @@
       }
     },
     "nA": "غير متوفر",
+    "exportFailed": "فشل تصدير البيانات. حاول مرة أخرى.",
     "clear": "مسح",
     "errorLoading": "خطأ في التحميل",
     "errorOccurred": "حدث خطأ",
@@ -685,7 +707,17 @@
     "emirateId": "رقم الإمارة",
     "createdAt": "تاريخ الإنشاء",
     "filterActive": "تصفية نشطة",
-    "results": "النتائج"
+    "results": "النتائج",
+    "downloading": "جاري التنزيل...",
+    "downloadAllPages": "تنزيل كل الصفحات",
+    "downloadOptions": {
+      "pdf": "تنزيل PDF",
+      "excel": "تنزيل Excel",
+      "csv": "تنزيل CSV"
+    },
+    "sheetName": "المزارعون",
+    "pdfTitle": "قائمة المزارعين",
+    "pdfTotalRecords": "إجمالي السجلات:"
   },
   "auth": {
     "welcomeBack": "مرحباً بعودتك!",
@@ -701,8 +733,66 @@
     },
     "toast": {
       "loginFailed": "فشل تسجيل الدخول"
+    },
+    "passwordResetSuccessful": "تم إعادة تعيين كلمة المرور بنجاح",
+    "passwordResetSuccessDesc": "تمت إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.",
+    "goToLogin": "الذهاب إلى تسجيل الدخول",
+    "uaePassDemo": "عرض UAE Pass",
+    "loginWithUaePass": "تسجيل الدخول عبر UAE Pass",
+    "uaePassDescription": "انقر على زر تسجيل الدخول لبدء بيئة UAE Pass. يتعامل الخادم الخلفي مع الاستدعاء ويعيد ملف تعريف المستخدم المشفر ليتم عرضه هنا.",
+    "redirectUri": "عنوان التحويل:",
+    "status": "الحالة",
+    "stateMismatch": "أعاد الخادم حالة لا تتطابق مع الحالة المخزنة قبل إعادة التوجيه.",
+    "stateMismatchMessage": "القيمة المرجعة للحالة لا تتطابق مع القيمة المخزنة.",
+    "stateHandshakeFailed": "فشل تبادل الحالة بعد العودة من UAE Pass.",
+    "payloadDecodeFailed": "يتعذر قراءة الحمولة المرجعة من الخادم الخلفي.",
+    "payloadDecodeFailedStatus": "فشل فك ترميز الحمولة بعد إعادة التوجيه.",
+    "preparingLogin": "جارٍ إعداد تسجيل الدخول عبر UAE Pass...",
+    "userProfile": "ملف المستخدم",
+    "retrievedAttributes": "السمات المسترجعة",
+    "startOver": "ابدأ من جديد",
+    "readyToStart": "جاهز لبدء المصافحة"
+  },
+  "reset": {
+    "title": "إعادة تعيين كلمة المرور",
+    "description": "أنشئ كلمة مرور جديدة لحسابك.",
+    "newPasswordPlaceholder": "كلمة المرور الجديدة",
+    "confirmPasswordPlaceholder": "تأكيد كلمة المرور",
+    "saveButton": "حفظ كلمة المرور",
+    "errors": {
+      "newPasswordRequired": "يرجى إدخال كلمة مرور جديدة",
+      "confirmPasswordRequired": "يرجى تأكيد كلمة المرور",
+      "passwordsMismatch": "كلمتا المرور غير متطابقتين، حاول مرة أخرى"
     }
   },
+  "forgot": {
+    "title": "نسيت كلمة المرور",
+    "description": "أدخل البريد الإلكتروني المرتبط بحسابك وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.",
+    "placeholder": "البريد الإلكتروني",
+    "sendButton": "إرسال رابط إعادة التعيين",
+    "errors": {
+      "emailRequired": "يرجى إدخال عنوان البريد الإلكتروني.",
+      "emailInvalid": "يرجى إدخال عنوان بريد إلكتروني صحيح."
+    }
+  },
+  "confirm": {
+    "title": "تحقق من بريدك",
+    "description": "أرسلنا رابط تأكيد إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد (وأيضًا صندوق الرسائل المزعجة).",
+    "didNotReceive": "لم يصل البريد؟",
+    "resendLink": "إعادة إرسال الرابط"
+  },
+  "passwordResetSuccessful": "تم إعادة تعيين كلمة المرور بنجاح",
+  "passwordResetSuccessDesc": "تمت إعادة تعيين كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.",
+  "goToLogin": "الذهاب إلى تسجيل الدخول",
+  "uaePassDemo": "عرض UAE Pass",
+  "loginWithUaePass": "تسجيل الدخول عبر UAE Pass",
+  "uaePassDescription": "انقر على زر تسجيل الدخول لبدء بيئة UAE Pass. يتعامل الخادم الخلفي مع الاستدعاء ويعيد ملف تعريف المستخدم المشفر ليتم عرضه هنا.",
+  "redirectUri": "عنوان التحويل:",
+  "stateMismatch": "أعاد الخادم حالة لا تتطابق مع الحالة المخزنة قبل إعادة التوجيه.",
+  "userProfile": "ملف المستخدم",
+  "retrievedAttributes": "السمات المسترجعة",
+  "startOver": "ابدأ من جديد",
+  "readyToStart": "جاهز لبدء المصافحة",
   "analytics": {
     "crops": {
       "title": "فئات المحاصيل",
@@ -719,26 +809,79 @@
       "selectCrop": "اختر المحصول",
       "selectFarming": "اختر نوع الزراعة",
       "selectCover": "اختر نوع الغطاء",
-      "totalFarms": "إجمالي المزارع لكل فئة من فئات المحاصيل!"
+      "totalFarms": "إجمالي المزارع لكل فئة من فئات المحاصيل!",
+      "export": {
+        "title": "لوحة تحليلات المحاصيل الزراعية",
+        "generatedOn": "تاريخ الإنشاء:",
+        "metric": "المقياس",
+        "value": "القيمة",
+        "totalFarms": "إجمالي المزارع",
+        "farmsWithFruits": "مزارع تحتوي على فواكه",
+        "farmsWithVegetables": "مزارع تحتوي على خضروات",
+        "farmsWithFodders": "مزارع تحتوي على أعلاف",
+        "farmsWithGreenhouses": "مزارع تحتوي على بيوت محمية",
+        "sheetSummary": "الملخص",
+        "sheetCropTypes": "أنواع المحاصيل",
+        "sheetTopFruits": "أعلى أنواع الفاكهة",
+        "sheetTopVegetables": "أعلى أنواع الخضروات",
+        "sheetTopFodders": "أعلى أنواع الأعلاف",
+        "sheetByEmirate": "حسب الإمارة",
+        "sheetByCenter": "حسب مركز الخدمة",
+        "sheetGreenhouseTypes": "أنواع البيوت المحمية",
+        "sheetCoverTypes": "أنواع الغطاء",
+        "sheetFarmingSystems": "أنظمة الزراعة",
+        "exporting": "جارٍ التصدير...",
+        "exportFailed": "فشل التصدير. حاول مرة أخرى"
+      },
+      "updatedSuccessfully": "تم التحديث بنجاح"
     },
     "farmAnalytics": {
-      "title": "تحليلات تسجيل المزارع",
-      "emirateRegionCenter": "الإمارة    المنطقة    المركز",
-      "totalFarms": "إجمالي المزارع",
-      "totalCultivatedArea": "إجمالي المساحة المزروعة",
-      "totalGreenhouseArea": "إجمالي مساحة البيوت المحمية",
-      "avgWellsFarm": "متوسط الآبار/المزرعة",
-      "totalDesalinated": "إجمالي المياه المحلَّاة",
-      "farmsByEmirate": "المزارع حسب الإمارة",
-      "landUseBreakdown": "توزيع استخدامات الأراضي",
-      "waterSourceUsage": "استخدام مصادر المياه حسب المنطقة",
-      "farmingSystems": "أنظمة الزراعة",
-      "recentChanges": "آخر التغييرات / التنبيهات",
-      "farmId": "رقم المزرعة",
-      "emirateRegionCenterHeader": "الإمارة / المنطقة / المركز",
-      "wellsCount": "الآبار-العدد",
-      "waterSources": "مصادر المياه",
-      "cultivatedPercent": "المزروع %"
+      "export": {
+        "title": "تقرير تحليلات المزارع",
+        "generatedOn": "تاريخ الإنشاء:",
+        "appliedFilters": "المرشحات المطبقة:",
+        "region": "المنطقة",
+        "emirate": "الإمارة",
+        "center": "المركز",
+        "location": "الموقع",
+        "metric": "المقياس",
+        "value": "القيمة",
+        "totalFarms": "إجمالي المزارع",
+        "totalCultivatedArea": "إجمالي المساحة المزروعة (هكتار)",
+        "totalGreenhouseArea": "إجمالي مساحة البيوت المحمية (هكتار)",
+        "avgWellsPerFarm": "متوسط الآبار لكل مزرعة",
+        "waterSources": "مصادر المياه",
+        "groundwaterOnly": "مياه جوفية فقط",
+        "desalinatedOnly": "محلّاة فقط",
+        "both": "كلاهما",
+        "exporting": "جارٍ التصدير...",
+        "exportFailed": "فشل التصدير. حاول مرة أخرى",
+        "exportReport": "تصدير التقرير",
+        "filenamePrefix": "تحليلات_المزارع",
+        "sheetSummary": "الملخص",
+        "sheetByEmirate": "المزارع حسب الإمارة",
+        "colEmirate": "الإمارة",
+        "colNumberOfFarms": "عدد المزارع",
+        "colTotalArea": "إجمالي المساحة (هكتار)",
+        "sheetLandUse": "توزيع استخدامات الأراضي",
+        "colCategory": "الفئة",
+        "colPercentage": "النسبة %",
+        "sheetTopFruits": "أعلى أنواع الفاكهة",
+        "colFruitType": "نوع الفاكهة",
+        "sheetTopVegetables": "أعلى أنواع الخضروات",
+        "colVegetableType": "نوع الخضار",
+        "sheetByCenter": "المزارع حسب المركز",
+        "colServiceCenter": "مركز الخدمة",
+        "sheetGreenhouseData": "بيانات البيوت المحمية",
+        "colGreenhouseType": "نوع البيت المحمي",
+        "colCount": "العدد",
+        "colCoverType": "نوع الغطاء",
+        "sheetTopFarms": "أفضل المزارع حسب مساحة البيوت المحمية",
+        "colFarmId": "رقم المزرعة",
+        "colCenter": "المركز",
+        "colGreenhouses": "عدد البيوت المحمية",
+        "colArea": "المساحة (هكتار)"
+      }
     },
     "greenhouseDashboard": {
       "title": "البيوت المحمية والزراعة المحمية",
@@ -757,7 +900,9 @@
       "emirate": "الإمارة",
       "region": "المنطقة",
       "greenhouses": "البيوت المحمية",
-      "greenhouseAreaHa": "مساحة البيوت المحمية (هكتار)"
+      "greenhouseAreaHa": "مساحة البيوت المحمية (هكتار)",
+      "exportReport": "تصدير التقرير",
+      "exporting": "جارٍ التصدير..."
     },
     "center": {
       "title": "إدارة المراكز",
@@ -786,7 +931,21 @@
   },
   "articles": {
     "category": {
-      "empty": "لم يتم العثور على فئات. أضف فئتك الأولى للبدء."
+      "title": "فئات المقالات",
+      "add": "إضافة فئة",
+      "empty": "لم يتم العثور على فئات. أضف فئتك الأولى للبدء.",
+      "table": {
+        "name": "الاسم",
+        "nameArabic": "الاسم (بالعربية)",
+        "createdAt": "تاريخ الإنشاء",
+        "actions": "الإجراءات"
+      },
+      "modal": {
+        "addTitle": "إضافة فئة جديدة",
+        "editTitle": "تعديل الفئة",
+        "namePlaceholder": "مثال: مهارات الزراعة",
+        "nameArabicPlaceholder": "مثال: مهارات الزراعة"
+      }
     },
     "title": "المقالات",
     "subtitle": "إدارة مقالاتك ومنشورات المدونة",
@@ -808,6 +967,29 @@
       "empty": {
         "noItems": "لا توجد فئات فرعية بعد",
         "cta": "انقر على \"إضافة فئة فرعية\" لإنشاء واحدة"
+      },
+      "title": "الفئات الفرعية للمقالات",
+      "subtitle": "إدارة الفئات الفرعية المستخدمة بالمقالات",
+      "add": "إضافة فئة فرعية",
+      "modal": {
+        "addTitle": "إضافة فئة فرعية جديدة",
+        "editTitle": "تعديل الفئة الفرعية",
+        "imageLabel": "الصورة",
+        "imageOptional": "اختياري - اتركه للابقاء على الحالي",
+        "nameLabel": "الاسم",
+        "namePlaceholder": "مثال: أخبار تقنية، نصائح صحية",
+        "nameArabicLabel": "الاسم (بالعربية)",
+        "parentCategoryLabel": "الفئة الرئيسية",
+        "loadingCategories": "جارٍ تحميل الفئات...",
+        "parentCategoryPlaceholder": "اختر الفئة الرئيسية"
+      },
+      "toast": {
+        "selectImage": "يرجى اختيار صورة للفئة الفرعية الجديدة",
+        "deleteSuccess": "تم حذف الفئة الفرعية",
+        "deleteFail": "فشل حذف الفئة الفرعية"
+      },
+      "confirm": {
+        "delete": "هل أنت متأكد من أنك تريد حذف هذه الفئة الفرعية؟"
       }
     },
     "stats": {
@@ -905,20 +1087,20 @@
       "selectUser": "يرجى اختيار المستخدم",
       "coder": "مبرمج",
       "deletedSuccessfully": "تم الحذف بنجاح"
-      },
-      "downloadSuccess": "تم التنزيل بنجاح",
-      "download": "تنزيل",
-      "downloadOptions": {
-        "csv": "تنسيق CSV",
-        "csvHint": "قيم مفصولة بفواصل",
-        "excel": "تنسيق Excel",
-        "excelHint": "ملف جدول بيانات",
-        "pdf": "تنسيق PDF",
-        "pdfHint": "مستند قابل للطباعة"
-      },
-      "minSize": "الحد الأدنى للحجم",
-      "maxSize": "الحد الأقصى للحجم"
     },
+    "downloadSuccess": "تم التنزيل بنجاح",
+    "download": "تنزيل",
+    "downloadOptions": {
+      "csv": "تنسيق CSV",
+      "csvHint": "قيم مفصولة بفواصل",
+      "excel": "تنسيق Excel",
+      "excelHint": "ملف جدول بيانات",
+      "pdf": "تنسيق PDF",
+      "pdfHint": "مستند قابل للطباعة"
+    },
+    "minSize": "الحد الأدنى للحجم",
+    "maxSize": "الحد الأقصى للحجم"
+  },
   "center": {
     "title": "إدارة المراكز",
     "addCenter": "إضافة مركز",
@@ -942,7 +1124,6 @@
     "deleteConfirm": "هل أنت متأكد من أنك تريد حذف هذا المركز؟",
     "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة"
   },
-  
   "locations": {
     "title": "المواقع",
     "add": "إضافة",
@@ -1072,11 +1253,6 @@
     "searchResults": "نتائج البحث",
     "searchPlaceholder": "حقل البحث",
     "found": "تم العثور"
-  },
-  "sizes": {
-    "title": "إجمالي مسارات المزارع المسجلة في الإمارات!",
-    "farmSizes": "أحجام المزارع",
-    "downloadReport": "تنزيل التقرير"
   },
   "crops": {
     "title": "إدارة المحاصيل",
@@ -1231,6 +1407,7 @@
   },
   "fruitTypes": {
     "title": "إدارة أنواع الفواكه",
+    "subtitle": "إدارة أنواع الفاكهة في النظام",
     "searchHeading": "ابحث عن أنواع الفواكه",
     "searchResults": "نتائج البحث",
     "add": "إضافة",
@@ -1253,7 +1430,8 @@
     "update": "تحديث",
     "pleaseFillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
     "enterNameEnglish": "أدخل الاسم بالإنجليزية",
-    "enterNameArabic": "أدخل الاسم بالعربية"
+    "enterNameArabic": "أدخل الاسم بالعربية",
+    "results": "نتائج"
   },
   "irrigationSystem": {
     "title": "إدارة أنظمة الري",
@@ -1406,6 +1584,7 @@
   },
   "vegetableTypes": {
     "title": "إدارة أنواع الخضروات",
+    "subtitle": "إدارة أنواع الخضروات في النظام",
     "nameEnglishPlaceholder": "مثال: طماطم",
     "searchHeading": "ابحث عن أنواع الخضروات",
     "searchResults": "نتائج البحث",
@@ -1446,7 +1625,8 @@
       "cancel": "إلغاء",
       "update": "تحديث",
       "addItem": "إضافة عنصر"
-    }
+    },
+    "results": "نتائج"
   },
   "fodderTypes": {
     "title": "إدارة أنواع المحاصيل العلفية",

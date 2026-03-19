@@ -4,6 +4,7 @@ import { Download, Home, TrendingUp, Activity, Layers, Filter, X, BarChart3, Map
 import useStore from '../../store/store';
 import Dropdown from '../../components/dropdownWithSearch';
 import useTranslation from '../../hooks/useTranslation';
+import { toast } from 'react-toastify';
 import * as XLSX from 'xlsx';
 
 const GreenhouseDashboard = () => {
@@ -142,8 +143,8 @@ const GreenhouseDashboard = () => {
         const nonCooledCount = totalGreenhouses - cooledCount;
 
         const greenhouseTypesData = [
-            { name: 'Cooled', value: Number(((cooledCount / (totalGreenhouses || 1)) * 100).toFixed(2)), count: cooledCount, color: '#10b981' },
-            { name: 'Non-Cooled', value: Number(((nonCooledCount / (totalGreenhouses || 1)) * 100).toFixed(2)), count: nonCooledCount, color: '#6ee7b7' }
+            { name: t('analytics.greenhouseDashboard.cooled'), value: Number(((cooledCount / (totalGreenhouses || 1)) * 100).toFixed(2)), count: cooledCount, color: '#10b981' },
+            { name: t('analytics.greenhouseDashboard.nonCooled'), value: Number(((nonCooledCount / (totalGreenhouses || 1)) * 100).toFixed(2)), count: nonCooledCount, color: '#6ee7b7' }
         ].filter(item => item.count > 0);
 
         // Cover Types Distribution
@@ -164,7 +165,7 @@ const GreenhouseDashboard = () => {
             const coverType = coverTypes.find(ct => ct.id === coverTypeId);
             const percentage = totalCoveredGreenhouses > 0 ? ((coverTypeCounts[coverTypeId] / totalCoveredGreenhouses) * 100).toFixed(2) : 0;
             return {
-                name: coverType ? (isLTR ? coverType.name : coverType.nameInArrabic) : 'Other',
+                name: coverType ? (isLTR ? coverType.name : coverType.nameInArrabic) : t('translation.other'),
                 value: Number(percentage),
                 count: coverTypeCounts[coverTypeId],
                 color: colors[index % colors.length]
@@ -191,7 +192,7 @@ const GreenhouseDashboard = () => {
         const emirateAreaData = Object.keys(emirateAreas).map(emirateId => {
             const emirateObj = emirates.find(e => e.id === emirateId);
             return {
-                name: emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : 'Other',
+                name: emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : t('translation.other'),
                 value: Number(emirateAreas[emirateId].area.toFixed(2)),
                 count: emirateAreas[emirateId].count,
                 avgArea: Number((emirateAreas[emirateId].area / emirateAreas[emirateId].count).toFixed(2))
@@ -233,9 +234,9 @@ const GreenhouseDashboard = () => {
             
             return {
                 farmNo: farm.farmNo || farm.id,
-                emirate: emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : 'Other',
-                region: regionObj ? (isLTR ? regionObj.name : regionObj.nameInArrabic) : 'Other',
-                center: centerObj ? (isLTR ? centerObj.name : centerObj.nameInArrabic) : 'Other',
+                    emirate: emirateObj ? (isLTR ? emirateObj.name : emirateObj.nameInArrabic) : t('common.unknown'),
+                    region: regionObj ? (isLTR ? regionObj.name : regionObj.nameInArrabic) : t('common.unknown'),
+                    center: centerObj ? (isLTR ? centerObj.name : centerObj.nameInArrabic) : t('common.unknown'),
                 greenhouses: totalGreenhouses,
                 area: Number(totalArea.toFixed(2))
             };
@@ -408,7 +409,7 @@ const GreenhouseDashboard = () => {
             
         } catch (error) {
             console.error('Export failed:', error);
-            alert('Failed to export data. Please try again.');
+            toast.error(t('common.exportFailed'));
         } finally {
             setIsExporting(false);
         }
@@ -470,7 +471,7 @@ const GreenhouseDashboard = () => {
                             className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <Download className="w-4 h-4" />
-                            {isExporting ? 'Exporting...' : 'Export Report'}
+                                            {isExporting ? t('analytics.greenhouseDashboard.exporting') : t('analytics.greenhouseDashboard.exportReport')}
                         </button>
                     </div>
 

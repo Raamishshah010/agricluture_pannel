@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { toast } from "react-toastify";
 import service from '../../services/farmerService';
 import { Edit2, Plus, Trash2, X, Eye } from "lucide-react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import useTranslation from '../../hooks/useTranslation';
+import { toast } from 'react-toastify';
 
 export default function Farmers({ list, handleFarms, setList }) {
     const t = useTranslation();
@@ -66,7 +66,7 @@ export default function Farmers({ list, handleFarms, setList }) {
             !formData.phoneNumber ||
             (!editingItem && !formData.password)
         ) {
-            alert(t('farmers.farmers.requiredFields'));
+            toast.error(t('farmers.farmers.requiredFields'));
             return;
         }
         try {

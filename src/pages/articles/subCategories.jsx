@@ -31,7 +31,7 @@ export default function SubCategories() {
             const res = await articleService.getSubCategories();
             setSubCategories(res.data?.items || res.data || []);
         } catch (err) {
-            toast.error('Failed to load sub-categories: ' + err.message);
+            toast.error(t('articles.toast.subcategoriesLoadFail') + (err?.message ? ': ' + err.message : ''));
         } finally {
             setLoading(false);
         }
@@ -44,7 +44,7 @@ export default function SubCategories() {
             const res = await articleService.getCategories();
             setCategories(res.data || []);
         } catch (err) {
-            toast.error('Failed to load categories: ' + err.message);
+            toast.error(t('articles.toast.categoriesLoadFail') + (err?.message ? ': ' + err.message : ''));
         } finally {
             setCatsLoading(false);
         }
@@ -93,11 +93,11 @@ export default function SubCategories() {
 
     const handleSubmit = async () => {
         if (!formData.name.trim() || !formData.nameInArabic.trim() || !formData.categoryId) {
-            toast.error('English name, Arabic name, and category are required');
+            toast.error(t('articles.toast.validationRequiredFields'));
             return;
         }
         if (!editingSubCat && !formData.image) {
-            toast.error('Please select an image for new sub-category');
+            toast.error(t('articles.subCategories.toast.selectImage'));
             return;
         }
 
@@ -120,30 +120,30 @@ export default function SubCategories() {
                         item.id === editingSubCat.id ? res.data : item
                     )
                 );
-                toast.success('Sub-category updated');
+                toast.success(t('articles.toast.updateSuccess'));
             } else {
                 const res = await articleService.addSubCategory(payload);
                 setSubCategories(prev => [...prev, res.data]);
-                toast.success('Sub-category added');
+                toast.success(t('articles.toast.addSuccess'));
             }
 
             closeModal();
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Operation failed');
+            toast.error(err.response?.data?.message || t('articles.toast.operationFailed'));
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Delete this sub-category?')) return;
+        if (!window.confirm(t('articles.subCategories.confirm.delete'))) return;
 
         try {
             await articleService.deleteSubCategory(id);
             setSubCategories(prev => prev.filter(item => item.id !== id));
-            toast.success('Sub-category deleted');
+            toast.success(t('articles.subCategories.toast.deleteSuccess'));
         } catch (err) {
-            toast.error('Failed to delete: ' + (err.message || ''));
+            toast.error(t('articles.subCategories.toast.deleteFail') + (err.message ? ': ' + err.message : ''));
         }
     };
 
@@ -163,16 +163,16 @@ export default function SubCategories() {
                 <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                            Article Sub-Categories
+                            {t('articles.subCategories.title')}
                         </h1>
-                        <p className="text-gray-600 mt-1">Manage sub-categories for your articles</p>
+                        <p className="text-gray-600 mt-1">{t('articles.subCategories.subtitle')}</p>
                     </div>
                     <button
                         onClick={openAddModal}
                         className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-colors"
                     >
                         <Plus size={20} />
-                        Add Sub-Category
+                        {t('articles.subCategories.add')}
                     </button>
                 </div>
 
@@ -257,8 +257,8 @@ export default function SubCategories() {
 
                             {subCategories.length === 0 && (
                                 <div className="py-16 text-center text-gray-500">
-                                    <p className="text-lg">{t('articles.subCategories.empty.noItems') || 'No sub-categories yet'}</p>
-                                    <p className="mt-2">{t('articles.subCategories.empty.cta') || 'Click "Add Sub-Category" to create one'}</p>
+                                    <p className="text-lg">{t('articles.subCategories.empty.noItems')}</p>
+                                    <p className="mt-2">{t('articles.subCategories.empty.cta')}</p>
                                 </div>
                             )}
                         </>
@@ -279,7 +279,7 @@ export default function SubCategories() {
                     <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
                         <div className="flex justify-between items-center px-6 py-4 border-b bg-gray-50">
                             <h2 className="text-xl font-semibold text-gray-900">
-                                {editingSubCat ? 'Edit Sub-Category' : 'Add New Sub-Category'}
+                                {editingSubCat ? t('articles.subCategories.modal.editTitle') : t('articles.subCategories.modal.addTitle')}
                             </h2>
                             <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
                                 <X size={24} />
@@ -290,7 +290,7 @@ export default function SubCategories() {
                             {/* Image */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Image {editingSubCat ? '(optional - leave empty to keep current)' : <span className="text-red-500">*</span>}
+                                    {t('articles.subCategories.modal.imageLabel')} {editingSubCat ? `(${t('articles.subCategories.modal.imageOptional')})` : <span className="text-red-500">*</span>}
                                 </label>
                                 <input
                                     type="file"
@@ -315,7 +315,7 @@ export default function SubCategories() {
                             {/* Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Name <span className="text-red-500">*</span>
+                                    {t('articles.subCategories.modal.nameLabel')} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -323,14 +323,14 @@ export default function SubCategories() {
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    placeholder="e.g. Technology News, Health Tips"
+                                    placeholder={t('articles.subCategories.modal.namePlaceholder')}
                                 />
                             </div>
 
                             {/* Arabic Name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Arabic Name <span className="text-red-500">*</span>
+                                    {t('articles.subCategories.modal.nameArabicLabel')} <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -345,10 +345,10 @@ export default function SubCategories() {
                             {/* Category */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    Parent Category <span className="text-red-500">*</span>
+                                    {t('articles.subCategories.modal.parentCategoryLabel')} <span className="text-red-500">*</span>
                                 </label>
                                 {catsLoading ? (
-                                    <div className="text-sm text-gray-500 py-2">Loading categories...</div>
+                                    <div className="text-sm text-gray-500 py-2">{t('articles.subCategories.modal.loadingCategories')}</div>
                                 ) : (
                                     <select
                                         name="categoryId"
@@ -356,7 +356,7 @@ export default function SubCategories() {
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
                                     >
-                                        <option value="">Select parent category</option>
+                                        <option value="">{t('articles.subCategories.modal.parentCategoryPlaceholder')}</option>
                                         {categories.map(cat => (
                                             <option key={cat.id} value={cat.id}>
                                                 {cat.name}
@@ -368,12 +368,12 @@ export default function SubCategories() {
                         </div>
 
                         <div className="px-6 py-4 border-t flex justify-end gap-3">
-                            <button
-                                onClick={closeModal}
-                                className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
-                            >
-                                Cancel
-                            </button>
+                                <button
+                                    onClick={closeModal}
+                                    className="px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+                                >
+                                    {t('common.cancel')}
+                                </button>
                             <button
                                 onClick={handleSubmit}
                                 disabled={loading}
@@ -385,7 +385,7 @@ export default function SubCategories() {
                                         <path fill="currentColor" d="M4 12a8 8 0 018-8v8z" className="opacity-75" />
                                     </svg>
                                 )}
-                                {editingSubCat ? 'Update' : 'Add'}
+                                {editingSubCat ? t('common.update') : t('common.add')}
                             </button>
                         </div>
                     </div>

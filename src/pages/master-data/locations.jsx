@@ -125,7 +125,7 @@ export default function Locations() {
 
     const handleSubmit = async () => {
         if (!formData.name || !formData.nameInArrabic || !formData.centerId || !formData.emirateId) {
-            alert(t('locations.validation.requiredFields'));
+            toast.error(t('locations.validation.requiredFields'));
             return;
         }
 

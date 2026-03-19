@@ -63,7 +63,7 @@ export default function CourageTypes() {
 
     const handleSubmit = async () => {
         if (!formData.name) {
-            alert(t('courageTypes.fillRequiredFields'));
+            toast.error(t('courageTypes.fillRequiredFields'));
             return;
         }
 
