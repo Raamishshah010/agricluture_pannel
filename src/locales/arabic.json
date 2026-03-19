@@ -443,6 +443,16 @@
         "statusUpdatedSuccess": "تم تحديث حالة المزرعة إلى {status} بنجاح",
         "nA": "غير متوفر",
         "statusUpdatedSuccessfully": "تم تحديث الحالة بنجاح"
+        ,
+        "download": "تنزيل",
+        "downloadOptions": {
+          "csv": "تنسيق CSV",
+          "csvHint": "قيم مفصولة بفواصل",
+          "excel": "تنسيق Excel",
+          "excelHint": "ملف جدول بيانات",
+          "pdf": "تنسيق PDF",
+          "pdfHint": "مستند قابل للطباعة"
+        }
       }
     },
     "clear": "مسح",

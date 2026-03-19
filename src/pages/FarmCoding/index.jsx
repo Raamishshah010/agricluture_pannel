@@ -415,7 +415,7 @@ const FarmCodingRequest = () => {
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
-                <span className="font-medium">Download</span>
+                <span className="font-medium">{t('common.components.farmCoding.download')}</span>
                 <svg className={`w-4 h-4 transition-transform duration-200 ${showDownloadMenu ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
@@ -439,8 +439,8 @@ const FarmCodingRequest = () => {
                         </svg>
                       </div>
                       <div>
-                        <div className="font-medium text-gray-900">CSV Format</div>
-                        <div className="text-xs text-gray-500">Comma-separated</div>
+                        <div className="font-medium text-gray-900">{t('common.components.farmCoding.downloadOptions.csv')}</div>
+                        <div className="text-xs text-gray-500">{t('common.components.farmCoding.downloadOptions.csvHint')}</div>
                       </div>
                     </button>
                     <button
@@ -453,8 +453,8 @@ const FarmCodingRequest = () => {
                         </svg>
                       </div>
                       <div>
-                        <div className="font-medium text-gray-900">Excel Format</div>
-                        <div className="text-xs text-gray-500">Spreadsheet file</div>
+                        <div className="font-medium text-gray-900">{t('common.components.farmCoding.downloadOptions.excel')}</div>
+                        <div className="text-xs text-gray-500">{t('common.components.farmCoding.downloadOptions.excelHint')}</div>
                       </div>
                     </button>
                     <button
@@ -467,8 +467,8 @@ const FarmCodingRequest = () => {
                         </svg>
                       </div>
                       <div>
-                        <div className="font-medium text-gray-900">PDF Format</div>
-                        <div className="text-xs text-gray-500">Printable document</div>
+                        <div className="font-medium text-gray-900">{t('common.components.farmCoding.downloadOptions.pdf')}</div>
+                        <div className="text-xs text-gray-500">{t('common.components.farmCoding.downloadOptions.pdfHint')}</div>
                       </div>
                     </button>
                   </div>

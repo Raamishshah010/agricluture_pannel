@@ -482,6 +482,16 @@
         "statusUpdatedSuccess": "Farm status updated to {status} successfully",
         "nA": "N/A",
         "statusUpdatedSuccessfully": "Status Updated Successfully"
+        ,
+        "download": "Download",
+        "downloadOptions": {
+          "csv": "CSV Format",
+          "csvHint": "Comma-separated",
+          "excel": "Excel Format",
+          "excelHint": "Spreadsheet file",
+          "pdf": "PDF Format",
+          "pdfHint": "Printable document"
+        }
       }
     },
     "clear": "Clear",
