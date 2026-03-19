@@ -138,7 +138,7 @@ const DashboardLayout = () => {
       label: t('common.components.dashboard.masterData'),
       hasSubmenu: true,
       submenuItems: [
-        // { id: 'master management', icon: Wheat, label: t('common.components.dashboard.cropsManagement') },
+        { id: 'crops-management', icon: Sprout, label: t('common.components.dashboard.cropsManagement') },
         { id: 'Fruit Types', icon: Wheat, label: t('common.components.dashboard.fruitTypes') },
         { id: 'Vegetable Types', icon: Wheat, label: t('common.components.dashboard.vegetableTypes') },
         { id: 'Cover Types', icon: Wheat, label: t('common.components.dashboard.coverTypes') },
@@ -187,7 +187,7 @@ const DashboardLayout = () => {
           return <Sizes />;
         case 'crops':
           return <CropsDashboard />;
-        case 'master management':
+        case 'crops-management':
           return <Crops />;
         case 'manageFarmers':
           return <Farmers number={farmsNumber} />;

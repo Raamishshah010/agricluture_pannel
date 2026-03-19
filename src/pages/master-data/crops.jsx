@@ -15,6 +15,7 @@ export default function Crops() {
     const t = useTranslation();
     const { language: lang } = useStore(st => st);
     const isLTR = lang.includes('en');
+    const getCropTypeLabel = (type) => (isLTR ? type.name : type.nameInArrabic || type.scientificName || type.name);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -338,7 +339,7 @@ export default function Crops() {
                                     <option value="">{t('crops.selectType')}</option>
                                     {cropTypes.map(type => (
                                         <option key={type.id} value={type.id}>
-                                            {isLTR ? type.name : type.scientificName}
+                                            {getCropTypeLabel(type)}
                                         </option>
                                     ))}
                                 </select>

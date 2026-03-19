@@ -22,6 +22,30 @@ const AdminManagementFlow = () => {
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
 
+  const getEmirateLabel = (value) => {
+    const labels = {
+      'Abu Dhabi': t('admin.emirateNames.abuDhabi'),
+      Dubai: t('admin.emirateNames.dubai'),
+      Sharjah: t('admin.emirateNames.sharjah'),
+      Ajman: t('admin.emirateNames.ajman'),
+      'Umm Al Quwain': t('admin.emirateNames.ummAlQuwain'),
+      'Ras Al Khaimah': t('admin.emirateNames.rasAlKhaimah'),
+      Fujairah: t('admin.emirateNames.fujairah')
+    };
+
+    return labels[value] || value;
+  };
+
+  const getTypeLabel = (value) => {
+    const labels = {
+      Admin: t('admin.roleNames.admin'),
+      'Super Admin': t('admin.roleNames.superAdmin'),
+      Moderator: t('admin.roleNames.moderator')
+    };
+
+    return labels[value] || value;
+  };
+
   // Auto-dismiss success popup after 2 seconds
   useEffect(() => {
     if (showSuccessPopup) {
@@ -73,7 +97,7 @@ const AdminManagementFlow = () => {
   };
 
   const handleDelete = (id) => {
-    if (window.confirm(t('admin.deleteConfirm') || 'Delete this admin?')) {
+    if (window.confirm(t('admin.deleteConfirm'))) {
       (async () => {
         setLoading(true);
         try {
@@ -104,7 +128,7 @@ const AdminManagementFlow = () => {
 
   const deleteSelected = async () => {
     if (selectedIds.length === 0) return;
-    if (!window.confirm(t('admin.deleteSelectedConfirm') || `Delete ${selectedIds.length} selected admins?`)) return;
+    if (!window.confirm(t('admin.deleteSelectedConfirm'))) return;
     setLoading(true);
     try {
       await Promise.all(selectedIds.map(id => adminService.deleteAdmin(id).catch(() => null)));
@@ -301,13 +325,13 @@ const AdminManagementFlow = () => {
               className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
             >
               <option value="">{t('admin.selectEmirates')}</option>
-              <option value="Abu Dhabi">Abu Dhabi</option>
-              <option value="Dubai">Dubai</option>
-              <option value="Sharjah">Sharjah</option>
-              <option value="Ajman">Ajman</option>
-              <option value="Umm Al Quwain">Umm Al Quwain</option>
-              <option value="Ras Al Khaimah">Ras Al Khaimah</option>
-              <option value="Fujairah">Fujairah</option>
+              <option value="Abu Dhabi">{t('admin.emirateNames.abuDhabi')}</option>
+              <option value="Dubai">{t('admin.emirateNames.dubai')}</option>
+              <option value="Sharjah">{t('admin.emirateNames.sharjah')}</option>
+              <option value="Ajman">{t('admin.emirateNames.ajman')}</option>
+              <option value="Umm Al Quwain">{t('admin.emirateNames.ummAlQuwain')}</option>
+              <option value="Ras Al Khaimah">{t('admin.emirateNames.rasAlKhaimah')}</option>
+              <option value="Fujairah">{t('admin.emirateNames.fujairah')}</option>
             </select>
           </div>
         </div>
@@ -320,9 +344,9 @@ const AdminManagementFlow = () => {
             className="w-full max-w-sm px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
           >
             <option value="">{t('admin.selectType')}</option>
-            <option value="Admin">Admin</option>
-            <option value="Super Admin">Super Admin</option>
-            <option value="Moderator">Moderator</option>
+            <option value="Admin">{t('admin.roleNames.admin')}</option>
+            <option value="Super Admin">{t('admin.roleNames.superAdmin')}</option>
+            <option value="Moderator">{t('admin.roleNames.moderator')}</option>
           </select>
         </div>
 
@@ -417,13 +441,13 @@ const AdminManagementFlow = () => {
               className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
             >
               <option value="">{t('admin.selectEmirates')}</option>
-              <option value="Abu Dhabi">Abu Dhabi</option>
-              <option value="Dubai">Dubai</option>
-              <option value="Sharjah">Sharjah</option>
-              <option value="Ajman">Ajman</option>
-              <option value="Umm Al Quwain">Umm Al Quwain</option>
-              <option value="Ras Al Khaimah">Ras Al Khaimah</option>
-              <option value="Fujairah">Fujairah</option>
+              <option value="Abu Dhabi">{t('admin.emirateNames.abuDhabi')}</option>
+              <option value="Dubai">{t('admin.emirateNames.dubai')}</option>
+              <option value="Sharjah">{t('admin.emirateNames.sharjah')}</option>
+              <option value="Ajman">{t('admin.emirateNames.ajman')}</option>
+              <option value="Umm Al Quwain">{t('admin.emirateNames.ummAlQuwain')}</option>
+              <option value="Ras Al Khaimah">{t('admin.emirateNames.rasAlKhaimah')}</option>
+              <option value="Fujairah">{t('admin.emirateNames.fujairah')}</option>
             </select>
           </div>
         </div>
@@ -436,9 +460,9 @@ const AdminManagementFlow = () => {
             className="w-full max-w-sm px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none bg-white"
           >
             <option value="">{t('admin.selectType')}</option>
-            <option value="Admin">Admin</option>
-            <option value="Super Admin">Super Admin</option>
-            <option value="Moderator">Moderator</option>
+            <option value="Admin">{t('admin.roleNames.admin')}</option>
+            <option value="Super Admin">{t('admin.roleNames.superAdmin')}</option>
+            <option value="Moderator">{t('admin.roleNames.moderator')}</option>
           </select>
         </div>
 
@@ -537,8 +561,8 @@ const AdminManagementFlow = () => {
                     </div>
                     <div className="font-medium">{admin.name}</div>
                     <div className="truncate">{admin.email}</div>
-                    <div>{admin.emirate}</div>
-                    <div>{admin.type}</div>
+                    <div>{getEmirateLabel(admin.emirate)}</div>
+                    <div>{getTypeLabel(admin.type)}</div>
                     <div>{admin.mobile}</div>
                   </div>
                 </div>

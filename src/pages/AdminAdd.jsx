@@ -148,13 +148,13 @@ export default function AdminAdd() {
           <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.emirates')}</label>
           <select value={formData.emirates} onChange={e => handleInputChange('emirates', e.target.value)} className="w-full px-3 py-3 border border-gray-300 rounded-lg appearance-none bg-white">
             <option value="">{t('admin.selectEmirates')}</option>
-            <option value="Abu Dhabi">Abu Dhabi</option>
-            <option value="Dubai">Dubai</option>
-            <option value="Sharjah">Sharjah</option>
-            <option value="Ajman">Ajman</option>
-            <option value="Umm Al Quwain">Umm Al Quwain</option>
-            <option value="Ras Al Khaimah">Ras Al Khaimah</option>
-            <option value="Fujairah">Fujairah</option>
+            <option value="Abu Dhabi">{t('admin.emirateNames.abuDhabi')}</option>
+            <option value="Dubai">{t('admin.emirateNames.dubai')}</option>
+            <option value="Sharjah">{t('admin.emirateNames.sharjah')}</option>
+            <option value="Ajman">{t('admin.emirateNames.ajman')}</option>
+            <option value="Umm Al Quwain">{t('admin.emirateNames.ummAlQuwain')}</option>
+            <option value="Ras Al Khaimah">{t('admin.emirateNames.rasAlKhaimah')}</option>
+            <option value="Fujairah">{t('admin.emirateNames.fujairah')}</option>
           </select>
         </div>
       </div>
@@ -163,9 +163,9 @@ export default function AdminAdd() {
         <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.type')}</label>
         <select value={formData.type} onChange={e => handleInputChange('type', e.target.value)} className="w-full max-w-sm px-3 py-3 border border-gray-300 rounded-lg">
           <option value="">{t('admin.selectType')}</option>
-          <option value="Admin">Admin</option>
-          <option value="Super Admin">Super Admin</option>
-          <option value="Moderator">Moderator</option>
+          <option value="Admin">{t('admin.roleNames.admin')}</option>
+          <option value="Super Admin">{t('admin.roleNames.superAdmin')}</option>
+          <option value="Moderator">{t('admin.roleNames.moderator')}</option>
         </select>
       </div>
 

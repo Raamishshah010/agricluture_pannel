@@ -203,7 +203,7 @@ export default function Index(props) {
 
         // Title
         doc.setFontSize(18);
-        const title = "Farms List | قائمة المزارع";
+        const title = t('farms.title');
         doc.text(title, 148, 15, { align: 'center' });
 
         // Table

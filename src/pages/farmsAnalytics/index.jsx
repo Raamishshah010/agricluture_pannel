@@ -191,10 +191,10 @@ const FarmAnalytics = () => {
     });
     const totalFarms = filteredFarms.length || 1;
     const landUseData = [
-      { name: 'Greenhouses', value: ((landUse.greenhouses / totalFarms) * 100).toFixed(1), color: '#10b981', count: landUse.greenhouses },
-      { name: 'Fruit Trees', value: ((landUse.fruits / totalFarms) * 100).toFixed(1), color: '#3b82f6', count: landUse.fruits },
-      { name: 'Vegetables', value: ((landUse.vegetables / totalFarms) * 100).toFixed(1), color: '#8b5cf6', count: landUse.vegetables },
-      { name: 'Fodder', value: ((landUse.fodder / totalFarms) * 100).toFixed(1), color: '#f59e0b', count: landUse.fodder },
+      { name: t('greenhouses'), value: ((landUse.greenhouses / totalFarms) * 100).toFixed(1), color: '#10b981', count: landUse.greenhouses },
+      { name: t('fruitTrees'), value: ((landUse.fruits / totalFarms) * 100).toFixed(1), color: '#3b82f6', count: landUse.fruits },
+      { name: t('vegetable'), value: ((landUse.vegetables / totalFarms) * 100).toFixed(1), color: '#8b5cf6', count: landUse.vegetables },
+      { name: t('fodder'), value: ((landUse.fodder / totalFarms) * 100).toFixed(1), color: '#f59e0b', count: landUse.fodder },
     ].filter(item => parseFloat(item.value) > 0);
 
     // Farming Systems Distribution

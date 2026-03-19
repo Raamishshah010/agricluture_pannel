@@ -105,7 +105,7 @@ const Emirates = () => {
     if (!options) return [];
     return options.map(option => ({
       ...option,
-      name: isLTR ? option.name : (option.nameInArrabic || option.name),
+      name: isLTR ? option.name : (option.nameInArabic || option.nameInArrabic || option.scientificName || option.name),
       originalName: option.name
     }));
   }, [isLTR]);
@@ -281,7 +281,12 @@ const Emirates = () => {
     });
 
     const cropTypeData = Object.entries(cropCounts).map(([key, count]) => ({
-      name: key.charAt(0).toUpperCase() + key.slice(1),
+      name: ({
+        fruits: t('translation.fruits'),
+        vegetables: t('translation.vegetables'),
+        fodders: t('translation.fodder'),
+        greenhouses: t('translation.greenhouse'),
+      })[key] || key,
       count,
     }));
 
@@ -452,7 +457,12 @@ const Emirates = () => {
     const totalFarms = transformFarms.length || 1;
     const cropTypePieData = Object.entries(cropCounts)
       .map(([key, count]) => ({
-        name: key.charAt(0).toUpperCase() + key.slice(1),
+        name: ({
+          fruits: t('translation.fruits'),
+          vegetables: t('translation.vegetables'),
+          fodders: t('translation.fodder'),
+          greenhouses: t('translation.greenhouse'),
+        })[key] || key,
         value: count,
         percentage: ((count / totalFarms) * 100).toFixed(1),
       }))

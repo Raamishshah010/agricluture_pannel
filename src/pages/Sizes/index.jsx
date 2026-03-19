@@ -94,21 +94,21 @@ const Sizes = () => {
     }, [farms, emirate, center, location]);
 
     const ranges = [
-        { label: '0-500', min: 0, max: 500 },
-        { label: '500-1K', min: 500, max: 1000 },
-        { label: '1K-1.5K', min: 1000, max: 1500 },
-        { label: '1.5K-2K', min: 1500, max: 2000 },
-        { label: '2K-2.5K', min: 2000, max: 2500 },
-        { label: '2.5K+', min: 2500, max: Infinity },
+        { id: 'from0To500', label: t('sizes.ranges.from0To500'), min: 0, max: 500 },
+        { id: 'from500To1000', label: t('sizes.ranges.from500To1000'), min: 500, max: 1000 },
+        { id: 'from1000To1500', label: t('sizes.ranges.from1000To1500'), min: 1000, max: 1500 },
+        { id: 'from1500To2000', label: t('sizes.ranges.from1500To2000'), min: 1500, max: 2000 },
+        { id: 'from2000To2500', label: t('sizes.ranges.from2000To2500'), min: 2000, max: 2500 },
+        { id: 'above2500', label: t('sizes.ranges.above2500'), min: 2500, max: Infinity },
     ];
 
     const rangeColors = {
-        '0-500': '#8B5CF6',
-        '500-1K': '#06B6D4',
-        '1K-1.5K': '#F59E0B',
-        '1.5K-2K': '#10B981',
-        '2K-2.5K': '#6366F1',
-        '2.5K+': '#EF4444',
+        from0To500: '#8B5CF6',
+        from500To1000: '#06B6D4',
+        from1000To1500: '#F59E0B',
+        from1500To2000: '#10B981',
+        from2000To2500: '#6366F1',
+        above2500: '#EF4444',
     };
 
     const CHART_COLORS = ['#0078D4', '#00BCF2', '#0099BC', '#005A9E', '#004578', '#10B981', '#F59E0B', '#EF4444'];
@@ -428,7 +428,7 @@ const Sizes = () => {
                             </div>
                             <div>
                                 <h2 className="text-base font-bold text-gray-900">
-                                    {t('sizes.title') || 'Farm Size Analytics Dashboard'}
+                                    {t('sizes.title')}
                                 </h2>
                                 <p className="text-xs text-gray-500 mt-0.5">
                                    {t('translation.summary')}
@@ -452,7 +452,7 @@ const Sizes = () => {
                                 <MapPin className="w-4 h-4 text-white" strokeWidth={2} />
                             </div>
                             <span className="text-sm font-semibold text-gray-900">
-                                {t("filters.geographic") || "Filters"}
+                                {t('sizes.filterTitle')}
                             </span>
                             {activeFiltersCount > 0 && (
                                 <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
@@ -466,14 +466,14 @@ const Sizes = () => {
                             options={getLocalizedOptions(emirates)}
                             value={emirate}
                             onChange={handleEmirateChange}
-                            placeholder={t('overview.selectEmirate') || "Select Emirate"}
+                            placeholder={t('overview.selectEmirate')}
                         />
                         <Dropdown
                             classes="w-[180px]"
                             options={getLocalizedOptions(filteredCenters)}
                             value={center}
                             onChange={handleCenterChange}
-                            placeholder={t('overview.selectCenter') || "Select Center"}
+                            placeholder={t('overview.selectCenter')}
                             disabled={!emirate}
                         />
                         <Dropdown
@@ -481,7 +481,7 @@ const Sizes = () => {
                             options={getLocalizedOptions(filteredLocations)}
                             value={location}
                             onChange={setLocation}
-                            placeholder={t('overview.selectLocation') || "Select Location"}
+                            placeholder={t('overview.selectLocation')}
                             disabled={!emirate && !center}
                         />
 
@@ -491,7 +491,7 @@ const Sizes = () => {
                                 className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-colors text-sm border border-red-200 shadow-sm"
                             >
                                 <X className="w-4 h-4" />
-                                <span>{t("filters.clearAll") || "Clear All"}</span>
+                                <span>{t('sizes.clearAll')}</span>
                             </button>
                         )}
                     </div>

@@ -37,12 +37,17 @@ const Dropdown = ({ options, value, onChange, placeholder, classes = "w-48" }) =
     setSearchTerm('');
   };
 
+  const getLocalizedName = (option) => (
+    isLTR ? option.name : (option.nameInArabic || option.nameInArrabic || option.scientificName || option.name)
+  );
+
   // Filter options based on search term
   const filteredOptions = options.filter(option => {
+    const localizedName = option.nameInArabic || option.nameInArrabic || option.scientificName || option.name;
     return (
       isLTR ?
         option.name.toLowerCase().includes(searchTerm.toLowerCase())
-        : option.nameInArrabic ? option.nameInArrabic.toLowerCase().includes(searchTerm.toLowerCase())
+        : localizedName ? localizedName.toLowerCase().includes(searchTerm.toLowerCase())
           : option.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
   });
@@ -50,7 +55,7 @@ const Dropdown = ({ options, value, onChange, placeholder, classes = "w-48" }) =
   // Get display name based on language
   const getDisplayName = () => {
     if (!value) return finalPlaceholder;
-    return isLTR ? value.name : (value.nameInArrabic || value.name);
+    return getLocalizedName(value);
   };
 
   return (
@@ -91,7 +96,7 @@ const Dropdown = ({ options, value, onChange, placeholder, classes = "w-48" }) =
                   className={`w-full px-4 py-3 text-left hover:bg-gray-100 transition-colors ${value?.id === option.id ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-900'
                     } ${index === filteredOptions.length - 1 ? 'rounded-b-lg' : ''}`}
                 >
-                  {isLTR ? option.name : option.nameInArrabic ?? option.name}
+                  {getLocalizedName(option)}
                 </button>
               ))
             ) : (

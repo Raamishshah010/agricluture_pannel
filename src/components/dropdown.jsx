@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "../hooks/useTranslation";
 import useStore from "../store/store";
+
 const Dropdown = ({
   options,
   value,
@@ -14,6 +15,7 @@ const Dropdown = ({
   const finalPlaceholder = placeholder || t("common.components.select");
   const dropdownRef = useRef(null);
   const { language: lang } = useStore((st) => st);
+  const isLTR = lang.includes("en");
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -26,36 +28,31 @@ const Dropdown = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const getLocalizedName = (option) => (
+    isLTR ? option.name : (option.nameInArabic || option.nameInArrabic || option.scientificName || option.name)
+  );
+
   const handleSelect = (option) => {
     onChange(option);
     setIsOpen(false);
   };
 
-  // Get display name
   const getDisplayName = () => {
     if (!value) return finalPlaceholder;
-
-    return isLTR ? value.name : value.nameInArrabic || value.name;
+    return getLocalizedName(value);
   };
-  const isLTR = lang.includes("en");
 
   return (
     <div className={`relative ${classes}`} ref={dropdownRef}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full ${
-          isLTR ? "flex-row" : "flex-row-reverse"
-        } px-2 py-1.5 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-between hover:border-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
+        className={`w-full ${isLTR ? "flex-row" : "flex-row-reverse"} px-2 py-1.5 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-between hover:border-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
       >
-        <span className="text-gray-900 font-medium text-md">
-          {getDisplayName()}
-        </span>
+        <span className="text-gray-900 font-medium text-md">{getDisplayName()}</span>
         <ChevronDown
           size={20}
-          className={`text-gray-700 transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
+          className={`text-gray-700 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -66,17 +63,9 @@ const Dropdown = ({
               key={option.id}
               type="button"
               onClick={() => handleSelect(option)}
-              className={`w-full px-4 py-3 ${
-                isLTR ? "text-left" : "text-right"
-              } hover:bg-gray-100 transition-colors ${
-                value?.id === option.id
-                  ? "bg-blue-50 text-blue-600 font-medium"
-                  : "text-gray-900"
-              } ${index === 0 ? "rounded-t-lg" : ""} ${
-                index === options.length - 1 ? "rounded-b-lg" : ""
-              }`}
+              className={`w-full px-4 py-3 ${isLTR ? "text-left" : "text-right"} hover:bg-gray-100 transition-colors ${value?.id === option.id ? "bg-blue-50 text-blue-600 font-medium" : "text-gray-900"} ${index === 0 ? "rounded-t-lg" : ""} ${index === options.length - 1 ? "rounded-b-lg" : ""}`}
             >
-              {isLTR ? option.name : option.nameInArrabic || option.name}
+              {getLocalizedName(option)}
             </button>
           ))}
         </div>

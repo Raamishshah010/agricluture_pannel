@@ -269,15 +269,13 @@ const Emirates = () => {
         ? isLTR
           ? centerObj.name
           : centerObj.nameInArrabic
-        : isLTR
-        ? "Other"
-        : "آخر";
+        : t('other');
       if (centerName && centerName !== "Unknown") {
         farmsByCenter[centerName] = (farmsByCenter[centerName] || 0) + 1;
       }
     });
     const centerData = Object.entries(farmsByCenter)
-      .filter(([name]) => name && name !== "Unknown" && name !== "آخر")
+      .filter(([name]) => name && name !== "Unknown" && name !== t('other'))
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
@@ -291,9 +289,7 @@ const Emirates = () => {
         const sourceName =
           typeof waterSource === "string"
             ? waterSource
-            : isLTR
-            ? "Well"
-            : "بئر";
+            : t('overview.well');
         farmsByWaterSource[sourceName] =
           (farmsByWaterSource[sourceName] || 0) + 1;
       }
@@ -361,7 +357,7 @@ const Emirates = () => {
     const farmsByPossession = {};
     transformFarms.forEach((farm) => {
       const possession =
-        farm.possession || farm.ownership || (isLTR ? "Owner" : "مالك");
+        farm.possession || farm.ownership || t('owner');
       if (possession) {
         farmsByPossession[possession] =
           (farmsByPossession[possession] || 0) + 1;
@@ -447,14 +443,14 @@ const Emirates = () => {
         cropTypeDistribution.greenhouse++;
     });
     const cropDistData = [
-      { name: isLTR ? "Fruits" : "فواكه", value: cropTypeDistribution.fruits },
+      { name: t('overview.fruits'), value: cropTypeDistribution.fruits },
       {
-        name: isLTR ? "Vegetables" : "خضروات",
+        name: t('overview.vegetable'),
         value: cropTypeDistribution.vegetables,
       },
-      { name: isLTR ? "Fodder" : "علف", value: cropTypeDistribution.fodder },
+      { name: t('overview.fodder'), value: cropTypeDistribution.fodder },
       {
-        name: isLTR ? "Greenhouse" : "بيوت محمية",
+        name: t('overview.greenhouse'),
         value: cropTypeDistribution.greenhouse,
       },
     ].filter((item) => item.value > 0);
@@ -503,7 +499,7 @@ const Emirates = () => {
     }, {});
 
     const farmCounts = transformFarms.reduce((acc, farm) => {
-      const emirateName = emirateMap[farm.emirate] || (isLTR ? "Other" : "آخر");
+      const emirateName = emirateMap[farm.emirate] || t('other');
       acc[emirateName] = (acc[emirateName] || 0) + 1;
       return acc;
     }, {});
@@ -544,7 +540,7 @@ const Emirates = () => {
       await farmService.updateFarm(item, id);
       setSelectedFarm(null);
       setActiveTab("emirates");
-      toast.success("Updated successfully");
+      toast.success(t('common.components.farmCoding.statusUpdatedSuccessfully'));
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);
     }

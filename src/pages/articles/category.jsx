@@ -62,7 +62,7 @@ export default function ArticleCategories() {
 
     const handleSubmit = async () => {
         if (!formData.name.trim() || !formData.nameInArabic.trim()) {
-            toast.error('Please fill all fields');
+            toast.error(t('fillRequiredFields'));
             return;
         }
 
@@ -85,20 +85,20 @@ export default function ArticleCategories() {
 
             closeModal();
         } catch (error) {
-            toast.error(error?.message || 'Error saving category');
+            toast.error(error?.message || t('errorOccurred'));
         } finally {
             setLoading(false);
         }
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Delete this category?')) return;
+        if (!window.confirm(t('articles.category.deleteConfirm'))) return;
 
         try {
             await service.deleteCategory(id);
             setList(prev => prev.filter(item => item.id !== id));
         } catch (error) {
-            toast.error(error?.message || 'Delete failed');
+            toast.error(error?.message || t('errorOccurred'));
         }
     };
 
@@ -202,7 +202,7 @@ export default function ArticleCategories() {
                                 name="name"
                                 value={formData.name}
                                 onChange={handleInputChange}
-                                placeholder="Name"
+                                placeholder={t('articles.category.modal.namePlaceholder')}
                                 className="w-full border p-2 rounded"
                             />
 
@@ -210,7 +210,7 @@ export default function ArticleCategories() {
                                 name="nameInArabic"
                                 value={formData.nameInArabic}
                                 onChange={handleInputChange}
-                                placeholder="Arabic Name"
+                                placeholder={t('articles.category.modal.nameArabicPlaceholder')}
                                 className="w-full border p-2 rounded"
                             />
                         </div>

@@ -9,12 +9,17 @@ const MultiSelect = ({ name, data, handleSelectItems, selectedItems: items }) =>
     const [selectedItems, setSelectedItems] = useState(items);
     const [searchTerm, setSearchTerm] = useState('');
     const dropdownRef = useRef(null);
-    const filteredItems = data.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !selectedItems.find(selected => selected.id === item.id)
-    );
     const { language: lang } = useStore(st => st);
     const isLTR = lang.includes('en');
+
+    const getLocalizedName = (item) => (
+        isLTR ? item.name : (item.nameInArabic || item.nameInArrabic || item.scientificName || item.name)
+    );
+
+    const filteredItems = data.filter(item =>
+        getLocalizedName(item).toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !selectedItems.find(selected => selected.id === item.id)
+    );
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -56,7 +61,7 @@ const MultiSelect = ({ name, data, handleSelectItems, selectedItems: items }) =>
                                     key={item.id}
                                     className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm font-medium"
                                 >
-                                    {isLTR ? item.name : item.nameInArrabic}
+                                    {getLocalizedName(item)}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -110,7 +115,7 @@ const MultiSelect = ({ name, data, handleSelectItems, selectedItems: items }) =>
                                             onClick={() => handleSelect(item)}
                                             className="px-4 py-2 hover:bg-blue-50 cursor-pointer text-gray-700 transition-colors"
                                         >
-                                            {isLTR ? item.name : item.nameInArrabic}
+                                            {getLocalizedName(item)}
                                         </li>
                                     ))}
                                 </ul>

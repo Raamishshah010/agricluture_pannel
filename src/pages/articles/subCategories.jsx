@@ -189,19 +189,19 @@ export default function SubCategories() {
                                     <thead className="bg-gray-50">
                                         <tr>
                                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider w-24">
-                                                Image
+                                                {t('articles.subCategories.table.image')}
                                             </th>
                                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                                Name
+                                                {t('articles.subCategories.table.name')}
                                             </th>
                                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                                Arabic Name
+                                                {t('articles.subCategories.table.nameArabic')}
                                             </th>
                                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                                                Created At
+                                                {t('articles.subCategories.table.createdAt')}
                                             </th>
                                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider w-32">
-                                                Actions
+                                                {t('articles.subCategories.table.actions')}
                                             </th>
                                         </tr>
                                     </thead>
@@ -218,7 +218,7 @@ export default function SubCategories() {
                                                                 onError={e => e.target.src = '/placeholder.jpg'}
                                                             />
                                                         ) : (
-                                                            <span className="text-gray-400 text-xs">No image</span>
+                                                            <span className="text-gray-400 text-xs">{t('noImage')}</span>
                                                         )}
                                                     </div>
                                                 </td>
@@ -268,7 +268,7 @@ export default function SubCategories() {
                 {/* Stats */}
                 {!loading && (
                     <div className="mt-4 text-sm text-gray-600 text-right">
-                        Total sub-categories: <span className="font-medium">{subCategories.length}</span>
+                        {t('articles.subCategories.stats.total')} <span className="font-medium">{subCategories.length}</span>
                     </div>
                 )}
             </div>
@@ -338,7 +338,7 @@ export default function SubCategories() {
                                     value={formData.nameInArabic}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                                    placeholder="مثال: أخبار التكنولوجيا"
+                                    placeholder={t('articles.subCategories.modal.nameArabicPlaceholder')}
                                 />
                             </div>
 

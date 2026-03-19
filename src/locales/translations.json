@@ -17,6 +17,20 @@
     "writeNewPassword": "Write the new password for the admin",
     "selectEmirates": "Select which emirates for the new admin",
     "selectType": "Select the type for the admin",
+    "emirateNames": {
+      "abuDhabi": "Abu Dhabi",
+      "dubai": "Dubai",
+      "sharjah": "Sharjah",
+      "ajman": "Ajman",
+      "ummAlQuwain": "Umm Al Quwain",
+      "rasAlKhaimah": "Ras Al Khaimah",
+      "fujairah": "Fujairah"
+    },
+    "roleNames": {
+      "admin": "Admin",
+      "superAdmin": "Super Admin",
+      "moderator": "Moderator"
+    },
     "cancel": "Cancel",
     "addAdminBtn": "Add Admin",
     "adminAdded": "Admin Added Successfully",
@@ -101,9 +115,12 @@
     "farmanalytics&insights": "Farm analytics & insights",
     "selectGreenhouseType": "Select Greenhouse Type",
     "selectCoverType": "Select Cover Type",
-    "avgAreaPerGreenhouse": "Avg Area Per Greenhouse"
+    "avgAreaPerGreenhouse": "Avg Area Per Greenhouse",
+    "title": "Farm Size Dashboard",
+    "other": "Other"
   },
   "status": {
+    "label": "Status",
     "download": "Download",
     "all": "All",
     "active": "Active",
@@ -306,6 +323,9 @@
     "totalVegetablesArea": "Total vegetables area per square meter",
     "fruits": "Fruits",
     "totalFruitsArea": "Total fruits area per square meter",
+    "fodder": "Fodder",
+    "greenhouse": "Greenhouse",
+    "well": "Well",
     "crops": "Crops",
     "totalCropsArea": "Total crop area per square meter",
     "uncultivated": "Uncultivated",
@@ -314,10 +334,12 @@
     "totalNurseries": "Total nurseries",
     "noData": "No data"
   },
+  "searchUsers": "Search users...",
   "reports": {
     "totalResults": "Total no. of results:",
     "searchReports": "Search reports",
     "downloadAllReports": "Download all reports",
+    "datePlaceholder": "MM/DD/YYYY",
     "emirate": "Emirate",
     "season": "Season",
     "crop": "Crop",
@@ -350,6 +372,7 @@
   "common": {
     "loading": "Loading...",
     "noDataToExport": "No data to export",
+    "processing": "Processing...",
     "save": "Save",
     "edit": "Edit",
     "delete": "Delete",
@@ -384,6 +407,8 @@
     "enter": "Enter",
     "write": "Write",
     "click": "Click",
+    "downloadSuccess": "Downloaded successfully",
+    "exportFailed": "Failed to export data. Please try again.",
     "components": {
       "loadingMap": "Loading map...",
       "noPolygonToDisplay": "No polygon to display",
@@ -425,7 +450,7 @@
         "manageCoders": "Manage Coders",
         "manageFarmers": "Manage Farmers",
         "masterData": "Master Data",
-        "cropsManagement": "Crops",
+        "cropsManagement": "Crops Management",
         "fruitTypes": "Fruit Types",
         "vegetableTypes": "Vegetable Types",
         "coverTypes": "Cover Types",
@@ -474,6 +499,7 @@
         "selectEmirate": "Select Emirate",
         "selectCenter": "Select Center",
         "selectLocation": "Select Location",
+        "selectCoder": "Select Coder",
         "clear": "Clear",
         "farmName": "Farm Name",
         "agricultureId": "Agriculture ID",
@@ -578,6 +604,10 @@
     }
   },
   "farmCodingDetails": {
+    "farmDetailsTitle": "Farm Details",
+    "basicInformation": "Basic Information",
+    "field": "Field",
+    "value": "Value",
     "back": "Back",
     "active": "Active",
     "inactive": "Inactive",
@@ -593,6 +623,7 @@
     "phoneNumber": "Phone Number",
     "holderInformation": "Holder Information",
     "locationDetails": "Location Details",
+    "waterAndIrrigation": "Water & Irrigation",
     "location": "Location",
     "region": "Region",
     "emirate": "Emirate",
@@ -634,6 +665,23 @@
     "additionalInformation": "Additional Information",
     "notes": "Notes",
     "numberOfGreenhouses": "Number of Greenhouses",
+    "download": "Download",
+    "downloadOptions": {
+      "pdf": "PDF Format",
+      "pdfHint": "Printable document",
+      "excel": "Excel Format",
+      "excelHint": "Spreadsheet file",
+      "csv": "CSV Format",
+      "csvHint": "Comma-separated values"
+    },
+    "downloadListTitle": "Coders List",
+    "modalDescription": {
+      "add": "Add a new coder to the system",
+      "edit": "Update coder information"
+    },
+    "toast": {
+      "fetchFail": "Failed to load coders"
+    },
     "destinationMachines": "Destination Machines",
     "pendingUpdates": "Pending Updates",
     "agricultureId": "Agriculture ID",
@@ -721,7 +769,17 @@
     "emirateId": "Emirate Id",
     "createdAt": "Created At",
     "filterActive": "Filter Active",
-    "results": "Results"
+    "results": "Results",
+    "downloading": "Downloading...",
+    "downloadAllPages": "Download all pages",
+    "downloadOptions": {
+      "pdf": "Download PDF",
+      "excel": "Download Excel",
+      "csv": "Download CSV"
+    },
+    "sheetName": "Farmers",
+    "pdfTitle": "Farmers List",
+    "pdfTotalRecords": "Total records:"
   },
   "auth": {
     "welcomeBack": "Welcome Back!",
@@ -747,11 +805,57 @@
     "redirectUri": "Redirect URI:",
     "status": "Status",
     "stateMismatch": "The backend returned a state that does not match the one stored before redirecting.",
+    "stateMismatchMessage": "The returned state value does not match the stored one.",
+    "stateHandshakeFailed": "The state handshake failed after returning from UAE Pass.",
+    "payloadDecodeFailed": "Unable to read the payload returned from the backend.",
+    "payloadDecodeFailedStatus": "Failed to decode the redirected payload.",
+    "preparingLogin": "Preparing UAE Pass login...",
     "userProfile": "User Profile",
     "retrievedAttributes": "Retrieved attributes",
     "startOver": "Start over",
     "readyToStart": "Ready to start the handshake"
   },
+  "reset": {
+    "title": "Reset Password",
+    "description": "Create a new password for your account.",
+    "newPasswordPlaceholder": "New password",
+    "confirmPasswordPlaceholder": "Confirm password",
+    "saveButton": "Save Password",
+    "errors": {
+      "newPasswordRequired": "Please enter a new password",
+      "confirmPasswordRequired": "Please confirm the password",
+      "passwordsMismatch": "The passwords do not match, please try again"
+    }
+  },
+  "forgot": {
+    "title": "Forgot Password",
+    "description": "Enter the email associated with your account and we will send you a password reset link.",
+    "placeholder": "Email address",
+    "sendButton": "Send reset link",
+    "errors": {
+      "emailRequired": "Please enter your email address.",
+      "emailInvalid": "Please enter a valid email address."
+    }
+  },
+  "confirm": {
+    "title": "Check your email",
+    "description": "We sent a confirmation link to your email. Please check your inbox and spam folder.",
+    "didNotReceive": "Didn't receive the email?",
+    "resendLink": "Resend link"
+  },
+  "passwordResetSuccessful": "Password Reset Successful",
+  "passwordResetSuccessDesc": "Your password has been reset successfully. You can now log in with your new password.",
+  "goToLogin": "Go to Login",
+  "uaePassDemo": "UAE Pass Demo",
+  "loginWithUaePass": "Login with UAE Pass",
+  "uaePassDescription": "Click the login button to start the UAE Pass sandbox. The backend handles the callback and returns an encoded user profile which will be displayed here.",
+  "redirectUri": "Redirect URI:",
+  "stateMismatch": "The backend returned a state that does not match the one stored before redirecting.",
+  "userProfile": "User Profile",
+  "retrievedAttributes": "Retrieved attributes",
+  "startOver": "Start over",
+  "readyToStart": "Ready to start the handshake",
+  "nA": "N/A",
   "center": {
     "title": "Centers Management",
     "addCenter": "Add Center",
@@ -791,7 +895,31 @@
       "selectCrop": "Select Crop",
       "selectFarming": "Select Farming",
       "selectCover": "Select Cover",
-      "totalFarms": "Total farms each crop category have!"
+      "totalFarms": "Total farms each crop category have!",
+      "export": {
+        "title": "Farm Crop Analytics Dashboard",
+        "generatedOn": "Generated on:",
+        "metric": "Metric",
+        "value": "Value",
+        "totalFarms": "Total farms",
+        "farmsWithFruits": "Farms with fruits",
+        "farmsWithVegetables": "Farms with vegetables",
+        "farmsWithFodders": "Farms with fodders",
+        "farmsWithGreenhouses": "Farms with greenhouses",
+        "sheetSummary": "Summary",
+        "sheetCropTypes": "Crop Types",
+        "sheetTopFruits": "Top Fruits",
+        "sheetTopVegetables": "Top Vegetables",
+        "sheetTopFodders": "Top Fodders",
+        "sheetByEmirate": "By Emirate",
+        "sheetByCenter": "By Service Center",
+        "sheetGreenhouseTypes": "Greenhouse Types",
+        "sheetCoverTypes": "Cover Types",
+        "sheetFarmingSystems": "Farming Systems",
+        "exporting": "Exporting...",
+        "exportFailed": "Export failed. Please try again"
+      },
+      "updatedSuccessfully": "Updated successfully"
     },
     "farmAnalytics": {
       "title": "Farm Registration Analytics",
@@ -810,7 +938,53 @@
       "emirateRegionCenterHeader": "Emirate / Region / Center",
       "wellsCount": "Wells-Count",
       "waterSources": "Water Sources",
-      "cultivatedPercent": "Cultivated %"
+      "cultivatedPercent": "Cultivated %",
+      "export": {
+        "title": "Farm Analytics Report",
+        "generatedOn": "Generated on:",
+        "appliedFilters": "Applied filters:",
+        "region": "Region",
+        "emirate": "Emirate",
+        "center": "Center",
+        "location": "Location",
+        "metric": "Metric",
+        "value": "Value",
+        "totalFarms": "Total farms",
+        "totalCultivatedArea": "Total cultivated area (ha)",
+        "totalGreenhouseArea": "Total greenhouse area (ha)",
+        "avgWellsPerFarm": "Avg wells per farm",
+        "waterSources": "Water Sources",
+        "groundwaterOnly": "Groundwater only",
+        "desalinatedOnly": "Desalinated only",
+        "both": "Both",
+        "exporting": "Exporting...",
+        "exportFailed": "Export failed. Please try again",
+        "exportReport": "Export Report",
+        "filenamePrefix": "farm_analytics",
+        "sheetSummary": "Summary",
+        "sheetByEmirate": "Farms by Emirate",
+        "colEmirate": "Emirate",
+        "colNumberOfFarms": "Number of farms",
+        "colTotalArea": "Total area (ha)",
+        "sheetLandUse": "Land Use Distribution",
+        "colCategory": "Category",
+        "colPercentage": "Percentage %",
+        "sheetTopFruits": "Top Fruits",
+        "colFruitType": "Fruit type",
+        "sheetTopVegetables": "Top Vegetables",
+        "colVegetableType": "Vegetable type",
+        "sheetByCenter": "Farms by Center",
+        "colServiceCenter": "Service Center",
+        "sheetGreenhouseData": "Greenhouse Data",
+        "colGreenhouseType": "Greenhouse type",
+        "colCount": "Count",
+        "colCoverType": "Cover type",
+        "sheetTopFarms": "Top Farms by Greenhouse Area",
+        "colFarmId": "Farm ID",
+        "colCenter": "Center",
+        "colGreenhouses": "Greenhouses",
+        "colArea": "Area (ha)"
+      }
     },
     "greenhouseDashboard": {
       "title": "Greenhouses & Protected Farming",
@@ -818,6 +992,32 @@
       "selectEmirate": "Select Emirate",
       "selectCenter": "Select center",
       "clearFilter": "Clear filter",
+      "rank": "Rank",
+      "center": "Center",
+      "location": "Location",
+      "greenhouseType": "Greenhouse Type",
+      "coverType": "Cover Type",
+      "generatedOn": "Generated on:",
+      "appliedFilters": "Applied Filters:",
+      "summaryTitle": "Greenhouse Analytics Dashboard",
+      "metric": "Metric",
+      "value": "Value",
+      "totalGreenhouseAreaHa": "Total Greenhouse Area (ha)",
+      "avgGreenhousesPerFarm": "Average Greenhouses per Farm",
+      "sheetSummary": "Summary",
+      "sheetGreenhouseTypes": "Greenhouse Types",
+      "sheetCoverTypes": "Cover Types",
+      "sheetByEmirate": "By Emirate",
+      "sheetGreenhousesPerFarm": "Greenhouses per Farm",
+      "sheetTopFarms": "Top Farms by Greenhouse Area",
+      "colType": "Type",
+      "colCount": "Count",
+      "colPercentage": "Percentage",
+      "colCoverType": "Cover Type",
+      "colTotalAreaSqm": "Total Area (sqm)",
+      "colNumberOfGreenhouses": "Number of Greenhouses",
+      "colAverageAreaPerGreenhouseSqm": "Average Area per Greenhouse (sqm)",
+      "colNumberOfFarms": "Number of Farms",
       "greenhouseTypes": "Greenhouse Types",
       "coverTypes": "Cover Types",
       "cooled": "Cooled",
@@ -829,7 +1029,9 @@
       "emirate": "Emirate",
       "region": "Region",
       "greenhouses": "Greenhouses",
-      "greenhouseAreaHa": "Greenhouse Area (ha)"
+      "greenhouseAreaHa": "Greenhouse Area (ha)",
+      "exportReport": "Export Report",
+      "exporting": "Exporting..."
     },
     "center": {
       "title": "Centers Management",
@@ -894,6 +1096,16 @@
       "title": "Article Sub-Categories",
       "subtitle": "Manage the sub-categories used by articles",
       "add": "Add Sub-Category",
+      "table": {
+        "image": "Image",
+        "name": "Name",
+        "nameArabic": "Arabic Name",
+        "createdAt": "Created At",
+        "actions": "Actions"
+      },
+      "stats": {
+        "total": "Total sub-categories:"
+      },
       "empty": {
         "noItems": "No sub-categories yet",
         "cta": "Click \"Add Sub-Category\" to create one"
@@ -975,7 +1187,42 @@
   "sizes": {
     "title": "Total registered Farms size in UAE!",
     "farmSizes": "Farm Sizes",
-    "downloadReport": "Download report"
+    "downloadReport": "Download report",
+    "filterTitle": "Filters",
+    "clearAll": "Clear All",
+    "avgFarmSize": "Average size",
+    "medianSize": "Median size",
+    "mostCommonRange": "Most common size range",
+    "farmsInCommonRange": "Farms in the most common range",
+    "ranges": {
+      "from0To500": "0-500",
+      "from500To1000": "500-1000",
+      "from1000To1500": "1000-1500",
+      "from1500To2000": "1500-2000",
+      "from2000To2500": "2000-2500",
+      "above2500": "2500+"
+    },
+    "export": {
+      "title": "Farm Sizes Analytics Dashboard",
+      "generatedOn": "Generated on:",
+      "filtersApplied": "Filters applied:",
+      "metric": "Metric",
+      "value": "Value",
+      "unit": "Unit",
+      "unitFarms": "farm",
+      "allFarmsTitle": "All farms details",
+      "farmId": "Farm ID",
+      "sizeSqrt": "Area (m²)",
+      "export": "Export",
+      "exporting": "Exporting..."
+    },
+    "map": {
+      "sizeLabel": "Size",
+      "unit": "feddan",
+      "rangeLabel": "Range",
+      "coordinatesLabel": "Coordinates",
+      "viewDetails": "View details"
+    }
   },
   "coverTypes": {
     "title": "CoverTypes Management",
@@ -1156,6 +1403,7 @@
   },
   "fruitTypes": {
     "title": "Fruit Types Management",
+    "subtitle": "Manage fruit types in the system",
     "searchHeading": "Search Fruit Types",
     "searchResults": "Search Results",
     "add": "Add",
@@ -1178,7 +1426,8 @@
     "update": "Update",
     "pleaseFillRequiredFields": "Please fill in all required fields",
     "enterNameEnglish": "Enter Name English",
-    "enterNameArabic": "Enter Name Arabic"
+    "enterNameArabic": "Enter Name Arabic",
+    "results": "Results"
   },
   "irrigationSystem": {
     "title": "Irrigation System Management",
@@ -1331,6 +1580,7 @@
   },
   "vegetableTypes": {
     "title": "VegetableType Management",
+    "subtitle": "Manage vegetable types in the system",
     "nameEnglishPlaceholder": "e.g., Tomato",
     "searchHeading": "Search Vegetable Types",
     "searchResults": "Search Results",
@@ -1372,7 +1622,8 @@
       "cancel": "Cancel",
       "update": "Update",
       "addItem": "Add Item"
-    }
+    },
+    "results": "Results"
   },
   "waterSources": {
     "title": "Water Sources",
@@ -1485,6 +1736,7 @@
   },
   "fodderTypes": {
     "title": "FodderTypes Management",
+    "subtitle": "Manage fodder types in the system",
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
@@ -1511,7 +1763,20 @@
     "addSuccess": "Add Success",
     "deleteConfirmation": "Delete Confirmation",
     "deleteSuccess": "Delete Success",
-    "subtitle": "Subtitle",
-    "emptyState": "Empty State"
+    "emptyState": "Empty State",
+    "form": {
+      "nameArabic": "Name (Arabic) *",
+      "nameArabicPlaceholder": "Enter in item name in arrabic",
+      "nameEnglish": "Name (English) *",
+      "nameEnglishPlaceholder": "Enter name in English"
+    },
+    "table": {
+      "headers": {
+        "nameArabic": "Name (Arabic)",
+        "nameEnglish": "Name (English)",
+        "createdAt": "Created At",
+        "actions": "Actions"
+      }
+    }
   }
 }

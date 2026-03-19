@@ -36,33 +36,31 @@ const FarmCodingRequest = () => {
 
   // Helper function to translate status labels
   const getStatusLabel = (status) => {
-    if (!isArabic) return status;
-    
-    const statusTranslations = {
-      'active': 'نشط',
-      'pending': 'قيد الانتظار',
-      'draft': 'مسودة',
-      'suspended': 'معلق',
-      'assigned': 'معين'
+    const statusKeyMap = {
+      active: 'active',
+      pending: 'pending',
+      draft: 'drafts',
+      suspended: 'suspended',
+      assigned: 'assigned',
     };
-    
-    return statusTranslations[status] || status;
+
+    const statusKey = statusKeyMap[status] || status;
+    return t(`common.components.farmCoding.${statusKey}`) || status;
   };
 
   // Helper function to translate status tab labels
   const getStatusTabLabel = (status) => {
-    if (!isArabic) return status;
-    
-    const tabTranslations = {
-      'All': 'الكل',
-      'Active': 'نشط',
-      'Pending': 'قيد الانتظار',
-      'Assigned': 'معين',
-      'Drafts': 'مسودات',
-      'Rejected': 'مرفوض'
+    const tabKeyMap = {
+      All: 'all',
+      Active: 'active',
+      Pending: 'pending',
+      Assigned: 'assigned',
+      Drafts: 'drafts',
+      Rejected: 'rejected',
     };
-    
-    return tabTranslations[status] || status;
+
+    const tabKey = tabKeyMap[status] || status;
+    return t(`common.components.farmCoding.${tabKey}`) || status;
   };
 
   React.useEffect(() => {
@@ -289,7 +287,7 @@ const FarmCodingRequest = () => {
     const data = prepareDataForExport();
     
     if (data.length === 0) {
-      toast.error(t('common.noDataToExport') || 'No data to export');
+      toast.error(t('noDataToExport'));
       setShowDownloadMenu(false);
       return;
     }
@@ -306,7 +304,7 @@ const FarmCodingRequest = () => {
     link.href = URL.createObjectURL(blob);
     link.download = `farms_${selectedStatus}_${new Date().toISOString().split('T')[0]}.csv`;
     link.click();
-    toast.success('CSV downloaded successfully');
+    toast.success(t('downloadSuccess'));
     setShowDownloadMenu(false);
   };
 
@@ -314,7 +312,7 @@ const FarmCodingRequest = () => {
     const data = prepareDataForExport();
     
     if (data.length === 0) {
-      toast.error(t('common.noDataToExport') || 'No data to export');
+      toast.error(t('noDataToExport'));
       setShowDownloadMenu(false);
       return;
     }
@@ -326,7 +324,7 @@ const FarmCodingRequest = () => {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Farms');
     XLSX.writeFile(wb, `farms_${selectedStatus}_${new Date().toISOString().split('T')[0]}.xlsx`);
-    toast.success('Excel downloaded successfully');
+    toast.success(t('downloadSuccess'));
     setShowDownloadMenu(false);
   };
 
@@ -359,7 +357,7 @@ const FarmCodingRequest = () => {
       }
 
       doc.setFontSize(18);
-      const title = isArabic ? "بيانات ترميز المزرعة" : "Farm Coding Data";
+      const title = t('common.components.farmCoding.title');
       doc.text(title, isArabic ? 280 : 14, 15, { align: isArabic ? 'right' : 'left' });
 
       autoTable(doc, {
@@ -556,7 +554,7 @@ const FarmCodingRequest = () => {
                   options={farmers}
                   value={selectedCoder}
                   onChange={setSelectedCoder}
-                  placeholder={isArabic ? 'اختر المُرمّز' : 'Select Coder'}
+                  placeholder={t('common.components.farmCoding.selectCoder')}
                 />
               </div>
               <button

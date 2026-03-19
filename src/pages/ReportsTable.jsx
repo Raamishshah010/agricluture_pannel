@@ -2,13 +2,6 @@ import React, { useState } from 'react';
 import { Search, Download, ChevronDown } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 
-const filterOptions = {
-  emirate: ['All', 'Ras Al Khaimah', 'Dubai', 'Abu Dhabi', 'Sharjah'],
-  season: ['All', 'Winter', 'Summer', 'Spring', 'Autumn'],
-  crop: ['All', 'Fruit trees and palm trees', 'Vegetables', 'Grains'],
-  reportType: ['All', 'Monthly', 'Quarterly', 'Annual'],
-};
-
   const data = [
     {
       id: 1,
@@ -97,11 +90,17 @@ const CustomDropdown = ({ label, value, options, onChange, open, onOpen, onClose
 
 const ReportsTable = () => {
   const t = useTranslation();
+  const filterOptions = {
+    emirate: [t('reports.all'), t('reports.rasAlKhaimah'), t('reports.dubai'), t('reports.abuDhabi'), t('reports.sharjah')],
+    season: [t('reports.all'), t('translation.winter'), t('translation.summer'), t('translation.spring'), t('translation.autumn')],
+    crop: [t('reports.all'), t('translation.fruitTrees'), t('translation.vegetables'), t('translation.grains')],
+    reportType: [t('reports.all'), t('translation.monthly'), t('translation.quarterly'), t('translation.annual')],
+  };
   const [filters, setFilters] = useState({
-    emirate: 'All',
-    season: 'All',
-    crop: 'All',
-    reportType: 'All'
+    emirate: t('reports.all'),
+    season: t('reports.all'),
+    crop: t('reports.all'),
+    reportType: t('reports.all')
   });
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
@@ -178,7 +177,7 @@ const ReportsTable = () => {
             value={dateFrom}
             onChange={(e) => setDateFrom(e.target.value)}
             className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="MM/DD/YYYY"
+              placeholder={t('reports.datePlaceholder')}
           />
         </div>
         <div className="flex items-center gap-2">
@@ -188,7 +187,7 @@ const ReportsTable = () => {
             value={dateTo}
             onChange={(e) => setDateTo(e.target.value)}
             className="border border-gray-300 rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="MM/DD/YYYY"
+              placeholder={t('reports.datePlaceholder')}
           />
         </div>
         <button className="bg-teal-600 text-white px-6 py-2 rounded-md text-sm hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500">

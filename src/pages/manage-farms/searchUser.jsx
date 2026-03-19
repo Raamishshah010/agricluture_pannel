@@ -4,8 +4,9 @@ import { Search, X, User, CheckCircle, Loader2 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import service from '../../services/farmerService';
 
-export const UserSearchSelect = ({ onSelect, selectedUser = null, placeholder = "Search users..." }) => {
+export const UserSearchSelect = ({ onSelect, selectedUser = null, placeholder }) => {
     const t = useTranslation();
+    const searchPlaceholder = placeholder || t('searchUsers');
     const [searchQuery, setSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -127,7 +128,7 @@ export const UserSearchSelect = ({ onSelect, selectedUser = null, placeholder = 
                                 type="text"
                                 value={searchQuery}
                                 onChange={handleInputChange}
-                                placeholder={placeholder}
+                                placeholder={searchPlaceholder}
                                 className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                             />
                             {isLoading && (

@@ -22,21 +22,21 @@ import useTranslation from '../../hooks/useTranslation';
   }, [map]);
 
   const ranges = [
-    { label: '0-500', min: 0, max: 500 },
-    { label: '500-1000', min: 500, max: 1000 },
-    { label: '1000-1500', min: 1000, max: 1500 },
-    { label: '1500-2000', min: 1500, max: 2000 },
-    { label: '2000-2500', min: 2000, max: 2500 },
-    { label: '2500+', min: 2500, max: Infinity },
+    { id: 'from0To500', label: t('sizes.ranges.from0To500'), min: 0, max: 500 },
+    { id: 'from500To1000', label: t('sizes.ranges.from500To1000'), min: 500, max: 1000 },
+    { id: 'from1000To1500', label: t('sizes.ranges.from1000To1500'), min: 1000, max: 1500 },
+    { id: 'from1500To2000', label: t('sizes.ranges.from1500To2000'), min: 1500, max: 2000 },
+    { id: 'from2000To2500', label: t('sizes.ranges.from2000To2500'), min: 2000, max: 2500 },
+    { id: 'above2500', label: t('sizes.ranges.above2500'), min: 2500, max: Infinity },
   ];
 
   const rangeColors = {
-    '0-500': '#8B5CF6',
-    '500-1000': '#06B6D4',
-    '1000-1500': '#F59E0B',
-    '1500-2000': '#10B981',
-    '2000-2500': '#6366F1',
-    '2500+': '#EF4444'
+    from0To500: '#8B5CF6',
+    from500To1000: '#06B6D4',
+    from1000To1500: '#F59E0B',
+    from1500To2000: '#10B981',
+    from2000To2500: '#6366F1',
+    above2500: '#EF4444'
   };
 
   // Add markers and clustering
@@ -71,7 +71,7 @@ import useTranslation from '../../hooks/useTranslation';
       const rangeLabel = matchedRange.label;
     
       // Get color for this range
-      const color = rangeColors[rangeLabel] || '#10B981';
+      const color = rangeColors[matchedRange.id] || '#10B981';
 
       // Create marker WITHOUT map property (clusterer will handle it)
       const marker = new window.google.maps.Marker({
@@ -98,10 +98,10 @@ import useTranslation from '../../hooks/useTranslation';
               <strong>${t('sizes.map.sizeLabel')}:</strong> ${farm.totalArea || t('nA')} ${t('sizes.map.unit')}
             </p>
             <p style="margin: 4px 0; color: #374151; font-size: 14px;">
-              <strong>Range:</strong> ${rangeLabel}
+              <strong>${t('sizes.map.rangeLabel')}:</strong> ${rangeLabel}
             </p>
             <p style="margin: 4px 0; color: #6b7280; font-size: 12px;">
-              Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}
+              ${t('sizes.map.coordinatesLabel')}: ${lat.toFixed(4)}, ${lng.toFixed(4)}
             </p>
               <button 
               id="view-farm-${farm.id}"

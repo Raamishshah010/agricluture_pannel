@@ -127,31 +127,31 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         // Title
         doc.setFontSize(18);
         doc.setTextColor(34, 197, 94);
-        const titleText = isLTR ? `Farm Details: ${farm.farmName}` : `تفاصيل المزرعة: ${farm.farmName}`;
+        const titleText = `${t('farmCodingDetails.farmDetailsTitle')}: ${farm.farmName}`;
         doc.text(titleText, 105, yPosition, { align: 'center' });
         yPosition += 15;
 
         // Basic Information
         doc.setFontSize(14);
         doc.setTextColor(0, 0, 0);
-        doc.text(isLTR ? 'Basic Information' : 'المعلومات الأساسية', 20, yPosition);
+        doc.text(t('farmCodingDetails.basicInformation'), 20, yPosition);
         yPosition += 10;
 
         const basicInfo = [
-            [isLTR ? 'Agriculture ID' : 'معرف الزراعة', farm.agricultureId || t('common.nA')],
-            [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.phoneNumber || t('common.nA')],
-            [isLTR ? 'Farm Number' : 'رقم المزرعة', farm.farmNo || t('common.nA')],
-            [isLTR ? 'Farm Serial' : 'مسلسل المزرعة', farm.farmSerial || t('common.nA')],
-            [isLTR ? 'Status' : 'الحالة', farm.status || t('common.nA')],
-            [isLTR ? 'Total Area' : 'المساحة الإجمالية', `${Math.round(farm.totalArea)} ${isLTR ? 'ha' : 'هكتار'}`],
-            [isLTR ? 'Size' : 'الحجم', `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
-            [isLTR ? 'Possession Style' : 'أسلوب الاستحواذ', getPossessionStyleName()],
-            [isLTR ? 'Farming System' : 'نظام الزراعة', getFarmingSystemNames()],
+            [t('farmCodingDetails.agricultureId'), farm.agricultureId || t('common.nA')],
+            [t('farmCodingDetails.phone'), farm.phoneNumber || t('common.nA')],
+            [t('farmCodingDetails.farmNo'), farm.farmNo || t('common.nA')],
+            [t('farmCodingDetails.farmSerial'), farm.farmSerial || t('common.nA')],
+            [t('common.components.farmCoding.statusHeader'), farm.status || t('common.nA')],
+            [t('farmCodingDetails.totalArea'), `${Math.round(farm.totalArea)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [t('farmCodingDetails.size'), `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [t('farmCodingDetails.possessionStyle'), getPossessionStyleName()],
+            [t('farmCodingDetails.farmingSystem'), getFarmingSystemNames()],
         ];
 
         autoTable(doc, {
             startY: yPosition,
-            head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+            head: [[t('farmCodingDetails.field'), t('farmCodingDetails.value')]],
             body: basicInfo,
             theme: 'grid',
             styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
@@ -166,19 +166,19 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             yPosition = 20;
         }
         doc.setFontSize(14);
-        doc.text(isLTR ? 'Owner Information' : 'معلومات المالك', 20, yPosition);
+        doc.text(t('farmCodingDetails.ownerInformation'), 20, yPosition);
         yPosition += 10;
 
         const ownerInfo = [
-            [isLTR ? 'Name' : 'الاسم', farm.owner?.name || t('common.nA')],
-            [isLTR ? 'Email' : 'البريد الإلكتروني', farm.owner?.email || t('common.nA')],
-            [isLTR ? 'Emirates ID' : 'الهوية الإماراتية', farm.emiratesID || t('common.nA')],
-            [isLTR ? 'Email Verified' : 'تم التحقق من البريد الإلكتروني', farm.owner?.isEmailVerified ? (isLTR ? 'Yes' : 'نعم') : (isLTR ? 'No' : 'لا')],
+            [t('farmCodingDetails.name'), farm.owner?.name || t('common.nA')],
+            [t('farmCodingDetails.email'), farm.owner?.email || t('common.nA')],
+            [t('farmCodingDetails.emiratesID'), farm.emiratesID || t('common.nA')],
+            [t('farmCodingDetails.emailVerified'), farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')],
         ];
 
         autoTable(doc, {
             startY: yPosition,
-            head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+            head: [[t('farmCodingDetails.field'), t('farmCodingDetails.value')]],
             body: ownerInfo,
             theme: 'grid',
             styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
@@ -194,19 +194,19 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 yPosition = 20;
             }
             doc.setFontSize(14);
-            doc.text(isLTR ? 'Holder Information' : 'معلومات الحامل', 20, yPosition);
+            doc.text(t('farmCodingDetails.holderInformation'), 20, yPosition);
             yPosition += 10;
 
             const holderInfo = [
-                [isLTR ? 'Name' : 'الاسم', farm.holder?.name || 'N/A'],
-                [isLTR ? 'Email' : 'البريد الإلكتروني', farm.holder?.email || 'N/A'],
-                [isLTR ? 'Email Verified' : 'تم التحقق من البريد الإلكتروني', farm.holder?.isEmailVerified ? (isLTR ? 'Yes' : 'نعم') : (isLTR ? 'No' : 'لا')],
-                [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.holder?.phoneNumber || 'N/A'],
+                [t('farmCodingDetails.name'), farm.holder?.name || t('common.nA')],
+                [t('farmCodingDetails.email'), farm.holder?.email || t('common.nA')],
+                [t('farmCodingDetails.emailVerified'), farm.holder?.isEmailVerified ? t('common.yes') : t('common.no')],
+                [t('farmCodingDetails.phoneNumber'), farm.holder?.phoneNumber || t('common.nA')],
             ];
 
             autoTable(doc, {
                 startY: yPosition,
-                head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+                head: [[t('farmCodingDetails.field'), t('farmCodingDetails.value')]],
                 body: holderInfo,
                 theme: 'grid',
                 styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
@@ -222,20 +222,20 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             yPosition = 20;
         }
         doc.setFontSize(14);
-        doc.text(isLTR ? 'Location Information' : 'معلومات الموقع', 20, yPosition);
+        doc.text(t('farmCodingDetails.locationDetails'), 20, yPosition);
         yPosition += 10;
 
         const locationInfo = [
-            [isLTR ? 'Location' : 'الموقع', (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Region' : 'المنطقة', (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Emirate' : 'الإمارة', (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Service Center' : 'مركز الخدمة', (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Coordinates' : 'الإحداثيات', `${farm.coordinates?.lat || 'N/A'}, ${farm.coordinates?.lng || 'N/A'}`],
+            [t('farmCodingDetails.location'), (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.region'), (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.emirate'), (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.serviceCenter'), (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.coordinates'), `${farm.coordinates?.lat || t('common.nA')}, ${farm.coordinates?.lng || t('common.nA')}`],
         ];
 
         autoTable(doc, {
             startY: yPosition,
-            head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+            head: [[t('farmCodingDetails.field'), t('farmCodingDetails.value')]],
             body: locationInfo,
             theme: 'grid',
             styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
@@ -251,19 +251,19 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 yPosition = 20;
             }
             doc.setFontSize(14);
-            doc.text(isLTR ? 'Land Use Distribution' : 'توزيع استخدامات الأراضي', 20, yPosition);
+            doc.text(t('farmCodingDetails.landUseDistribution'), 20, yPosition);
             yPosition += 10;
 
             const landUseInfo = [
-                [isLTR ? 'Vegetables (Open)' : 'الخضروات (مفتوحة)', `${farm.landUse?.arrableLand?.vegetablesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Fruit & Palm Trees (Open)' : 'أشجار الفاكهة والنخيل (مفتوح)', `${farm.landUse?.arrableLand?.fruitPalmTreesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Field Crops & Fodder' : 'المحاصيل الحقلية والأعلاف', `${farm.landUse?.arrableLand?.fieldCropsFodder || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Buildings & Roads' : 'المباني والطرق', `${farm.landUse?.nonArrableLand?.buildingsRoads || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.vegetablesOpen'), `${farm.landUse?.arrableLand?.vegetablesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.fruitPalmTreesOpen'), `${farm.landUse?.arrableLand?.fruitPalmTreesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.fieldCropsFodder'), `${farm.landUse?.arrableLand?.fieldCropsFodder || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.buildingsRoads'), `${farm.landUse?.nonArrableLand?.buildingsRoads || 0} ${isLTR ? 'm²' : 'م²'}`],
             ];
 
             autoTable(doc, {
                 startY: yPosition,
-                head: [[isLTR ? 'Land Use Type' : 'نوع استخدام الأرض', isLTR ? 'Area' : 'المساحة']],
+                head: [[t('farmCodingDetails.field'), t('farmCodingDetails.value')]],
                 body: landUseInfo,
                 theme: 'grid',
                 styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
@@ -280,19 +280,19 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 yPosition = 20;
             }
             doc.setFontSize(14);
-            doc.text(isLTR ? 'Water & Irrigation' : 'المياه والري', 20, yPosition);
+            doc.text(t('farmCodingDetails.waterAndIrrigation'), 20, yPosition);
             yPosition += 10;
 
             const waterInfo = [
-                [isLTR ? 'Water Sources' : 'مصادر المياه', farm.waterSources.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ')],
-                [isLTR ? 'Irrigation Systems' : 'أنظمة الري', farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || t('common.nA')],
-                [isLTR ? 'Production Wells' : 'آبار الإنتاج', farm.numberOfProductionWells || t('common.nA')],
-                [isLTR ? 'Desalination Units' : 'وحدات تحلية المياه', farm.desalinationUnits || t('common.nA')],
+                [t('farmCodingDetails.waterSources'), farm.waterSources.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ')],
+                [t('farmCodingDetails.irrigationSystems'), farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || t('common.nA')],
+                [t('farmCodingDetails.productionWells'), farm.numberOfProductionWells || t('common.nA')],
+                [t('farmCodingDetails.desalinationUnits'), farm.desalinationUnits || t('common.nA')],
             ];
 
             autoTable(doc, {
                 startY: yPosition,
-                head: [[isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة']],
+                head: [[t('farmCodingDetails.field'), t('farmCodingDetails.value')]],
                 body: waterInfo,
                 theme: 'grid',
                 styles: { font: 'Amiri', fontSize: 9, halign: 'center' },
@@ -309,7 +309,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 yPosition = 20;
             }
             doc.setFontSize(14);
-            doc.text(isLTR ? 'Fruit Trees' : 'أشجار الفاكهة', 20, yPosition);
+            doc.text(t('farmCodingDetails.fruitTrees'), 20, yPosition);
             yPosition += 10;
 
             const fruitsData = farm.crops.fruits.map(fruit => [
@@ -343,7 +343,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 yPosition = 20;
             }
             doc.setFontSize(14);
-            doc.text(isLTR ? 'Vegetables' : 'الخضروات', 20, yPosition);
+            doc.text(t('farmCodingDetails.vegetables'), 20, yPosition);
             yPosition += 10;
 
             const vegetablesData = farm.crops.vegetables.map(veg => [
@@ -375,7 +375,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 yPosition = 20;
             }
             doc.setFontSize(14);
-            doc.text(isLTR ? 'Field Crops & Fodder' : 'المحاصيل الحقلية والأعلاف', 20, yPosition);
+            doc.text(t('farmCodingDetails.fieldCropsFodderLabel'), 20, yPosition);
             yPosition += 10;
 
             const fodderData = farm.crops.fieldCropsFodder.map(fodder => [
@@ -407,19 +407,19 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 yPosition = 20;
             }
             doc.setFontSize(14);
-            doc.text(isLTR ? 'Livestocks' : 'الثروة الحيوانية', 20, yPosition);
+            doc.text(t('farms.livestocks'), 20, yPosition);
             yPosition += 10;
 
             const livestocksData = farm.livestocks.map(stock => [
                 stockType(stock),
-                stock.numberOfAnimals || 'N/A'
+                stock.numberOfAnimals || t('common.nA')
             ]);
 
             autoTable(doc, {
                 startY: yPosition,
                 head: [[
-                    isLTR ? 'Type' : 'النوع',
-                    isLTR ? 'Number of Animals' : 'عدد الحيوانات'
+                    t('farmCodingDetails.field'),
+                    t('farms.numberOfAnimals')
                 ]],
                 body: livestocksData,
                 theme: 'grid',
@@ -432,7 +432,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
         doc.save(`farm-details-${farm.farmName}.pdf`);
         setIsDownloadOpen(false);
-        toast.success(isLTR ? 'PDF downloaded successfully!' : 'تم تنزيل ملف PDF بنجاح!');
+        toast.success(t('common.downloadSuccess'));
     };
 
     // Download as Excel
@@ -441,86 +441,86 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
         // Basic Information Sheet
         const basicData = [
-            [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
-            [isLTR ? 'Farm Name' : 'اسم المزرعة', farm.farmName],
-            [isLTR ? 'Agriculture ID' : 'معرف الزراعة', farm.agricultureId],
-            [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.phoneNumber],
-            [isLTR ? 'Farm Number' : 'رقم المزرعة', farm.farmNo],
-            [isLTR ? 'Farm Serial' : 'مسلسل المزرعة', farm.farmSerial],
-            [isLTR ? 'Status' : 'الحالة', farm.status],
-            [isLTR ? 'Total Area' : 'المساحة الإجمالية', `${Math.round(farm.totalArea)} ${isLTR ? 'ha' : 'هكتار'}`],
-            [isLTR ? 'Size' : 'الحجم', `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
-            [isLTR ? 'Possession Style' : 'أسلوب الاستحواذ', getPossessionStyleName()],
-            [isLTR ? 'Farming System' : 'نظام الزراعة', getFarmingSystemNames()],
-            [isLTR ? 'Workers' : 'العمال', farm.noOfWorkers || 0],
+            [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
+            [t('farms.farmName'), farm.farmName],
+            [t('farmCodingDetails.agricultureId'), farm.agricultureId],
+            [t('farmCodingDetails.phone'), farm.phoneNumber],
+            [t('farmCodingDetails.farmNo'), farm.farmNo],
+            [t('farmCodingDetails.farmSerial'), farm.farmSerial],
+            [t('common.components.farmCoding.statusHeader'), farm.status],
+            [t('farmCodingDetails.totalArea'), `${Math.round(farm.totalArea)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [t('farmCodingDetails.size'), `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [t('farmCodingDetails.possessionStyle'), getPossessionStyleName()],
+            [t('farmCodingDetails.farmingSystem'), getFarmingSystemNames()],
+            [t('farmCodingDetails.workers'), farm.noOfWorkers || 0],
         ];
         const basicSheet = XLSX.utils.aoa_to_sheet(basicData);
-        XLSX.utils.book_append_sheet(workbook, basicSheet, isLTR ? 'Basic Info' : 'المعلومات الأساسية');
+        XLSX.utils.book_append_sheet(workbook, basicSheet, t('farmCodingDetails.basicInformation'));
 
         // Owner Information Sheet
         const ownerData = [
-            [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
-            [isLTR ? 'Name' : 'الاسم', farm.owner?.name || 'N/A'],
-            [isLTR ? 'Email' : 'البريد الإلكتروني', farm.owner?.email || 'N/A'],
-            [isLTR ? 'Emirates ID' : 'الهوية الإماراتية', farm.emiratesID || 'N/A'],
-            [isLTR ? 'Email Verified' : 'تم التحقق من البريد الإلكتروني', farm.owner?.isEmailVerified ? (isLTR ? 'Yes' : 'نعم') : (isLTR ? 'No' : 'لا')],
+            [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
+            [t('farmCodingDetails.name'), farm.owner?.name || t('common.nA')],
+            [t('farmCodingDetails.email'), farm.owner?.email || t('common.nA')],
+            [t('farmCodingDetails.emiratesID'), farm.emiratesID || t('common.nA')],
+            [t('farmCodingDetails.emailVerified'), farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')],
         ];
         const ownerSheet = XLSX.utils.aoa_to_sheet(ownerData);
-        XLSX.utils.book_append_sheet(workbook, ownerSheet, isLTR ? 'Owner Info' : 'معلومات المالك');
+        XLSX.utils.book_append_sheet(workbook, ownerSheet, t('farmCodingDetails.ownerInformation'));
 
         // Holder Information Sheet
         if (farm.holder) {
             const holderData = [
-                [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
-                [isLTR ? 'Name' : 'الاسم', farm.holder?.name || 'N/A'],
-                [isLTR ? 'Email' : 'البريد الإلكتروني', farm.holder?.email || 'N/A'],
-                [isLTR ? 'Email Verified' : 'تم التحقق من البريد الإلكتروني', farm.holder?.isEmailVerified ? (isLTR ? 'Yes' : 'نعم') : (isLTR ? 'No' : 'لا')],
-                [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.holder?.phoneNumber || 'N/A'],
+                [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
+                [t('farmCodingDetails.name'), farm.holder?.name || t('common.nA')],
+                [t('farmCodingDetails.email'), farm.holder?.email || t('common.nA')],
+                [t('farmCodingDetails.emailVerified'), farm.holder?.isEmailVerified ? t('common.yes') : t('common.no')],
+                [t('farmCodingDetails.phoneNumber'), farm.holder?.phoneNumber || t('common.nA')],
             ];
             const holderSheet = XLSX.utils.aoa_to_sheet(holderData);
-            XLSX.utils.book_append_sheet(workbook, holderSheet, isLTR ? 'Holder Info' : 'معلومات الحامل');
+            XLSX.utils.book_append_sheet(workbook, holderSheet, t('farmCodingDetails.holderInformation'));
         }
 
         // Location Information Sheet
         const locationData = [
-            [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
-            [isLTR ? 'Location' : 'الموقع', (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Region' : 'المنطقة', (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Emirate' : 'الإمارة', (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Service Center' : 'مركز الخدمة', (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Coordinates' : 'الإحداثيات', `${farm.coordinates?.lat || 'N/A'}, ${farm.coordinates?.lng || 'N/A'}`],
+            [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
+            [t('farmCodingDetails.location'), (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.region'), (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.emirate'), (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.serviceCenter'), (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.coordinates'), `${farm.coordinates?.lat || t('common.nA')}, ${farm.coordinates?.lng || t('common.nA')}`],
         ];
         const locationSheet = XLSX.utils.aoa_to_sheet(locationData);
-        XLSX.utils.book_append_sheet(workbook, locationSheet, isLTR ? 'Location Info' : 'معلومات الموقع');
+        XLSX.utils.book_append_sheet(workbook, locationSheet, t('farmCodingDetails.locationDetails'));
 
         // Land Use Sheet
         if (farm.landUse) {
             const landUseData = [
-                [isLTR ? 'Land Use Type' : 'نوع استخدام الأرض', isLTR ? 'Area' : 'المساحة'],
-                [isLTR ? 'Vegetables (Open)' : 'الخضروات (مفتوحة)', `${farm.landUse?.arrableLand?.vegetablesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Fruit & Palm Trees (Open)' : 'أشجار الفاكهة والنخيل (مفتوح)', `${farm.landUse?.arrableLand?.fruitPalmTreesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Field Crops & Fodder' : 'المحاصيل الحقلية والأعلاف', `${farm.landUse?.arrableLand?.fieldCropsFodder || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Left for Rest' : 'غادر للراحة', `${Math.round(farm.landUse?.arrableLand?.leftForRest || 0)} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Nurseries' : 'مشاتل', `${farm.landUse?.arrableLand?.nurseries || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Buildings & Roads' : 'المباني والطرق', `${farm.landUse?.nonArrableLand?.buildingsRoads || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Windbreaks' : 'مصدات الرياح', `${farm.landUse?.nonArrableLand?.windbreaks || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [isLTR ? 'Barren Land' : 'أرض قاحلة', `${farm.landUse?.nonArrableLand?.barrenLand || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
+                [t('farmCodingDetails.vegetablesOpen'), `${farm.landUse?.arrableLand?.vegetablesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.fruitPalmTreesOpen'), `${farm.landUse?.arrableLand?.fruitPalmTreesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.fieldCropsFodder'), `${farm.landUse?.arrableLand?.fieldCropsFodder || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.leftForRest'), `${Math.round(farm.landUse?.arrableLand?.leftForRest || 0)} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.nurseries'), `${farm.landUse?.arrableLand?.nurseries || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.buildingsRoads'), `${farm.landUse?.nonArrableLand?.buildingsRoads || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.windbreaks'), `${farm.landUse?.nonArrableLand?.windbreaks || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.barrenLand'), `${farm.landUse?.nonArrableLand?.barrenLand || 0} ${isLTR ? 'm²' : 'م²'}`],
             ];
             const landUseSheet = XLSX.utils.aoa_to_sheet(landUseData);
-            XLSX.utils.book_append_sheet(workbook, landUseSheet, isLTR ? 'Land Use' : 'استخدام الأراضي');
+            XLSX.utils.book_append_sheet(workbook, landUseSheet, t('farmCodingDetails.landUseDistribution'));
         }
 
         // Water & Irrigation Sheet
         if (farm.waterSources && farm.waterSources.length > 0) {
             const waterData = [
-                [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'],
-                [isLTR ? 'Water Sources' : 'مصادر المياه', farm.waterSources.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ')],
-                [isLTR ? 'Irrigation Systems' : 'أنظمة الري', farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || 'N/A'],
-                [isLTR ? 'Production Wells' : 'آبار الإنتاج', farm.numberOfProductionWells || 'N/A'],
-                [isLTR ? 'Desalination Units' : 'وحدات تحلية المياه', farm.desalinationUnits || 'N/A'],
+                [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
+                [t('farmCodingDetails.waterSources'), farm.waterSources.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ')],
+                [t('farmCodingDetails.irrigationSystems'), farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || t('common.nA')],
+                [t('farmCodingDetails.productionWells'), farm.numberOfProductionWells || t('common.nA')],
+                [t('farmCodingDetails.desalinationUnits'), farm.desalinationUnits || t('common.nA')],
             ];
             const waterSheet = XLSX.utils.aoa_to_sheet(waterData);
-            XLSX.utils.book_append_sheet(workbook, waterSheet, isLTR ? 'Water & Irrigation' : 'المياه والري');
+            XLSX.utils.book_append_sheet(workbook, waterSheet, t('farmCodingDetails.waterAndIrrigation'));
         }
 
         // Crops Sheet - Fruits
@@ -599,7 +599,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
         XLSX.writeFile(workbook, `farm-details-${farm.farmName}.xlsx`);
         setIsDownloadOpen(false);
-        toast.success(isLTR ? 'Excel file downloaded successfully!' : 'تم تنزيل ملف Excel بنجاح!');
+        toast.success(t('common.downloadSuccess'));
     };
 
     // Download as CSV
@@ -617,17 +617,17 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             [isLTR ? 'Possession Style' : 'أسلوب الاستحواذ', getPossessionStyleName()],
             [isLTR ? 'Farming System' : 'نظام الزراعة', getFarmingSystemNames()],
             [isLTR ? 'Workers' : 'العمال', farm.noOfWorkers || 0],
-            [isLTR ? 'Owner Name' : 'اسم المالك', farm.owner?.name || 'N/A'],
-            [isLTR ? 'Owner Email' : 'بريد المالك الإلكتروني', farm.owner?.email || 'N/A'],
-            [isLTR ? 'Emirates ID' : 'الهوية الإماراتية', farm.emiratesID || 'N/A'],
-            [isLTR ? 'Location' : 'الموقع', (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Region' : 'المنطقة', (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Emirate' : 'الإمارة', (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Service Center' : 'مركز الخدمة', (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic) || 'N/A'],
-            [isLTR ? 'Water Sources' : 'مصادر المياه', farm.waterSources?.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ') || 'N/A'],
-            [isLTR ? 'Irrigation Systems' : 'أنظمة الري', farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || 'N/A'],
-            [isLTR ? 'Production Wells' : 'آبار الإنتاج', farm.numberOfProductionWells || 'N/A'],
-            [isLTR ? 'Desalination Units' : 'وحدات تحلية المياه', farm.desalinationUnits || 'N/A'],
+            [t('farmCodingDetails.name'), farm.owner?.name || t('common.nA')],
+            [t('farmCodingDetails.email'), farm.owner?.email || t('common.nA')],
+            [t('farmCodingDetails.emiratesID'), farm.emiratesID || t('common.nA')],
+            [t('farmCodingDetails.location'), (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.region'), (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.emirate'), (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.serviceCenter'), (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic) || t('common.nA')],
+            [t('farmCodingDetails.waterSources'), farm.waterSources?.map(ws => isLTR ? ws.name : ws.nameInArrabic).join(', ') || t('common.nA')],
+            [t('farmCodingDetails.irrigationSystems'), farm.irrigationSystem?.map(is => isLTR ? is.name : is.nameInArrabic).join(', ') || t('common.nA')],
+            [t('farmCodingDetails.productionWells'), farm.numberOfProductionWells || t('common.nA')],
+            [t('farmCodingDetails.desalinationUnits'), farm.desalinationUnits || t('common.nA')],
         ];
 
         const csvContent = [
@@ -641,7 +641,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         link.download = `farm-details-${farm.farmName}.csv`;
         link.click();
         setIsDownloadOpen(false);
-        toast.success(isLTR ? 'CSV file downloaded successfully!' : 'تم تنزيل ملف CSV بنجاح!');
+        toast.success(t('common.downloadSuccess'));
     };
 
     return (
@@ -652,7 +652,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                     className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 rounded-lg shadow-md transition-colors duration-200 border border-gray-200"
                 >
                     <ArrowLeft className="w-4 h-4" />
-                    <span className="font-medium">Back</span>
+                    <span className="font-medium">{t('farmCodingDetails.back')}</span>
                 </button>
 
                 {/* Download Dropdown */}
@@ -662,7 +662,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                         className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
                     >
                         <Download size={20} />
-                        <span className="font-medium">Download</span>
+                        <span className="font-medium">{t('common.download')}</span>
                         <ChevronDown
                             size={16}
                             className={`transition-transform duration-200 ${isDownloadOpen ? "rotate-180" : ""}`}
@@ -696,8 +696,8 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                         </svg>
                                     </div>
                                     <div>
-                                        <div className="font-medium text-gray-900">PDF Format</div>
-                                        <div className="text-xs text-gray-500">Printable document</div>
+                                        <div className="font-medium text-gray-900">{t('common.components.farmCoding.downloadOptions.pdf')}</div>
+                                        <div className="text-xs text-gray-500">{t('common.components.farmCoding.downloadOptions.pdfHint')}</div>
                                     </div>
                                 </button>
                                 <button
@@ -720,8 +720,8 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                         </svg>
                                     </div>
                                     <div>
-                                        <div className="font-medium text-gray-900">Excel Format</div>
-                                        <div className="text-xs text-gray-500">Spreadsheet file</div>
+                                        <div className="font-medium text-gray-900">{t('common.components.farmCoding.downloadOptions.excel')}</div>
+                                        <div className="text-xs text-gray-500">{t('common.components.farmCoding.downloadOptions.excelHint')}</div>
                                     </div>
                                 </button>
                                 <button
@@ -744,8 +744,8 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                         </svg>
                                     </div>
                                     <div>
-                                        <div className="font-medium text-gray-900">CSV Format</div>
-                                        <div className="text-xs text-gray-500">Comma-separated</div>
+                                        <div className="font-medium text-gray-900">{t('common.components.farmCoding.downloadOptions.csv')}</div>
+                                        <div className="text-xs text-gray-500">{t('common.components.farmCoding.downloadOptions.csvHint')}</div>
                                     </div>
                                 </button>
                             </div>
@@ -774,12 +774,12 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                             {farm.activeStatus ? (
                                 <span className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-sm font-semibold">
                                     <CheckCircle className="w-5 h-5" />
-                                    Active
+                                    {t('farmCodingDetails.active')}
                                 </span>
                             ) : (
                                 <span className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-sm font-semibold">
                                     <XCircle className="w-5 h-5" />
-                                    Inactive
+                                    {t('farmCodingDetails.inactive')}
                                 </span>
                             )}
                             <span className="px-4 py-2 bg-white/20 backdrop-blur rounded-full text-sm font-semibold capitalize text-center">
@@ -791,47 +791,47 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
                 {/* Quick Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <StatCard label={isLTR ? "Total Area" : "المساحة الكلية"} value={`${Math.round(farm.totalArea)} ha`} icon={Map} color="blue" />
-                    <StatCard label={isLTR ? "Production Wells" : "آبار الإنتاج"} value={farm.numberOfProductionWells} icon={Droplet} color="cyan" />
-                    <StatCard label={isLTR ? "Workers" : "العمال"} value={farm.noOfWorkers || 0} icon={Users} color="purple" />
-                    <StatCard label={isLTR ? "Water Sources" : "مصادر المياه"} value={farm.waterSources?.length || 0} icon={Droplet} color="teal" />
+                    <StatCard label={t('farmCodingDetails.totalArea')} value={`${Math.round(farm.totalArea)} ha`} icon={Map} color="blue" />
+                    <StatCard label={t('farmCodingDetails.productionWells')} value={farm.numberOfProductionWells} icon={Droplet} color="cyan" />
+                    <StatCard label={t('farmCodingDetails.workers')} value={farm.noOfWorkers || 0} icon={Users} color="purple" />
+                    <StatCard label={t('farmCodingDetails.waterSources')} value={farm.waterSources?.length || 0} icon={Droplet} color="teal" />
                 </div>
 
                 {/* Owner & Holder Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <InfoCard icon={User} title={isLTR ? "Owner Information" : "معلومات المالك"} gradient="from-blue-50 to-cyan-50">
-                        <InfoRow label={isLTR ? "Name" : "اسم"} value={farm.owner?.name} />
-                        <InfoRow label={isLTR ? "Emirates ID" : "الهوية الإماراتية"} value={farm.emiratesID} />
-                        <InfoRow label={isLTR ? "Email" : "بريد إلكتروني"} value={farm.owner?.email} />
+                    <InfoCard icon={User} title={t('farmCodingDetails.ownerInformation')} gradient="from-blue-50 to-cyan-50">
+                        <InfoRow label={t('farmCodingDetails.name')} value={farm.owner?.name} />
+                        <InfoRow label={t('farmCodingDetails.emiratesID')} value={farm.emiratesID} />
+                        <InfoRow label={t('farmCodingDetails.email')} value={farm.owner?.email} />
                         <InfoRow
                             label={isLTR ? "Email Verified" : "تم التحقق من البريد الإلكتروني"}
-                            value={farm.owner?.isEmailVerified ? 'Yes ✓' : 'No ✗'}
+                            value={farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')}
                             valueClass={farm.owner?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                         />
-                        <InfoRow label={isLTR ? "Phone Number" : "رقم التليفون"} value={farm.phoneNumber} />
+                        <InfoRow label={t('farmCodingDetails.phoneNumber')} value={farm.phoneNumber} />
                     </InfoCard>
 
-                    <InfoCard icon={Users} title={isLTR ? "Holder Information" : "معلومات الحامل"} gradient="from-purple-50 to-pink-50">
-                        <InfoRow label={isLTR ? "Name" : "اسم"} value={farm.holder?.name} />
-                        <InfoRow label={isLTR ? "Email" : "بريد إلكتروني"} value={farm.holder?.email} />
+                    <InfoCard icon={Users} title={t('farmCodingDetails.holderInformation')} gradient="from-purple-50 to-pink-50">
+                        <InfoRow label={t('farmCodingDetails.name')} value={farm.holder?.name} />
+                        <InfoRow label={t('farmCodingDetails.email')} value={farm.holder?.email} />
                         <InfoRow
                             label={isLTR ? "Email Verified" : "تم التحقق من البريد الإلكتروني"}
-                            value={farm.holder?.isEmailVerified ? 'Yes ✓' : 'No ✗'}
+                            value={farm.holder?.isEmailVerified ? t('common.yes') : t('common.no')}
                             valueClass={farm.holder?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                         />
-                        <InfoRow label={isLTR ? "Phone Number" : "رقم التليفون"} value={farm.holder?.phoneNumber || 'N/A'} />
+                        <InfoRow label={t('farmCodingDetails.phoneNumber')} value={farm.holder?.phoneNumber || t('common.nA')} />
                     </InfoCard>
                     {
                         coder && (
-                            <InfoCard icon={Users} title={isLTR ? "Coder Information" : "معلومات المبرمج"} gradient="from-purple-50 to-pink-50">
-                                <InfoRow label={isLTR ? "Name" : "اسم"} value={coder?.name} />
-                                <InfoRow label={isLTR ? "Email" : "بريد إلكتروني"} value={coder?.email} />
+                            <InfoCard icon={Users} title={t('farmCodingDetails.coderInformation')} gradient="from-purple-50 to-pink-50">
+                                <InfoRow label={t('farmCodingDetails.name')} value={coder?.name} />
+                                <InfoRow label={t('farmCodingDetails.email')} value={coder?.email} />
                                 <InfoRow
                                     label={isLTR ? "Email Verified" : "تم التحقق من البريد الإلكتروني"}
-                                    value={coder?.isEmailVerified ? 'Yes ✓' : 'No ✗'}
+                                    value={coder?.isEmailVerified ? t('common.yes') : t('common.no')}
                                     valueClass={coder?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                                 />
-                                <InfoRow label={isLTR ? "Phone Number" : "رقم التليفون"} value={coder?.phoneNumber || 'N/A'} />
+                                <InfoRow label={t('farmCodingDetails.phoneNumber')} value={coder?.phoneNumber || t('common.nA')} />
                             </InfoCard>
                         )
                     }
@@ -839,13 +839,13 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
                 {/* Location Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                    <InfoCard icon={MapPin} title={isLTR ? "Location Details" : "تفاصيل الموقع"} gradient="from-amber-50 to-orange-50">
-                        <InfoRow label={isLTR ? "Location" : "موقع"} value={isLTR ? farm.location?.name : farm.location?.nameInArrabic} />
-                        <InfoRow label={isLTR ? "Region" : "منطقة"} value={isLTR ? farm.region?.name : farm.region?.nameInArrabic} />
-                        <InfoRow label={isLTR ? "Emirate" : "الإمارة"} value={isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic} />
-                        <InfoRow label={isLTR ? "Service Center" : "مركز الخدمة"} value={isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic} />
+                    <InfoCard icon={MapPin} title={t('farmCodingDetails.locationDetails')} gradient="from-amber-50 to-orange-50">
+                        <InfoRow label={t('farmCodingDetails.location')} value={isLTR ? farm.location?.name : farm.location?.nameInArrabic} />
+                        <InfoRow label={t('farmCodingDetails.region')} value={isLTR ? farm.region?.name : farm.region?.nameInArrabic} />
+                        <InfoRow label={t('farmCodingDetails.emirate')} value={isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic} />
+                        <InfoRow label={t('farmCodingDetails.serviceCenter')} value={isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic} />
                         <InfoRow
-                            label={isLTR ? "Coordinates" : "الإحداثيات"}
+                            label={t('farmCodingDetails.coordinates')}
                             value={`${farm.coordinates?.lat}, ${farm.coordinates?.lng}`}
                         />
                         <a
@@ -855,16 +855,16 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                             className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold mt-2 hover:underline"
                         >
                             <Map className="w-4 h-4" />
-                            View on Google Maps
+                            {t('farmCodingDetails.viewOnGoogleMaps')}
                         </a>
                     </InfoCard>
 
-                    <InfoCard icon={Home} title={isLTR ? "Farm Properties" : "خصائص المزرعة"} gradient="from-green-50 to-lime-50">
-                        <InfoRow label={isLTR ? "Farm Serial" : "مسلسل المزرعة"} value={farm.farmSerial} />
-                        <InfoRow label={isLTR ? `Account No` : `رقم الحساب`} value={farm.accountNo} />
-                        <InfoRow label={isLTR ? `Size` : `الحجم`} value={`${Math.round(farm.size)} ha`} />
-                        <InfoRow label={isLTR ? `Possession Style` : `أسلوب الاستحواذ`} value={isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic} />
-                        <InfoRow label={isLTR ? `Farming System` : `نظام الزراعة`} value={farm.farmingSystem?.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ')} />
+                    <InfoCard icon={Home} title={t('farmCodingDetails.farmProperties')} gradient="from-green-50 to-lime-50">
+                        <InfoRow label={t('farmCodingDetails.farmSerial')} value={farm.farmSerial} />
+                        <InfoRow label={t('farmCodingDetails.accountNo')} value={farm.accountNo} />
+                        <InfoRow label={t('farmCodingDetails.size')} value={`${Math.round(farm.size)} ha`} />
+                        <InfoRow label={t('farmCodingDetails.possessionStyle')} value={isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic} />
+                        <InfoRow label={t('farmCodingDetails.farmingSystem')} value={farm.farmingSystem?.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ')} />
                     </InfoCard>
                 </div>
                 {
@@ -875,28 +875,28 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                         />
                     )
                 }
-                <InfoCard icon={Sprout} title={isLTR ? "Land Use Distribution" : "توزيع استخدامات الأراضي"} gradient="from-teal-50 to-cyan-50" >
+                <InfoCard icon={Sprout} title={t('farmCodingDetails.landUseDistribution')} gradient="from-teal-50 to-cyan-50" >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-start"}`}>
-                                {isLTR ? "Arable Land" : "أرض صالحة للزراعة"}</h4>
-                            <InfoRow label={isLTR ? `Vegetables (Open)` : `الخضروات (مفتوحة)`} value={`${farm.landUse?.arrableLand?.vegetablesOpen} m²`} />
-                            <InfoRow label={isLTR ? `Fruit & Palm Trees (Open)` : `أشجار الفاكهة والنخيل (مفتوح)`} value={`${farm.landUse?.arrableLand?.fruitPalmTreesOpen} m²`} />
-                            <InfoRow label={isLTR ? `Field Crops & Fodder` : 'المحاصيل الحقلية والأعلاف'} value={`${farm.landUse?.arrableLand?.fieldCropsFodder} m²`} />
-                            <InfoRow label={isLTR ? `Left for Rest` : `غادر للراحة`} value={`${Math.round(farm.landUse?.arrableLand?.leftForRest)} m²`} />
-                            <InfoRow label={isLTR ? `Nurseries` : `مشاتل`} value={`${farm.landUse?.arrableLand?.nurseries} m²`} />
+                                {t('farmCodingDetails.arableLand')}</h4>
+                            <InfoRow label={t('farmCodingDetails.vegetablesOpen')} value={`${farm.landUse?.arrableLand?.vegetablesOpen} m²`} />
+                            <InfoRow label={t('farmCodingDetails.fruitPalmTreesOpen')} value={`${farm.landUse?.arrableLand?.fruitPalmTreesOpen} m²`} />
+                            <InfoRow label={t('farmCodingDetails.fieldCropsFodder')} value={`${farm.landUse?.arrableLand?.fieldCropsFodder} m²`} />
+                            <InfoRow label={t('farmCodingDetails.leftForRest')} value={`${Math.round(farm.landUse?.arrableLand?.leftForRest)} m²`} />
+                            <InfoRow label={t('farmCodingDetails.nurseries')} value={`${farm.landUse?.arrableLand?.nurseries} m²`} />
                         </div>
                         <div>
                             <h4 className={`font-bold text-orange-700 mb-3 text-lg ${isLTR ? "text-start" : "text-start"}`}>
-                                {isLTR ? "Non-Arable Land" : "الأراضي غير الصالحة للزراعة"}</h4>
-                            <InfoRow label={isLTR ? `Buildings & Roads` : 'المباني والطرق'} value={`${farm.landUse?.nonArrableLand?.buildingsRoads} m²`} />
-                            <InfoRow label={isLTR ? `Windbreaks` : `مصدات الرياح`} value={`${farm.landUse?.nonArrableLand?.windbreaks} m²`} />
-                            <InfoRow label={isLTR ? `Barren Land` : `أرض قاحلة`} value={`${farm.landUse?.nonArrableLand?.barrenLand} m²`} />
+                                {t('farmCodingDetails.nonArableLand')}</h4>
+                            <InfoRow label={t('farmCodingDetails.buildingsRoads')} value={`${farm.landUse?.nonArrableLand?.buildingsRoads} m²`} />
+                            <InfoRow label={t('farmCodingDetails.windbreaks')} value={`${farm.landUse?.nonArrableLand?.windbreaks} m²`} />
+                            <InfoRow label={t('farmCodingDetails.barrenLand')} value={`${farm.landUse?.nonArrableLand?.barrenLand} m²`} />
                         </div>
                     </div>
                 </InfoCard>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-6 ">
-                    <InfoCard icon={Droplet} title={isLTR ? "Irrigation Systems" : "أنظمة الري"} gradient="from-blue-50 to-indigo-50">
+                    <InfoCard icon={Droplet} title={t('farmCodingDetails.irrigationSystems')} gradient="from-blue-50 to-indigo-50">
                         {farm.irrigationSystem?.map((system, idx) => (
                             <div key={idx} className="bg-white/70 rounded-lg p-3 border border-blue-200">
                                 {
@@ -910,7 +910,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                         ))}
                     </InfoCard>
 
-                    <InfoCard icon={Droplet} title={isLTR ? "Water Sources" : "أنظمة الري"} gradient="from-cyan-50 to-teal-50">
+                    <InfoCard icon={Droplet} title={t('farmCodingDetails.waterSources')} gradient="from-cyan-50 to-teal-50">
                         {farm.waterSources?.map((source, idx) => (
                             <div key={idx} className="bg-white/70 rounded-lg p-3 border border-cyan-200">
                                 {
@@ -923,8 +923,8 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                 }
                             </div>
                         ))}
-                        <InfoRow label={isLTR ? "Desalination Units" : "وحدات تحلية المياه"} value={farm.desalinationUnits} />
-                        <InfoRow label={isLTR ? "Production Wells" : "آبار الإنتاج"} value={farm.numberOfProductionWells} />
+                        <InfoRow label={t('farmCodingDetails.desalinationUnits')} value={farm.desalinationUnits} />
+                        <InfoRow label={t('farmCodingDetails.productionWells')} value={farm.numberOfProductionWells} />
                     </InfoCard>
                 </div>
 
@@ -933,7 +933,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border border-gray-200 mb-6">
                     <div className={`flex  ${isLTR ? "justify-start" : "justify-start"} items-center gap-3 mb-5`}>
                         <TreePine className="w-6 h-6 text-green-600" />
-                        <h3 className={`text-xl font-bold text-gray-800 ${isLTR ? "text-left" : "text-right"}`}>{isLTR ? "LiveStocks" : "الأسهم الحية"}</h3>
+                        <h3 className={`text-xl font-bold text-gray-800 ${isLTR ? "text-left" : "text-right"}`}>{t('farms.livestocks')}</h3>
                     </div>
 
                     {farm.livestocks && farm.livestocks.length > 0 && (
@@ -943,7 +943,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                     <div key={idx} className="bg-white rounded-lg p-4 border-l-4 border-green-500 shadow-md hover:shadow-lg transition-shadow">
                                         <h5 className="font-bold text-green-800 mb-2 text-lg" >{stockType(stock)}</h5>
                                         <div className="space-y-1 text-sm">
-                                            <p><span className="font-semibold">{isLTR ? "Number Of Animals" : "عدد الحيوانات"}:</span> {stock.numberOfAnimals}</p>
+                                            <p><span className="font-semibold">{t('farms.numberOfAnimals')}:</span> {stock.numberOfAnimals}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -954,22 +954,22 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg p-6 border border-gray-200 mb-6">
                     <div className={`${isLTR ? "justify-start" : "justify-end"} flex items-center gap-3 mb-5`}>
                         <TreePine className="w-6 h-6 text-green-600" />
-                        <h3 className="text-xl font-bold text-gray-800">{isLTR ? "Crops & Production" : "المحاصيل والإنتاج"}</h3>
+                        <h3 className="text-xl font-bold text-gray-800">{t('farmCodingDetails.cropsProduction')}</h3>
                     </div>
 
                     {/* Fruits */}
                     {farm.crops?.fruits && farm.crops.fruits.length > 0 && (
                         <div className="mb-6">
-                            <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "flex justify-end"}`}>🌳 {isLTR ? "Fruit Trees" : "أشجار الفاكهة"}</h4>
+                            <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "flex justify-end"}`}>🌳 {t('farmCodingDetails.fruitTrees')}</h4>
                             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${isLTR ? "left-direction" : "right-direction"}`}>
                                 {farm.crops.fruits.map((fruit, idx) => (
                                     <div key={idx} className="bg-white rounded-lg p-4 border-l-4 border-green-500 shadow-md hover:shadow-lg transition-shadow">
                                         <h5 className="font-bold text-green-800 mb-2 text-lg" >{isLTR ?  fruitType(fruit) : fruitType(fruit)  } </h5>
                                         <div className="space-y-1 text-sm">
-                                            <p><span className="font-semibold">{isLTR ? "Area" : "منطقة"}:</span> {fruit.area} m²</p>
-                                            <p><span className="font-semibold">{isLTR ? "Total Trees" : " مجموع الأشجار"}:</span> {fruit.totalTrees}</p>
-                                            <p><span className="font-semibold">{isLTR ? "Fruit Bearing" : "تحمل الفاكهة"}:</span> {fruit.fruitBearing}</p>
-                                            <p><span className="font-semibold">{isLTR ? "Production" : "إنتاج"}:</span> {fruit.productionPercent} kg</p>
+                                            <p><span className="font-semibold">{t('farmCodingDetails.cropAreaLabel')}:</span> {fruit.area} m²</p>
+                                            <p><span className="font-semibold">{t('farmCodingDetails.totalTrees')}:</span> {fruit.totalTrees}</p>
+                                            <p><span className="font-semibold">{t('farmCodingDetails.fruitBearing')}:</span> {fruit.fruitBearing}</p>
+                                            <p><span className="font-semibold">{t('farmCodingDetails.production')}:</span> {fruit.productionPercent} kg</p>
                                         </div>
                                         {
                                             !!fruit.coordinates?.length && (
@@ -989,14 +989,14 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                     {/* Vegetables */}
                     {farm.crops?.vegetables && farm.crops.vegetables.length > 0 && (
                         <div className="mb-6">
-                            <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>🥬 {isLTR ? "Vegetables" : "خضار"}</h4>
+                            <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>🥬 {t('farmCodingDetails.vegetables')}</h4>
                             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${isLTR ? "left-direction" : "right-direction"}`}>
                                 {farm.crops.vegetables.map((veg, idx) => (
                                     <div key={idx} className="bg-white rounded-lg p-4 border-l-4 border-lime-500 shadow-md hover:shadow-lg transition-shadow">
                                         <h5 className="font-bold text-lime-800 mb-2" >{vegetableType(veg)}</h5>
                                         <div className="space-y-1 text-sm">
-                                            <p><span className="font-semibold">{isLTR ? "Area" : "منطقة"}:</span> {veg.area} m²</p>
-                                            <p><span className="font-semibold">{isLTR ? "Production" : "إنتاج"}:</span> {veg.productionPercent} kg</p>
+                                            <p><span className="font-semibold">{t('farmCodingDetails.cropAreaLabel')}:</span> {veg.area} m²</p>
+                                            <p><span className="font-semibold">{t('farmCodingDetails.production')}:</span> {veg.productionPercent} kg</p>
                                         </div>
                                         {
                                             !!veg.coordinates?.length && (
@@ -1016,14 +1016,14 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                     {/* Field Crops & Fodder */}
                     {farm.crops?.fieldCropsFodder && farm.crops.fieldCropsFodder.length > 0 && (
                         <div>
-                            <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>🌾 {isLTR ? "Field Crops & Fodder" : "المحاصيل الحقلية والأعلاف"} </h4>
+                            <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>🌾 {t('farmCodingDetails.fieldCropsFodderLabel')} </h4>
                             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${isLTR ? "left-direction" : "right-direction"}`}>
                                 {farm.crops.fieldCropsFodder.map((fodder, idx) => (
                                     <div key={idx} className={`bg-white rounded-lg p-4 border-l-4 border-yellow-500 shadow-md hover:shadow-lg transition-shadow `}>
                                         <h5 className="font-bold text-yellow-800 mb-2" >{fodderTypeHandler(fodder)}</h5>
                                         <div className="space-y-1 text-sm">
-                                            <p><span className="font-semibold">{isLTR ? "Area" : "منطقة"}:</span> {fodder.area} m²</p>
-                                            <p><span className="font-semibold">{isLTR ? "Production" : "إنتاج"}:</span> {fodder.productionPercent} kg</p>
+                                            <p><span className="font-semibold">{t('farmCodingDetails.cropAreaLabel')}:</span> {fodder.area} m²</p>
+                                            <p><span className="font-semibold">{t('farmCodingDetails.production')}:</span> {fodder.productionPercent} kg</p>
                                         </div>
                                         {
                                             !!fodder.coordinates?.length && (
@@ -1042,7 +1042,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                     {/* greenhouses */}
                     {farm.crops?.greenhouses && farm.crops.greenhouses.length > 0 && (
                         <div className="mb-6">
-                            <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>🏠 {isLTR ? "Greenhouse Crops" : "محاصيل الدفيئة"}</h4>
+                            <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>🏠 {t('farmCodingDetails.greenhouseCrops')}</h4>
                             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ${isLTR ? "left-direction" : "right-direction"}`}>
                                 {farm.crops.greenhouses.map((greenhouse, idx) => (
                                     <div key={idx} className="bg-white rounded-xl p-5 border-2 border-emerald-300 shadow-lg hover:shadow-xl transition-shadow">
@@ -1050,60 +1050,60 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                             <div>
                                                 <h5 className="font-bold text-emerald-900 text-xl mb-1" >{greenhouse.crop}</h5>
                                                 <p className="text-sm text-gray-600" >
-                                                    <span className="font-semibold">{isLTR ? "Greenhouse Type" : "نوع الدفيئة"}:</span> {greenhouse.greenhouseType}
+                                                    <span className="font-semibold">{t('farmCodingDetails.greenhouseType')}:</span> {greenhouse.greenhouseType}
                                                 </p>
                                             </div>
                                             <span className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">
-                                                {isLTR ? "Greenhouse" : "دفيئة"}
+                                                {t('farmCodingDetails.greenhouse')}
                                             </span>
                                         </div>
 
                                         <div className="space-y-3">
                                             <div className="bg-emerald-50 rounded-lg p-3">
-                                                <p className="text-xs text-gray-600 font-semibold mb-1">{isLTR ? "System Details" : "تفاصيل النظام"}</p>
-                                                <p className="text-sm" ><span className="font-semibold">{isLTR ? "Farming System" : "نظام الزراعة"}:</span> {farmingSystemHandler(greenhouse)}</p>
-                                                <p className="text-sm" ><span className="font-semibold">{isLTR ? "Cover Type" : "نوع الغطاء"}:</span> {coverTypeHandler(greenhouse)}</p>
+                                                <p className="text-xs text-gray-600 font-semibold mb-1">{t('farmCodingDetails.systemDetails')}</p>
+                                                <p className="text-sm" ><span className="font-semibold">{t('farmCodingDetails.farmingSystem')}:</span> {farmingSystemHandler(greenhouse)}</p>
+                                                <p className="text-sm" ><span className="font-semibold">{t('farmCodingDetails.coverType')}:</span> {coverTypeHandler(greenhouse)}</p>
                                             </div>
 
                                             {/* First Crop */}
                                             <div className="bg-blue-50 rounded-lg p-3 border-l-4 border-blue-400">
-                                                <p className="font-bold text-blue-800 mb-2">{isLTR ? "First Crop Season" : "موسم المحاصيل الأول"}</p>
+                                                <p className="font-bold text-blue-800 mb-2">{t('farmCodingDetails.firstCropSeason')}</p>
                                                 <div className="grid grid-cols-2 gap-2 text-sm">
-                                                    <p><span className="font-semibold">{isLTR ? "Greenhouses" : "الدفيئات الزراعية"}:</span> {greenhouse.firstCropNoOfGreenhouses}</p>
-                                                    <p><span className="font-semibold">{isLTR ? "House Area" : "مساحة المنزل"}:</span> {greenhouse.firstCropHouseArea} m²</p>
-                                                    <p><span className="font-semibold">{isLTR ? "Crop Area" : "مساحة المحصول"}:</span> {greenhouse.firstCropArea} m²</p>
-                                                    <p><span className="font-semibold">{isLTR ? "Production" : "إنتاج"}:</span> {greenhouse.firstCropProductionPercent} kg</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.greenhouses')}:</span> {greenhouse.firstCropNoOfGreenhouses}</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.houseArea')}:</span> {greenhouse.firstCropHouseArea} m²</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.cropArea')}:</span> {greenhouse.firstCropArea} m²</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.production')}:</span> {greenhouse.firstCropProductionPercent} kg</p>
                                                 </div>
                                             </div>
 
                                             {/* Second Crop */}
                                             <div className="bg-purple-50 rounded-lg p-3 border-l-4 border-purple-400">
-                                                <p className="font-bold text-purple-800 mb-2">{isLTR ? "Second Crop Season" : "الموسم الزراعي الثاني"}</p>
+                                                <p className="font-bold text-purple-800 mb-2">{t('farmCodingDetails.secondCropSeason')}</p>
                                                 <div className="grid grid-cols-2 gap-2 text-sm">
-                                                    <p><span className="font-semibold">{isLTR ? "Greenhouses" : "الدفيئات الزراعية"}:</span> {greenhouse.secondCropNoOfGreenhouses}</p>
-                                                    <p><span className="font-semibold">{isLTR ? "House Area" : "مساحة المنزل"}:</span> {greenhouse.secondCropHouseArea} m²</p>
-                                                    <p><span className="font-semibold">{isLTR ? "Crop Area" : "مساحة المحصول"}:</span> {greenhouse.secondCropArea} m²</p>
-                                                    <p><span className="font-semibold">{isLTR ? "Production" : "إنتاج"}:</span> {greenhouse.secondCropProductionPercent} kg</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.greenhouses')}:</span> {greenhouse.secondCropNoOfGreenhouses}</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.houseArea')}:</span> {greenhouse.secondCropHouseArea} m²</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.cropArea')}:</span> {greenhouse.secondCropArea} m²</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.production')}:</span> {greenhouse.secondCropProductionPercent} kg</p>
                                                 </div>
                                             </div>
 
                                             {/* Third Crop */}
                                             <div className="bg-orange-50 rounded-lg p-3 border-l-4 border-orange-400">
-                                                <p className="font-bold text-orange-800 mb-2">{isLTR ? "Third Crop Season" : "موسم المحاصيل الثالث"}</p>
+                                                <p className="font-bold text-orange-800 mb-2">{t('farmCodingDetails.thirdCropSeason')}</p>
                                                 <div className="grid grid-cols-2 gap-2 text-sm">
-                                                    <p><span className="font-semibold">{isLTR ? "Greenhouses" : "الدفيئات الزراعية"}:</span> {greenhouse.thirdCropNoOfGreenhouses}</p>
-                                                    <p><span className="font-semibold">{isLTR ? "House Area" : "مساحة المنزل"}:</span> {greenhouse.thirdCropHouseArea} m²</p>
-                                                    <p><span className="font-semibold">{isLTR ? "Crop Area" : "مساحة المحصول"}:</span> {greenhouse.thirdCropArea} m²</p>
-                                                    <p><span className="font-semibold">{isLTR ? "Production" : "إنتاج"}:</span> {greenhouse.thirdCropProductionPercent} kg</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.greenhouses')}:</span> {greenhouse.thirdCropNoOfGreenhouses}</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.houseArea')}:</span> {greenhouse.thirdCropHouseArea} m²</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.cropArea')}:</span> {greenhouse.thirdCropArea} m²</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.production')}:</span> {greenhouse.thirdCropProductionPercent} kg</p>
                                                 </div>
                                             </div>
 
                                             {/* Total Summary */}
                                             <div className="bg-gradient-to-r from-emerald-100 to-teal-100 rounded-lg p-3 border border-emerald-300">
-                                                <p className="font-bold text-emerald-900 mb-1">{isLTR ? "Total Summary" : "ملخص إجمالي"}</p>
+                                                <p className="font-bold text-emerald-900 mb-1">{t('farmCodingDetails.totalSummary')}</p>
                                                 <div className="grid grid-cols-2 gap-2 text-sm">
-                                                    <p><span className="font-semibold">{isLTR ? "Total Greenhouses" : "إجمالي الدفيئات الزراعية"}:</span> {greenhouse.firstCropNoOfGreenhouses + greenhouse.secondCropNoOfGreenhouses + greenhouse.thirdCropNoOfGreenhouses}</p>
-                                                    <p><span className="font-semibold">{isLTR ? "Total Area" : "المساحة الإجمالية"}:</span> {greenhouse.firstCropArea + greenhouse.secondCropArea + greenhouse.thirdCropArea} m²</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.totalGreenhouses')}:</span> {greenhouse.firstCropNoOfGreenhouses + greenhouse.secondCropNoOfGreenhouses + greenhouse.thirdCropNoOfGreenhouses}</p>
+                                                    <p><span className="font-semibold">{t('farmCodingDetails.totalAreaLabel')}:</span> {greenhouse.firstCropArea + greenhouse.secondCropArea + greenhouse.thirdCropArea} m²</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1125,15 +1125,15 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
                 {/* Additional Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <InfoCard icon={FileText} title={isLTR ? "Additional Information" : "معلومات إضافية"} gradient="from-gray-50 to-slate-50">
-                        <InfoRow label={isLTR ? "Notes" : "ملحوظات"} value={farm.notes} />
-                        <InfoRow label={isLTR ? "Number of Greenhouses" : "عدد البيوت الزجاجية"} value={farm.crops.greenhouses?.length || 'None'} />
-                        <InfoRow label={isLTR ? "Destination Machines" : "آلات الوجهة"} value={farm.numberOfDestinationMachines} />
+                    <InfoCard icon={FileText} title={t('farmCodingDetails.additionalInformation')} gradient="from-gray-50 to-slate-50">
+                        <InfoRow label={t('farmCodingDetails.notes')} value={farm.notes} />
+                        <InfoRow label={t('farmCodingDetails.numberOfGreenhouses')} value={farm.crops.greenhouses?.length || t('common.nA')} />
+                        <InfoRow label={t('farmCodingDetails.destinationMachines')} value={farm.numberOfDestinationMachines} />
                     </InfoCard>
 
-                    <InfoCard icon={Calendar} title={isLTR ? "Timestamps" : "الطوابع الزمنية"} gradient="from-indigo-50 to-purple-50">
-                        <InfoRow label={isLTR ? "Created At" : "تم إنشاؤه في"} value={formatDate(farm.createdAt)} />
-                        <InfoRow label={isLTR ? "Updated At" : "تم التحديث في"} value={formatDate(farm.updatedAt)} />
+                    <InfoCard icon={Calendar} title={t('farmCodingDetails.timestamps')} gradient="from-indigo-50 to-purple-50">
+                        <InfoRow label={t('farmCodingDetails.createdAt')} value={formatDate(farm.createdAt)} />
+                        <InfoRow label={t('farmCodingDetails.updatedAt')} value={formatDate(farm.updatedAt)} />
                     </InfoCard>
                 </div>
             </div>

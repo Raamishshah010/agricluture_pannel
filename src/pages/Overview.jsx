@@ -353,7 +353,7 @@ const Overview = () => {
       await farmService.updateFarm(item, id);
       setSelectedFarm(null);
       setActiveTab('overview');
-      toast.success('Updated successfully');
+      toast.success(t('common.components.farmCoding.statusUpdatedSuccessfully'));
       sessionStorage.removeItem('selectedFarm');
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);

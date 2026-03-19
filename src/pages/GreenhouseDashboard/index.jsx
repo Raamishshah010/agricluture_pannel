@@ -305,79 +305,79 @@ const GreenhouseDashboard = () => {
 
             // Sheet 1: Summary
             const summaryData = [
-                ['Greenhouse Analytics Dashboard'],
-                ['Generated on:', new Date().toLocaleString()],
+                [t('analytics.greenhouseDashboard.summaryTitle')],
+                [t('analytics.greenhouseDashboard.generatedOn'), new Date().toLocaleString()],
                 [],
-                ['Applied Filters:'],
-                ['Region:', region ? (isLTR ? region.name : region.nameInArrabic) : 'All'],
-                ['Emirate:', emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : 'All'],
-                ['Center:', center ? (isLTR ? center.name : center.nameInArrabic) : 'All'],
-                ['Location:', location ? (isLTR ? location.name : location.nameInArrabic) : 'All'],
-                ['Greenhouse Type:', selectedGreenhouseType ? (isLTR ? selectedGreenhouseType.name : selectedGreenhouseType.nameInArrabic) : 'All'],
-                ['Cover Type:', selectedCoverType ? (isLTR ? selectedCoverType.name : selectedCoverType.nameInArrabic) : 'All'],
+                [t('analytics.greenhouseDashboard.appliedFilters')],
+                [t('analytics.greenhouseDashboard.region'), region ? (isLTR ? region.name : region.nameInArrabic) : t('filters.all')],
+                [t('analytics.greenhouseDashboard.emirate'), emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : t('filters.all')],
+                [t('analytics.greenhouseDashboard.center'), center ? (isLTR ? center.name : center.nameInArrabic) : t('filters.all')],
+                [t('analytics.greenhouseDashboard.location'), location ? (isLTR ? location.name : location.nameInArrabic) : t('filters.all')],
+                [t('analytics.greenhouseDashboard.greenhouseType'), selectedGreenhouseType ? (isLTR ? selectedGreenhouseType.name : selectedGreenhouseType.nameInArrabic) : t('filters.all')],
+                [t('analytics.greenhouseDashboard.coverType'), selectedCoverType ? (isLTR ? selectedCoverType.name : selectedCoverType.nameInArrabic) : t('filters.all')],
                 [],
-                ['Metric', 'Value'],
+                [t('analytics.greenhouseDashboard.metric'), t('analytics.greenhouseDashboard.value')],
                 [`${t('translation.farmsWithGreenhouses')}`, analytics.totalFarms],
                 [`${t('translation.totalGreenhouses')}`, analytics.totalGreenhouses],
-                ['Total Greenhouse Area (ha)', analytics.totalGreenhouseArea],
-                ['Average Greenhouses per Farm', analytics.avgGreenhousesPerFarm],
-                ['Average Area per Greenhouse (ha)', analytics.avgAreaPerGreenhouse],
+                [t('analytics.greenhouseDashboard.totalGreenhouseAreaHa'), analytics.totalGreenhouseArea],
+                [t('analytics.greenhouseDashboard.avgGreenhousesPerFarm'), analytics.avgGreenhousesPerFarm],
+                [t('translation.avgAreaPerGreenhouse'), analytics.avgAreaPerGreenhouse],
             ];
             const ws1 = XLSX.utils.aoa_to_sheet(summaryData);
             ws1['!cols'] = [{ wch: 35 }, { wch: 20 }];
-            XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+            XLSX.utils.book_append_sheet(wb, ws1, t('analytics.greenhouseDashboard.sheetSummary'));
 
             // Sheet 2: Greenhouse Types
             const typesData = [
-                ['Greenhouse Types Distribution'],
+                [t('analytics.greenhouseDashboard.sheetGreenhouseTypes')],
                 [],
-                ['Type', 'Count', 'Percentage'],
+                [t('analytics.greenhouseDashboard.colType'), t('analytics.greenhouseDashboard.colCount'), t('analytics.greenhouseDashboard.colPercentage')],
                 ...analytics.greenhouseTypesData.map(item => [item.name, item.count, item.value + '%'])
             ];
             const ws2 = XLSX.utils.aoa_to_sheet(typesData);
             ws2['!cols'] = [{ wch: 20 }, { wch: 15 }, { wch: 15 }];
-            XLSX.utils.book_append_sheet(wb, ws2, 'Greenhouse Types');
+            XLSX.utils.book_append_sheet(wb, ws2, t('analytics.greenhouseDashboard.sheetGreenhouseTypes'));
 
             // Sheet 3: Cover Types
             if (analytics.coverTypesData.length > 0) {
                 const coverData = [
-                    ['Cover Types Distribution'],
+                    [t('analytics.greenhouseDashboard.sheetCoverTypes')],
                     [],
-                    ['Cover Type', 'Count', 'Percentage'],
+                    [t('analytics.greenhouseDashboard.colCoverType'), t('analytics.greenhouseDashboard.colCount'), t('analytics.greenhouseDashboard.colPercentage')],
                     ...analytics.coverTypesData.map(item => [item.name, item.count, item.value + '%'])
                 ];
                 const ws3 = XLSX.utils.aoa_to_sheet(coverData);
                 ws3['!cols'] = [{ wch: 20 }, { wch: 15 }, { wch: 15 }];
-                XLSX.utils.book_append_sheet(wb, ws3, 'Cover Types');
+                XLSX.utils.book_append_sheet(wb, ws3, t('analytics.greenhouseDashboard.sheetCoverTypes'));
             }
 
             // Sheet 4: By Emirate
             const emirateData = [
-                ['Greenhouse Area by Emirate'],
+                [t('analytics.greenhouseDashboard.sheetByEmirate')],
                 [],
-                ['Emirate', 'Total Area (sqm)', 'Number of Greenhouses', 'Average Area per Greenhouse (sqm)'],
+                [t('analytics.greenhouseDashboard.emirate'), t('analytics.greenhouseDashboard.colTotalAreaSqm'), t('analytics.greenhouseDashboard.colNumberOfGreenhouses'), t('analytics.greenhouseDashboard.colAverageAreaPerGreenhouseSqm')],
                 ...analytics.emirateAreaData.map(item => [item.name, item.value, item.count, item.avgArea])
             ];
             const ws4 = XLSX.utils.aoa_to_sheet(emirateData);
             ws4['!cols'] = [{ wch: 25 }, { wch: 20 }, { wch: 25 }, { wch: 35 }];
-            XLSX.utils.book_append_sheet(wb, ws4, 'By Emirate');
+            XLSX.utils.book_append_sheet(wb, ws4, t('analytics.greenhouseDashboard.sheetByEmirate'));
 
             // Sheet 5: Greenhouses per Farm
             const perFarmData = [
-                ['Greenhouses per Farm Distribution'],
+                [t('analytics.greenhouseDashboard.sheetGreenhousesPerFarm')],
                 [],
-                ['Number of Greenhouses', 'Number of Farms'],
+                [t('analytics.greenhouseDashboard.colNumberOfGreenhouses'), t('analytics.greenhouseDashboard.colNumberOfFarms')],
                 ...analytics.greenhousesPerFarmData.map(item => [item.count, item.farms])
             ];
             const ws5 = XLSX.utils.aoa_to_sheet(perFarmData);
             ws5['!cols'] = [{ wch: 25 }, { wch: 20 }];
-            XLSX.utils.book_append_sheet(wb, ws5, 'Greenhouses per Farm');
+            XLSX.utils.book_append_sheet(wb, ws5, t('analytics.greenhouseDashboard.sheetGreenhousesPerFarm'));
 
             // Sheet 6: Top Farms
             const topFarmsData = [
-                ['Top Farms by Greenhouse Area'],
+                [t('analytics.greenhouseDashboard.sheetTopFarms')],
                 [],
-                ['Farm No', 'Emirate', 'Region', 'Center', 'Greenhouses', 'Total Area (sqm)'],
+                [t('analytics.greenhouseDashboard.farmNo'), t('analytics.greenhouseDashboard.emirate'), t('analytics.greenhouseDashboard.region'), t('analytics.greenhouseDashboard.center'), t('analytics.greenhouseDashboard.greenhouses'), t('analytics.greenhouseDashboard.colTotalAreaSqm')],
                 ...analytics.topFarms.map(farm => [
                     farm.farmNo,
                     farm.emirate,
@@ -388,7 +388,7 @@ const GreenhouseDashboard = () => {
                 ])
             ];
             const ws6 = XLSX.utils.aoa_to_sheet(topFarmsData);
-            ws6['!cols'] = [{ wch: 15 }, { wch: 25 }, { wch: 25 }, { wch: 30 }, { wch: 15 }, { wch: 20 }];
+                XLSX.utils.book_append_sheet(wb, ws6, t('analytics.greenhouseDashboard.sheetTopFarms'));
             XLSX.utils.book_append_sheet(wb, ws6, 'Top Farms');
 
             // Sheet 7: Size Distribution
@@ -461,7 +461,7 @@ const GreenhouseDashboard = () => {
                                 <Home className="w-6 h-6 text-white" strokeWidth={2.5} />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-bold text-gray-900">{t('analytics.greenhouseDashboard.title') || 'Greenhouse Analytics Dashboard'}</h1>
+                                <h1 className="text-2xl font-bold text-gray-900">{t('analytics.greenhouseDashboard.title')}</h1>
                                 <p className="text-sm text-gray-500 mt-0.5">{t('translation.greenhouseAnalytics')}</p>
                             </div>
                         </div>
@@ -484,7 +484,7 @@ const GreenhouseDashboard = () => {
                                     <MapPin className="w-4 h-4 text-white" strokeWidth={2} />
                                 </div>
                                 <span className="text-sm font-semibold text-gray-900">
-                                    {t("filters.geographic") || "Geographic"}
+                                    {t("filters.geographic")}
                                 </span>
                             </div>
 
@@ -493,21 +493,21 @@ const GreenhouseDashboard = () => {
                                 value={region}
                                 classes='min-w-[180px]'
                                 onChange={setRegion}
-                                placeholder={t('analytics.greenhouseDashboard.selectRegion') || 'Select Region'}
+                                placeholder={t('analytics.greenhouseDashboard.selectRegion')}
                             />
                             <Dropdown
                                 options={getLocalizedOptions(emirates)}
                                 value={emirate}
                                 classes='min-w-[180px]'
                                 onChange={handleEmirateChange}
-                                placeholder={t('analytics.greenhouseDashboard.selectEmirate') || 'Select Emirate'}
+                                placeholder={t('analytics.greenhouseDashboard.selectEmirate')}
                             />
                             <Dropdown
                                 options={getLocalizedOptions(filteredCenters)}
                                 value={center}
                                 classes='min-w-[180px]'
                                 onChange={handleCenterChange}
-                                placeholder={t('analytics.greenhouseDashboard.selectCenter') || 'Select Center'}
+                                placeholder={t('analytics.greenhouseDashboard.selectCenter')}
                                 disabled={!emirate}
                             />
                             <Dropdown
@@ -515,7 +515,7 @@ const GreenhouseDashboard = () => {
                                 value={location}
                                 classes='min-w-[180px]'
                                 onChange={setLocation}
-                                placeholder={t('overview.selectLocation') || 'Select Location'}
+                                placeholder={t('overview.selectLocation')}
                                 disabled={!emirate && !center}
                             />
                         </div>
@@ -527,7 +527,7 @@ const GreenhouseDashboard = () => {
                                     <SlidersHorizontal className="w-4 h-4 text-white" strokeWidth={2} />
                                 </div>
                                 <span className="text-sm font-semibold text-gray-900">
-                                    {t("filters.filters") || "Filters"}
+                                    {t("filters.filters")}
                                 </span>
                                 {activeFiltersCount > 0 && (
                                     <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full">
@@ -557,7 +557,7 @@ const GreenhouseDashboard = () => {
                                     className="flex items-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-semibold transition-colors text-sm border border-red-200 shadow-sm ml-auto"
                                 >
                                     <X className="w-4 h-4" />
-                                    <span>{t("filters.clearAll") || 'Clear All'}</span>
+                                    <span>{t("filters.clearAll")}</span>
                                 </button>
                             )}
                         </div>
@@ -597,7 +597,7 @@ const GreenhouseDashboard = () => {
                         icon={TrendingUp}
                         value={analytics.avgAreaPerGreenhouse}
                         unit="ha"
-                        label={t('translation.avgAreaPerGreenhouse') || 'Avg Area/Greenhouse'}
+                        label={t('translation.avgAreaPerGreenhouse')}
                         gradient="bg-gradient-to-br from-amber-500 to-amber-600"
                     />
                 </div>
@@ -608,7 +608,7 @@ const GreenhouseDashboard = () => {
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
                         <div className="flex items-center gap-2 mb-4">
                             <Home className="w-5 h-5 text-emerald-600" />
-                            <h2 className="text-base font-bold text-gray-900">{t('analytics.greenhouseDashboard.greenhouseTypes') || 'Greenhouse Types'}</h2>
+                            <h2 className="text-base font-bold text-gray-900">{t('analytics.greenhouseDashboard.greenhouseTypes')}</h2>
                         </div>
                         <ResponsiveContainer width="100%" height={280}>
                             <PieChart>
@@ -648,7 +648,7 @@ const GreenhouseDashboard = () => {
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
                             <div className="flex items-center gap-2 mb-4">
                                 <Layers className="w-5 h-5 text-blue-600" />
-                                <h2 className="text-base font-bold text-gray-900">{t('analytics.greenhouseDashboard.coverTypes') || 'Cover Types'}</h2>
+                                <h2 className="text-base font-bold text-gray-900">{t('analytics.greenhouseDashboard.coverTypes')}</h2>
                             </div>
                             <ResponsiveContainer width="100%" height={280}>
                                 <PieChart>
@@ -688,7 +688,7 @@ const GreenhouseDashboard = () => {
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
                         <div className="flex items-center gap-2 mb-4">
                             <BarChart3 className="w-5 h-5 text-amber-600" />
-                            <h2 className="text-base font-bold text-gray-900">{t('analytics.greenhouseDashboard.greenhousesPerFarm') || 'Greenhouses per Farm'}</h2>
+                            <h2 className="text-base font-bold text-gray-900">{t('analytics.greenhouseDashboard.greenhousesPerFarm')}</h2>
                         </div>
                         <ResponsiveContainer width="100%" height={280}>
                             <BarChart data={analytics.greenhousesPerFarmData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
@@ -720,7 +720,7 @@ const GreenhouseDashboard = () => {
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
                         <div className="flex items-center gap-2 mb-4">
                             <MapPin className="w-5 h-5 text-purple-600" />
-                            <h2 className="text-base font-bold text-gray-900">{t('analytics.greenhouseDashboard.totalGreenhouseAreaByEmirate') || 'Greenhouse Area by Emirate'}</h2>
+                            <h2 className="text-base font-bold text-gray-900">{t('analytics.greenhouseDashboard.totalGreenhouseAreaByEmirate')}</h2>
                         </div>
                         <ResponsiveContainer width="100%" height={320}>
                             <BarChart data={analytics.emirateAreaData} layout="vertical" margin={{ left: 10 }}>
@@ -786,29 +786,29 @@ const GreenhouseDashboard = () => {
                                 <div className="p-2 rounded-xl bg-rose-100">
                                     <TrendingUp className="w-5 h-5 text-rose-600" />
                                 </div>
-                                <h2 className="text-xl font-bold text-gray-900">{t('analytics.greenhouseDashboard.topFarmsByGreenhouseArea') || 'Top Farms by Greenhouse Area'}</h2>
+                                <h2 className="text-xl font-bold text-gray-900">{t('analytics.greenhouseDashboard.topFarmsByGreenhouseArea')}</h2>
                             </div>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
                                     <tr>
-                                        <th className="text-left px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Rank</th>
+                                        <th className="text-left px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">{t('analytics.greenhouseDashboard.rank')}</th>
                                         <th className="text-left px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                                            {t('analytics.greenhouseDashboard.farmNo') || 'Farm No'}
+                                            {t('analytics.greenhouseDashboard.farmNo')}
                                         </th>
                                         <th className="text-left px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                                            {t('analytics.greenhouseDashboard.emirate') || 'Emirate'}
+                                            {t('analytics.greenhouseDashboard.emirate')}
                                         </th>
                                         <th className="text-left px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                                            {t('analytics.greenhouseDashboard.region') || 'Region'}
+                                            {t('analytics.greenhouseDashboard.region')}
                                         </th>
-                                        <th className="text-left px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">Center</th>
+                                        <th className="text-left px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">{t('analytics.greenhouseDashboard.center')}</th>
                                         <th className="text-left px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                                            {t('analytics.greenhouseDashboard.greenhouses') || 'Greenhouses'}
+                                            {t('analytics.greenhouseDashboard.greenhouses')}
                                         </th>
                                         <th className="text-left px-6 py-4 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                                            {t('analytics.greenhouseDashboard.greenhouseAreaHa') || 'Area (sqm)'}
+                                            {t('analytics.greenhouseDashboard.greenhouseAreaHa')}
                                         </th>
                                     </tr>
                                 </thead>

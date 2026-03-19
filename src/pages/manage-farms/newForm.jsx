@@ -1021,7 +1021,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                         </label>
                                         <input
                                             type="number"
-                                            placeholder="Area (m²)"
+                                            placeholder={t('farms.area')}
                                             value={fruit.area}
                                             onChange={(e) => updateFruit(index, 'area', e.target.value)}
                                             className="px-3 py-2 w-full border border-gray-300 rounded-lg"
@@ -1034,7 +1034,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                         </label>
                                         <input
                                             type="number"
-                                            placeholder="Total Trees"
+                                            placeholder={t('farms.totalTrees')}
                                             value={fruit.totalTrees}
                                             onChange={(e) => updateFruit(index, 'totalTrees', e.target.value)}
                                             className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1047,7 +1047,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                         </label>
                                         <input
                                             type="number"
-                                            placeholder="Fruit Bearing"
+                                            placeholder={t('farms.fruitBearing')}
                                             value={fruit.fruitBearing}
                                             onChange={(e) => updateFruit(index, 'fruitBearing', e.target.value)}
                                             className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1060,7 +1060,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                         </label>
                                         <input
                                             type="number"
-                                            placeholder="Production (kg)"
+                                            placeholder={t('farms.production')}
                                             value={fruit.productionPercent}
                                             onChange={(e) => updateFruit(index, 'productionPercent', e.target.value)}
                                             className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1147,7 +1147,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             {t('farms.area')}
                                         </label> <input
                                             type="number"
-                                            placeholder="Area (m²)"
+                                            placeholder={t('farms.area')}
                                             value={veg.area}
                                             onChange={(e) => updateVegetable(index, 'area', e.target.value)}
                                             className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1159,7 +1159,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             {t('farms.production')}
                                         </label> <input
                                             type="number"
-                                            placeholder="Production (kg)"
+                                            placeholder={t('farms.production')}
                                             value={veg.productionPercent}
                                             onChange={(e) => updateVegetable(index, 'productionPercent', e.target.value)}
                                             className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1183,7 +1183,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                             className="flex items-center gap-2 px-4 py-2 bg-lime-600 text-white rounded-lg hover:bg-lime-700"
                         >
                             <Plus className="w-4 h-4" />
-                            Add Vegetable
+                            {t('farms.addVegetable')}
                         </button>
                     </div>
                     {/* Field Crops & Fodder */}
@@ -1215,7 +1215,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                         onClick={() => removeFieldCrop(index)}
                                         className="text-red-600 hover:text-red-800"
                                     >
-                                        <Trash2 className="w-5 h-5" />
+                                        {t('farms.addGreenhouse')}
                                     </button>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -1243,11 +1243,11 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                     </div>
                                     <div className='w-full'>
                                         <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                            Area (m²)
+                                            {t('farms.area')}
                                         </label>
                                         <input
                                             type="number"
-                                            placeholder="Area (m²)"
+                                            placeholder={t('farms.area')}
                                             value={crop.area}
                                             onChange={(e) => updateFieldCrop(index, 'area', e.target.value)}
                                             className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1256,11 +1256,11 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                     </div>
                                     <div className='w-full'>
                                         <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                            Production (kg)
+                                            {t('farms.production')}
                                         </label>
                                         <input
                                             type="number"
-                                            placeholder="Production (kg)"
+                                            placeholder={t('farms.production')}
                                             value={crop.productionPercent}
                                             onChange={(e) => updateFieldCrop(index, 'productionPercent', e.target.value)}
                                             className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1456,7 +1456,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             </label>
                                             <input
                                                 type="number"
-                                                placeholder="Production (kg)"
+                                                placeholder={t('farms.production')}
                                                 value={greenhouse.firstCropProductionPercent}
                                                 onChange={(e) => updateGreenhouse(index, 'firstCropProductionPercent', e.target.value)}
                                                 className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1487,7 +1487,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             </label>
                                             <input
                                                 type="number"
-                                                placeholder="House Area (m²)"
+                                                placeholder={t('farms.houseArea')}
                                                 value={greenhouse.secondCropHouseArea}
                                                 onChange={(e) => updateGreenhouse(index, 'secondCropHouseArea', e.target.value)}
                                                 className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1500,7 +1500,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             </label>
                                             <input
                                                 type="number"
-                                                placeholder="Crop Area (m²)"
+                                                placeholder={t('farms.cropArea')}
                                                 value={greenhouse.secondCropArea}
                                                 onChange={(e) => updateGreenhouse(index, 'secondCropArea', e.target.value)}
                                                 className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1513,7 +1513,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             </label>
                                             <input
                                                 type="number"
-                                                placeholder="Production (kg)"
+                                                placeholder={t('farms.production')}
                                                 value={greenhouse.secondCropProductionPercent}
                                                 onChange={(e) => updateGreenhouse(index, 'secondCropProductionPercent', e.target.value)}
                                                 className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1544,7 +1544,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             </label>
                                             <input
                                                 type="number"
-                                                placeholder="House Area (m²)"
+                                                placeholder={t('farms.houseArea')}
                                                 value={greenhouse.thirdCropHouseArea}
                                                 onChange={(e) => updateGreenhouse(index, 'thirdCropHouseArea', e.target.value)}
                                                 className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1557,7 +1557,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             </label>
                                             <input
                                                 type="number"
-                                                placeholder="Crop Area (m²)"
+                                                placeholder={t('farms.cropArea')}
                                                 value={greenhouse.thirdCropArea}
                                                 onChange={(e) => updateGreenhouse(index, 'thirdCropArea', e.target.value)}
                                                 className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1570,7 +1570,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             </label>
                                             <input
                                                 type="number"
-                                                placeholder="Production (kg)"
+                                                placeholder={t('farms.production')}
                                                 value={greenhouse.thirdCropProductionPercent}
                                                 onChange={(e) => updateGreenhouse(index, 'thirdCropProductionPercent', e.target.value)}
                                                 className="px-3 py-2 border border-gray-300 rounded-lg w-full"
@@ -1595,7 +1595,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                             className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
                         >
                             <Plus className="w-4 h-4" />
-                            Add Greenhouse
+                            {t('farms.addGreenhouse')}
                         </button>
                     </div>
                     {/* Action Buttons */}
