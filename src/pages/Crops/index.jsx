@@ -89,6 +89,54 @@ const Emirates = () => {
     "#F59E0B",
     "#EF4444",
   ];
+  const normalizeChartLabel = useCallback((label) => {
+    if (!label) return '';
+
+    const normalized = String(label)
+      .trim()
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu, ' ')
+      .replace(/\s+/g, ' ');
+
+    const words = normalized.split(' ');
+    const lastWord = words[words.length - 1] || '';
+    let canonicalLastWord = lastWord;
+
+    if (lastWord.endsWith('ies') && lastWord.length > 3) {
+      canonicalLastWord = `${lastWord.slice(0, -3)}y`;
+    } else if (lastWord.endsWith('oes') && lastWord.length > 3) {
+      canonicalLastWord = lastWord.slice(0, -2);
+    } else if (/((s|x|z|ch|sh)es)$/u.test(lastWord)) {
+      canonicalLastWord = lastWord.slice(0, -2);
+    } else if (lastWord.endsWith('s') && lastWord.length > 1 && !lastWord.endsWith('ss') && !lastWord.endsWith('us')) {
+      canonicalLastWord = lastWord.slice(0, -1);
+    }
+
+    words[words.length - 1] = canonicalLastWord;
+    return words.join(' ');
+  }, []);
+
+  const aggregateChartCounts = useCallback((entries, getLabel) => {
+    const counts = new Map();
+
+    entries.forEach((entry) => {
+      const label = getLabel(entry);
+      const key = normalizeChartLabel(label);
+      if (!key) return;
+
+      const current = counts.get(key);
+      if (current) {
+        current.count += 1;
+        if (!current.name || String(current.name).length > String(label).length) {
+          current.name = label;
+        }
+      } else {
+        counts.set(key, { name: label, count: 1 });
+      }
+    });
+
+    return Array.from(counts.values());
+  }, [normalizeChartLabel]);
 
   const cropColors = useMemo(() => {
     return {
@@ -273,51 +321,42 @@ const Emirates = () => {
       count,
     }));
 
-    // Top Fruit Types
-    const fruitCounts = {};
+    const fruitEntries = [];
     transformFarms.forEach((farm) => {
       farm.crops?.fruits?.forEach((fruit) => {
         const fruitObj = fruitTypes.find((f) => f.id === fruit.fruidId);
         if (fruitObj) {
-          const name = isLTR ? fruitObj.name : fruitObj.nameInArrabic;
-          fruitCounts[name] = (fruitCounts[name] || 0) + 1;
+          fruitEntries.push(isLTR ? fruitObj.name : fruitObj.nameInArrabic);
         }
       });
     });
-    const topFruitData = Object.entries(fruitCounts)
-      .map(([name, count]) => ({ name, count }))
+    const topFruitData = aggregateChartCounts(fruitEntries, (name) => name)
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
 
-    // Top Vegetable Types
-    const vegetableCounts = {};
+    const vegetableEntries = [];
     transformFarms.forEach((farm) => {
       farm.crops?.vegetables?.forEach((veg) => {
         const vegObj = vegetableTypes.find((v) => v.id === veg.vegetableId);
         if (vegObj) {
-          const name = isLTR ? vegObj.name : vegObj.nameInArrabic;
-          vegetableCounts[name] = (vegetableCounts[name] || 0) + 1;
+          vegetableEntries.push(isLTR ? vegObj.name : vegObj.nameInArrabic);
         }
       });
     });
-    const topVegetableData = Object.entries(vegetableCounts)
-      .map(([name, count]) => ({ name, count }))
+    const topVegetableData = aggregateChartCounts(vegetableEntries, (name) => name)
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
 
-    // Top Fodder Types
-    const fodderCounts = {};
+    const fodderEntries = [];
     transformFarms.forEach((farm) => {
       farm.crops?.fieldCropsFodder?.forEach((fodder) => {
         const fodderObj = fodderTypes.find((f) => f.id === fodder.fodderId);
         if (fodderObj) {
-          const name = isLTR ? fodderObj.name : fodderObj.nameInArrabic;
-          fodderCounts[name] = (fodderCounts[name] || 0) + 1;
+          fodderEntries.push(isLTR ? fodderObj.name : fodderObj.nameInArrabic);
         }
       });
     });
-    const topFodderData = Object.entries(fodderCounts)
-      .map(([name, count]) => ({ name, count }))
+    const topFodderData = aggregateChartCounts(fodderEntries, (name) => name)
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
 
