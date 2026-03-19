@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import useStore from '../store/store';
 
-const Dropdown = ({ options, value, onChange, placeholder, classes = "w-48" }) => {
+const Dropdown = ({ options, value, onChange, placeholder, classes = "w-48", disabled = false }) => {
   const t = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const finalPlaceholder = placeholder || t('common.components.select');
@@ -32,6 +32,7 @@ const Dropdown = ({ options, value, onChange, placeholder, classes = "w-48" }) =
   }, [isOpen]);
 
   const handleSelect = (option) => {
+    if (disabled) return;
     onChange(option);
     setIsOpen(false);
     setSearchTerm('');
@@ -62,8 +63,13 @@ const Dropdown = ({ options, value, onChange, placeholder, classes = "w-48" }) =
     <div className={`relative ${classes}`} ref={dropdownRef}>
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-2 py-1.5 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-between hover:border-gray-400 focus:outline-none focus:border-blue-500 transition-colors"
+        onClick={() => {
+          if (!disabled) {
+            setIsOpen(!isOpen);
+          }
+        }}
+        disabled={disabled}
+        className={`w-full px-2 py-1.5 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-between focus:outline-none focus:border-blue-500 transition-colors ${disabled ? 'cursor-not-allowed opacity-60' : 'hover:border-gray-400'}`}
       >
         <span className="text-gray-900 font-medium text-md">
           {getDisplayName()}
@@ -74,7 +80,7 @@ const Dropdown = ({ options, value, onChange, placeholder, classes = "w-48" }) =
         />
       </button>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute z-10 w-full mt-2 bg-white border-2 border-gray-300 rounded-lg shadow-lg">
           <div className="p-2 border-b border-gray-200">
             <input

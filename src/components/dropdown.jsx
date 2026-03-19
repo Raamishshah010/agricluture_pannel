@@ -9,6 +9,7 @@ const Dropdown = ({
   onChange,
   placeholder,
   classes = "w-48",
+  disabled = false,
 }) => {
   const t = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -46,8 +47,13 @@ const Dropdown = ({
     <div className={`relative ${classes}`} ref={dropdownRef}>
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-full ${isLTR ? "flex-row" : "flex-row-reverse"} px-2 py-1.5 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-between hover:border-gray-400 focus:outline-none focus:border-blue-500 transition-colors`}
+        onClick={() => {
+          if (!disabled) {
+            setIsOpen(!isOpen);
+          }
+        }}
+        disabled={disabled}
+        className={`w-full ${isLTR ? "flex-row" : "flex-row-reverse"} px-2 py-1.5 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-between focus:outline-none focus:border-blue-500 transition-colors ${disabled ? "cursor-not-allowed opacity-60" : "hover:border-gray-400"}`}
       >
         <span className="text-gray-900 font-medium text-md">{getDisplayName()}</span>
         <ChevronDown
@@ -56,7 +62,7 @@ const Dropdown = ({
         />
       </button>
 
-      {isOpen && (
+      {isOpen && !disabled && (
         <div className="absolute z-10 w-full mt-2 bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
           {options.map((option, index) => (
             <button

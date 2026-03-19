@@ -49,28 +49,22 @@ const FarmAnalytics = () => {
   // Filtered centers based on emirate selection
   const filteredCenters = useMemo(() => {
     if (!selectedEmirate) return centers;
-    const emirateFarms = farms.filter(farm => farm.emirate === selectedEmirate.id);
-    const centerIds = [...new Set(emirateFarms.map(farm => farm.serviceCenter))];
-    return centers.filter(c => centerIds.includes(c.id));
-  }, [selectedEmirate, centers, farms]);
+    return centers.filter(c => c.emirateId === selectedEmirate.id);
+  }, [selectedEmirate, centers]);
 
   // Filtered locations based on emirate and/or center selection
   const filteredLocations = useMemo(() => {
     if (!selectedEmirate && !selectedCenter) return locations;
-    
-    let relevantFarms = farms;
-    
-    if (selectedEmirate) {
-      relevantFarms = relevantFarms.filter(farm => farm.emirate === selectedEmirate.id);
-    }
-    
-    if (selectedCenter) {
-      relevantFarms = relevantFarms.filter(farm => farm.serviceCenter === selectedCenter.id);
-    }
-    
-    const locationIds = [...new Set(relevantFarms.map(farm => farm.location))];
-    return locations.filter(l => locationIds.includes(l.id));
-  }, [selectedEmirate, selectedCenter, locations, farms]);
+
+    return locations.filter((locationItem) => {
+      const relatedCenter = centers.find((item) => item.id === locationItem.centerId);
+      const locationEmirateId = locationItem.emirateId || relatedCenter?.emirateId;
+
+      if (selectedEmirate && locationEmirateId !== selectedEmirate.id) return false;
+      if (selectedCenter && locationItem.centerId !== selectedCenter.id) return false;
+      return true;
+    });
+  }, [selectedEmirate, selectedCenter, locations, centers]);
 
   // Handle emirate change - reset dependent filters
   const handleEmirateChange = (emirate) => {

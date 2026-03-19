@@ -78,10 +78,11 @@ export default function Locations() {
                 setEmiratesLoading(false);
             }
         }
-        if (formData.emirateId !== item.center?.emirate?.id) {
+        const emirateId = item.center?.emirate?.id;
+        if (emirateId) {
             try {
                 setCentersLoading(true);
-                const res = await centerService.getCentersByEmirate(item.center?.emirate?.id);
+                const res = await centerService.getCentersByEmirate(emirateId);
                 setCenters(res.data);
             } catch (err) {
                 toast.error(err.message);
@@ -93,7 +94,7 @@ export default function Locations() {
         setFormData({
             name: item.name,
             nameInArrabic: item.nameInArrabic,
-            emirateId: item.center?.emirate?.id,
+            emirateId,
             centerId: item.centerId,
         });
         setIsModalOpen(true);
@@ -116,6 +117,13 @@ export default function Locations() {
             } finally {
                 setCentersLoading(false);
             }
+
+            setFormData(prev => ({
+                ...prev,
+                emirateId: value,
+                centerId: ''
+            }));
+            return;
         }
         setFormData(prev => ({
             ...prev,
