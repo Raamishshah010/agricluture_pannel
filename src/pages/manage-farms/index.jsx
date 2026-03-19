@@ -330,7 +330,7 @@ export default function Index(props) {
                             className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
                         >
                             <Download size={20} />
-                            <span className="font-medium">Download</span>
+                            <span className="font-medium">{t('manageFarms.download')}</span>
                             <ChevronDown
                                 size={16}
                                 className={`transition-transform duration-200 ${isDownloadOpen ? "rotate-180" : ""}`}
@@ -363,10 +363,10 @@ export default function Index(props) {
                                                 />
                                             </svg>
                                         </div>
-                                        <div>
-                                            <div className="font-medium text-gray-900">PDF Format</div>
-                                            <div className="text-xs text-gray-500">Printable document</div>
-                                        </div>
+                                            <div>
+                                                <div className="font-medium text-gray-900">{t('manageFarms.downloadOptions.pdf')}</div>
+                                                <div className="text-xs text-gray-500">{t('manageFarms.downloadOptions.pdfHint')}</div>
+                                            </div>
                                     </button>
                                     <button
                                         onClick={downloadExcel}
@@ -388,8 +388,8 @@ export default function Index(props) {
                                             </svg>
                                         </div>
                                         <div>
-                                            <div className="font-medium text-gray-900">Excel Format</div>
-                                            <div className="text-xs text-gray-500">Spreadsheet file</div>
+                                            <div className="font-medium text-gray-900">{t('manageFarms.downloadOptions.excel')}</div>
+                                            <div className="text-xs text-gray-500">{t('manageFarms.downloadOptions.excelHint')}</div>
                                         </div>
                                     </button>
                                     <button
@@ -411,10 +411,10 @@ export default function Index(props) {
                                                 />
                                             </svg>
                                         </div>
-                                        <div>
-                                            <div className="font-medium text-gray-900">CSV Format</div>
-                                            <div className="text-xs text-gray-500">Comma-separated</div>
-                                        </div>
+                                            <div>
+                                                <div className="font-medium text-gray-900">{t('manageFarms.downloadOptions.csv')}</div>
+                                                <div className="text-xs text-gray-500">{t('manageFarms.downloadOptions.csvHint')}</div>
+                                            </div>
                                     </button>
                                 </div>
                             </>
@@ -445,14 +445,14 @@ export default function Index(props) {
                 <div className="flex gap-2">
                     <input
                         type="number"
-                        placeholder="Min Size"
+                        placeholder={t('manageFarms.minSize')}
                         value={minSize}
                         onChange={(e) => setMinSize(e.target.value)}
                         className="border border-gray-300 rounded-lg p-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <input
                         type="number"
-                        placeholder="Max Size"
+                        placeholder={t('manageFarms.maxSize')}
                         value={maxSize}
                         onChange={(e) => setMaxSize(e.target.value)}
                         className="border border-gray-300 rounded-lg p-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"

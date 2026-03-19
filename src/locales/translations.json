@@ -119,7 +119,8 @@
     "totalWells": "Total Wells",
     "avgAreaPerFarm": "Avg Area/Farm",
     "hectaresPerFarm": "Hectares per farm",
-    "productionWells": "Production wells"
+    "productionWells": "Production wells",
+    "nA": "N/A"
   },
   "stats": {
     "totalFarms": "Total Farms",
@@ -273,9 +274,20 @@
       "selectUser": "Please select user",
       "coder": "Coder",
       "deletedSuccessfully": "Deleted Successfully"
+      },
+      "downloadSuccess": "Download Success",
+      "download": "Download",
+      "downloadOptions": {
+        "csv": "CSV Format",
+        "csvHint": "Comma-separated",
+        "excel": "Excel Format",
+        "excelHint": "Spreadsheet file",
+        "pdf": "PDF Format",
+        "pdfHint": "Printable document"
+      },
+      "minSize": "Min Size",
+      "maxSize": "Max Size"
     },
-    "downloadSuccess": "Download Success"
-  },
   "overview": {
     "selectEmirate": "Select Emirate",
     "selectCenter": "Select Center",
@@ -494,6 +506,7 @@
         }
       }
     },
+    "nA": "N/A",
     "clear": "Clear",
     "errorLoading": "Error Loading",
     "errorOccurred": "Error Occurred",

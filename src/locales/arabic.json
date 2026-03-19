@@ -121,6 +121,7 @@
     "avgAreaPerFarm": "متوسط مساحة المزرعة",
     "hectaresPerFarm": "الهكتارات لكل مزرعة",
     "productionWells": "آبار الإنتاج"
+    ,"nA": "غير متوفر"
   },
   "stats": {
     "totalFarms": "إجمالي المزارع",
@@ -865,6 +866,7 @@
     "pleaseFillRequiredFields": "يرجى ملء جميع الحقول المطلوبة",
     "noItemsFound": "لم يتم العثور على عناصر. أضف أول عنصر للبدء."
   },
+  "nA": "غير متوفر",
   "manageFarms": {
     "title": "المزارع",
     "addFarm": "إضافة مزرعة",
@@ -901,9 +903,20 @@
       "selectUser": "يرجى اختيار المستخدم",
       "coder": "مبرمج",
       "deletedSuccessfully": "تم الحذف بنجاح"
+      },
+      "downloadSuccess": "تم التنزيل بنجاح",
+      "download": "تنزيل",
+      "downloadOptions": {
+        "csv": "تنسيق CSV",
+        "csvHint": "قيم مفصولة بفواصل",
+        "excel": "تنسيق Excel",
+        "excelHint": "ملف جدول بيانات",
+        "pdf": "تنسيق PDF",
+        "pdfHint": "مستند قابل للطباعة"
+      },
+      "minSize": "الحد الأدنى للحجم",
+      "maxSize": "الحد الأقصى للحجم"
     },
-    "downloadSuccess": "تم التنزيل بنجاح"
-  },
   "center": {
     "title": "إدارة المراكز",
     "addCenter": "إضافة مركز",
@@ -927,6 +940,7 @@
     "deleteConfirm": "هل أنت متأكد من أنك تريد حذف هذا المركز؟",
     "fillRequiredFields": "يرجى ملء جميع الحقول المطلوبة"
   },
+  
   "locations": {
     "title": "المواقع",
     "add": "إضافة",

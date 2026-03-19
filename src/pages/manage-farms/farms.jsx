@@ -107,7 +107,7 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
 
     // Helper function to get localized name - supports multiple Arabic property names
     const getLocalizedName = (item) => {
-        if (!item) return 'N/A';
+        if (!item) return t('kpi.nA');
         
         // If language is Arabic, try different possible Arabic property names
         if (language === 'ar') {
