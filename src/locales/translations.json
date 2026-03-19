@@ -1,4 +1,5 @@
 {
+  ".": ".",
   "admin": {
     "addNewAdmin": "Add New Admin",
     "enterDetails": "Enter the details below to invite a new administrator to your team",
@@ -47,7 +48,6 @@
     "irrigationArea": "Area by Irrigation Method (ha)",
     "farmingSystems": "Farming Systems Distribution",
     "farmPossession": "Farm Possession Distribution",
-
     "summary": "Comprehensive size distribution and analysis",
     "totalFarms": "Total Farms",
     "totalArea": "Total Area",
@@ -66,10 +66,8 @@
     "sizeByServiceCenter": "Size by Service Center",
     "emirateRadar": "Emirate Performance Radar",
     "multiMetricEmirate": "Multi-Metric Emirate View",
-
     "analyticDashboard": "Farm Crop Analytics Dashboard",
     "analyticDashboardSub": "Comprehensive crop distribution and analysis",
-
     "farmCropType": "Farms by Crop Type",
     "cropTypeDistribution": "Crop Type Distribution",
     "topFruitTypes": "Top Fruit Types",
@@ -79,13 +77,11 @@
     "cropByEmirate": "Crop Types by Emirate",
     "greenhouseTypes": "Greenhouse Types",
     "coverTypes": "Cover Types",
-
     "farmsWithGreenhouses": "Farms with Greenhouses",
     "totalGreenhouses": "Total Greenhouses",
     "totalGreenhouseArea": "Total Greenhouse Area",
     "avgGreenhousesPerFarm": "Avg Greenhouses / Farm",
     "greenhouseAnalytics": "Comprehensive greenhouse analytics and insights",
-
     "statsSubTitle": "Comprehensive farm statistics and insights",
     "allEmirates": "All Emirates",
     "allCenters": "All Centers",
@@ -100,27 +96,23 @@
     "greenhousrbyEmirate": "Greenhouse Area by Emirate",
     "farmingSystemsDistribution": "Farming Systems Distribution",
     "topFarmsbyGreenhouseArea": "Top Farms by Greenhouse Area",
-    
-    
-    
     "farmCodingSub": "Manage and track farm coding requests",
     "dashboardOverview": "Dashboard Overview",
     "farmanalytics&insights": "Farm analytics & insights",
     "selectGreenhouseType": "Select Greenhouse Type",
-    "selectCoverType": "Select Cover Type"
-
+    "selectCoverType": "Select Cover Type",
+    "avgAreaPerGreenhouse": "Avg Area Per Greenhouse"
   },
-
   "status": {
     "download": "Download",
     "all": "All",
     "active": "Active",
     "pending": "Pending",
     "assigned": "Assigned",
+    "suspended": "Suspended",
     "drafts": "Drafts",
     "rejected": "Rejected"
   },
-
   "kpi": {
     "totalFarms": "Total Farms",
     "totalArea": "Total Area",
@@ -154,6 +146,7 @@
     "crop": "🌱 Crop",
     "greenhouse": "🏠 Greenhouse",
     "farming": "🚜 Farming System",
+    "geographic": "Geographic",
     "irrigation": "💧 Irrigation",
     "filters": "Filters",
     "clearAll": "Clear All"
@@ -232,7 +225,17 @@
     "selectionOverlapped": "Your selection is overlaped with some other crops.",
     "farmAreaSelectionRequired": "A farm area selection is required before you proceed.",
     "addStock": "Add Stock",
-    "saveChanges": "Save Changes"
+    "saveChanges": "Save Changes",
+    "totalPlantedAreas": "Total Planted Areas",
+    "totalQuantities": "Total Quantities",
+    "topIrrigationMethod": "Top Irrigation Method",
+    "mostUsedFertilizer": "Most Used Fertilizer",
+    "totalHives": "Total Hives",
+    "topPlantedCrops": "Top Planted Crops",
+    "allEmirates": "All Emirates",
+    "popupAreaLabel": "Area:",
+    "downloadReport": "Download Report",
+    "searchCrops": "Search crops"
   },
   "manageFarms": {
     "title": "Farms",
@@ -268,8 +271,10 @@
       "assignedSuccessfully": "Assigned successfully",
       "selectFarm": "Please select farm",
       "selectUser": "Please select user",
-      "coder": "Coder"
-    }
+      "coder": "Coder",
+      "deletedSuccessfully": "Deleted Successfully"
+    },
+    "downloadSuccess": "Download Success"
   },
   "overview": {
     "selectEmirate": "Select Emirate",
@@ -296,7 +301,6 @@
     "totalNurseries": "Total nurseries",
     "noData": "No data"
   },
-
   "reports": {
     "totalResults": "Total no. of results:",
     "searchReports": "Search reports",
@@ -332,6 +336,7 @@
   },
   "common": {
     "loading": "Loading...",
+    "noDataToExport": "No data to export",
     "save": "Save",
     "edit": "Edit",
     "delete": "Delete",
@@ -475,9 +480,15 @@
         "provideSuspensionReasonError": "Please provide a reason for suspension.",
         "statusUnchanged": "Status is unchanged.",
         "statusUpdatedSuccess": "Farm status updated to {status} successfully",
-        "nA": "N/A"
+        "nA": "N/A",
+        "statusUpdatedSuccessfully": "Status Updated Successfully"
       }
-    }
+    },
+    "clear": "Clear",
+    "errorLoading": "Error Loading",
+    "errorOccurred": "Error Occurred",
+    "createdAt": "Created At",
+    "actions": "Actions"
   },
   "coders": {
     "title": "Coders",
@@ -508,7 +519,35 @@
     "passwordRequired": "Password *",
     "password": "Password",
     "fillRequiredFields": "Please fill in all required fields",
-    "deleteConfirm": "Are you sure you want to delete this? this will delete all of his farms and related data."
+    "deleteConfirm": "Are you sure you want to delete this? this will delete all of his farms and related data.",
+    "downloadSuccess": "Download Success",
+    "download": "Download",
+    "downloadOptions": {
+      "pdf": "PDF Format",
+      "pdfHint": "Printable document",
+      "excel": "Excel Format",
+      "excelHint": "Spreadsheet file",
+      "csv": "CSV Format",
+      "csvHint": "Comma-separated values"
+    },
+    "downloadListTitle": "Coders List",
+    "view": "View",
+    "coderDetails": "Coder Details",
+    "coderInformation": "Coder Information",
+    "relatedFarms": "Related Farms",
+    "farmLocation": "Farm Location",
+    "farmSize": "Farm Size",
+    "active": "Active",
+    "noFarmsAssigned": "No Farms Assigned",
+    "noFarmsAvailable": "No Farms Available",
+    "close": "Close",
+    "modalDescription": {
+      "add": "Add a new coder to the system",
+      "edit": "Update coder information"
+    },
+    "toast": {
+      "fetchFail": "Failed to load coders"
+    }
   },
   "farmCodingDetails": {
     "back": "Back",
@@ -582,7 +621,10 @@
     "cropAreaLabel": "Area",
     "totalTrees": "Total Trees",
     "fruitBearing": "Fruit Bearing",
-    "cropsProduction": "Crops & Production"
+    "cropsProduction": "Crops & Production",
+    "greenhouse": "Greenhouse",
+    "phone": "Phone",
+    "emiratesId": "Emirates Id"
   },
   "farmers": {
     "title": "Farmers",
@@ -621,15 +663,53 @@
       "email": "Email",
       "enterEmail": "Enter email",
       "enterPhone": "Enter phone number",
-      "password": "Password"
-    }
+      "password": "Password",
+      "emptyCTA": "Add your first farmer to get started"
+    },
+    "modal": {
+      "description": {
+        "add": "Add a new farmer to the system",
+        "edit": "Update farmer information"
+      }
+    },
+    "toast": {
+      "pdfGenerationFailed": "Failed to generate PDF"
+    },
+    "stats": {
+      "totalFarmers": "Total Farmers"
+    },
+    "download": {
+      "totalRecords": "Total Records:",
+      "filterApplied": "Filter Applied:"
+    },
+    "noDataToDownload": "No Data To Download",
+    "downloadSuccess": "Download Success",
+    "image": "Image",
+    "imageAvailable": "Image Available",
+    "noImage": "No Image",
+    "name": "Name",
+    "noData": "No Data",
+    "phoneNumber": "Phone Number",
+    "emirateId": "Emirate Id",
+    "createdAt": "Created At",
+    "filterActive": "Filter Active",
+    "results": "Results"
   },
   "auth": {
     "welcomeBack": "Welcome Back!",
     "emailAddress": "Email address",
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot Password?",
-    "login": "Login"
+    "login": "Login",
+    "errors": {
+      "emailRequired": "Please enter your email",
+      "emailInvalid": "Please enter a valid email address",
+      "emailGmailSuggestion": "Did you mean gmail.com?",
+      "passwordRequired": "Please enter your password"
+    },
+    "toast": {
+      "loginFailed": "Login failed"
+    }
   },
   "center": {
     "title": "Centers Management",
@@ -731,7 +811,70 @@
       "noItemsFound": "No items found. Add your first center to get started.",
       "totalItems": "Total items:",
       "deleteConfirm": "Are you sure you want to delete this center?",
-      "fillRequiredFields": "Please fill in all required fields"
+      "fillRequiredFields": "Please fill in all required fields",
+      "selectEmirate": "Select Emirate"
+    }
+  },
+  "articles": {
+    "category": {
+      "empty": "No categories found. Add your first category to get started."
+    },
+    "title": "Articles",
+    "subtitle": "Manage your articles and blog posts",
+    "cta": "Add Article",
+    "table": {
+      "image": "Image",
+      "title": "Title",
+      "createdAt": "Created At",
+      "actions": "Actions",
+      "noImage": "No image",
+      "editAction": "Edit article",
+      "deleteAction": "Delete article"
+    },
+    "empty": {
+      "noArticles": "No articles yet",
+      "cta": "Click \"Add Article\" to create your first post"
+    },
+    "subCategories": {
+      "empty": {
+        "noItems": "No sub-categories yet",
+        "cta": "Click \"Add Sub-Category\" to create one"
+      }
+    },
+    "stats": {
+      "total": "Total articles:"
+    },
+    "modal": {
+      "editTitle": "Edit Article",
+      "addTitle": "Add New Article",
+      "imageLabel": "Article Image",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter article title",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Write a short description or summary...",
+      "categoryLabel": "Category",
+      "loadingCategories": "Loading categories...",
+      "categoryPlaceholder": "Select a category",
+      "subCategoryLabel": "Sub Category",
+      "loadingSubCategories": "Loading subcategories...",
+      "subCategoryPlaceholder": "Select a subcategory",
+      "submitUpdate": "Update Article",
+      "submitAdd": "Add Article"
+    },
+    "toast": {
+      "unknownError": "Unknown error",
+      "loadFail": "Failed to load articles",
+      "categoriesLoadFail": "Failed to load categories",
+      "subcategoriesLoadFail": "Failed to load subcategories",
+      "validationRequiredFields": "Please fill all required fields and select an image",
+      "updateSuccess": "Article updated successfully",
+      "addSuccess": "Article added successfully",
+      "operationFailed": "Operation failed",
+      "deleteSuccess": "Article deleted",
+      "deleteFail": "Failed to delete article"
+    },
+    "confirm": {
+      "delete": "Are you sure you want to delete this article?"
     }
   },
   "courageTypes": {
@@ -776,7 +919,11 @@
     "noItemsFound": "No items found. Add your first item to get started.",
     "totalItems": "Total items:",
     "deleteConfirm": "Are you sure you want to delete this item?",
-    "fillRequiredFields": "Please fill in all required fields"
+    "fillRequiredFields": "Please fill in all required fields",
+    "subtitle": "Manage cultivation methods",
+    "searchResults": "Search Results",
+    "searchPlaceholder": "Search Placeholder",
+    "found": "Found"
   },
   "crops": {
     "title": "Crops Management",
@@ -806,7 +953,18 @@
     "totalCrops": "Total Crops",
     "deleteConfirm": "Are you sure you want to delete this crop?",
     "fillRequiredFields": "Please fill in all required fields",
-    "cropType": "Crop Type"
+    "cropType": "Crop Type",
+    "updateSuccess": "Update Success",
+    "addSuccess": "Add Success",
+    "deleteSuccess": "Delete Success",
+    "searchPlaceholder": "Search Placeholder",
+    "cropList": "Crop List",
+    "selectType": "Select Type",
+    "markAsActive": "Mark As Active",
+    "searchCrops": "Search Crops",
+    "cropNameEnglishPlaceholder": "e.g., Wheat",
+    "cropNameArabicPlaceholder": "مثال: قمح",
+    "cultivationDurationPlaceholder": "e.g., 120–150 days"
   },
   "cropTypes": {
     "title": "Crop Types Management",
@@ -843,7 +1001,13 @@
     "update": "Update",
     "fillRequiredFields": "Please fill in all required fields",
     "deleteConfirm": "Are you sure you want to delete this item?",
-    "enterName": "Enter name"
+    "enterName": "Enter name",
+    "updateSuccess": "Update Success",
+    "addSuccess": "Add Success",
+    "deleteSuccess": "Delete Success",
+    "subtitle": "Manage cultivation methods",
+    "edit": "Edit",
+    "delete": "Delete"
   },
   "emirates": {
     "title": "Emirates Management",
@@ -866,7 +1030,10 @@
     "noItemsFound": "No emirates found. Add your first emirate to get started.",
     "totalItems": "Total emirates",
     "fillRequiredFields": "Please fill in all required fields",
-    "deleteConfirm": "Are you sure you want to delete this emirate?"
+    "deleteConfirm": "Are you sure you want to delete this emirate?",
+    "updateSuccess": "Update Success",
+    "addSuccess": "Add Success",
+    "deleteSuccess": "Delete Success"
   },
   "farmingSystem": {
     "title": "Farming System Management",
@@ -897,6 +1064,9 @@
     "noItemsFound": "No item found. Add your first item to get started.",
     "totalItems": "Total Items",
     "name": "Name",
+    "nameArabic": "Name (Arabic)",
+    "nameArabicLabel": "Name (Arabic)",
+    "nameArabicPlaceholder": "Enter name in Arabic",
     "createdAt": "Created At",
     "actions": "Actions",
     "addNewItem": "Add New Item",
@@ -908,6 +1078,8 @@
   },
   "fruitTypes": {
     "title": "Fruit Types Management",
+    "searchHeading": "Search Fruit Types",
+    "searchResults": "Search Results",
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
@@ -926,7 +1098,9 @@
     "nameEnglishPlaceholder": "e.g., Dubai",
     "cancel": "Cancel",
     "update": "Update",
-    "pleaseFillRequiredFields": "Please fill in all required fields"
+    "pleaseFillRequiredFields": "Please fill in all required fields",
+    "enterNameEnglish": "Enter Name English",
+    "enterNameArabic": "Enter Name Arabic"
   },
   "irrigationSystem": {
     "title": "Irrigation System Management",
@@ -948,7 +1122,9 @@
     "nameEnglishPlaceholder": "e.g., Dubai",
     "cancel": "Cancel",
     "update": "Update",
-    "pleaseFillRequiredFields": "Please fill in all required fields"
+    "pleaseFillRequiredFields": "Please fill in all required fields",
+    "enterName": "Enter Name",
+    "enterNameArabic": "Enter Name Arabic"
   },
   "livestock": {
     "title": "LiveStock Management",
@@ -992,7 +1168,16 @@
     "nameEnglishPlaceholder": "e.g., Dubai",
     "cancel": "Cancel",
     "update": "Update",
-    "pleaseFillRequiredFields": "Please fill in all required fields"
+    "pleaseFillRequiredFields": "Please fill in all required fields",
+    "validation": {
+      "allFieldsRequired": "All Fields Required"
+    },
+    "confirm": {
+      "deleteItem": "Delete Item"
+    },
+    "empty": {
+      "noItems": "No Items"
+    }
   },
   "seasons": {
     "title": "Seasons",
@@ -1003,15 +1188,25 @@
     "noItemsFound": "No item found. Add your first item to get started.",
     "totalItems": "Total Items",
     "name": "Name",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter name",
+    "nameArabic": "Name (Arabic)",
+    "nameArabicLabel": "Name (Arabic)",
     "createdAt": "Created At",
     "actions": "Actions",
     "addNewItem": "Add New Item",
     "editItem": "Edit Item",
-    "nameArabicPlaceholder": "Enter in item name in arrabic",
+    "nameArabicPlaceholder": "Enter name in Arabic",
     "enterName": "Enter name",
     "cancel": "Cancel",
     "update": "Update",
-    "pleaseFillRequiredFields": "Please fill in all required fields"
+    "pleaseFillRequiredFields": "Please fill in all required fields",
+    "validation": {
+      "allFieldsRequired": "All Fields Required"
+    },
+    "confirm": {
+      "deleteItem": "Delete Item"
+    }
   },
   "varieties": {
     "title": "Varieties Management",
@@ -1029,6 +1224,7 @@
     "table": {
       "headers": {
         "name": "Name",
+        "nameArabic": "Arabic Name",
         "createdAt": "Created At",
         "actions": "Actions"
       }
@@ -1041,17 +1237,25 @@
       "addNewVariety": "Add New Variety",
       "labels": {
         "name": "Name",
+        "nameArabic": "Name (Arabic)",
         "crop": "Crop"
       },
       "namePlaceholder": "e.g., Soft white Winter",
+      "nameArabicPlaceholder": "Enter the name in Arabic",
       "selectCrop": "Select a crop",
       "cancel": "Cancel",
       "update": "Update",
       "add": "Add"
+    },
+    "confirm": {
+      "deleteVariety": "Delete Variety"
     }
   },
   "vegetableTypes": {
     "title": "VegetableType Management",
+    "nameEnglishPlaceholder": "e.g., Tomato",
+    "searchHeading": "Search Vegetable Types",
+    "searchResults": "Search Results",
     "add": "Add",
     "edit": "Edit",
     "delete": "Delete",
@@ -1084,7 +1288,8 @@
       },
       "placeholders": {
         "nameArabic": "Enter in item name in arrabic",
-        "nameEnglish": "e.g., Dubai"
+        "nameEnglish": "e.g., Dubai",
+        "nameEnglishPlaceholder": "e.g., Tomato"
       },
       "cancel": "Cancel",
       "update": "Update",
@@ -1133,7 +1338,12 @@
     "cancel": "Cancel",
     "update": "Update",
     "pleaseFillRequiredFields": "Please fill in all required fields",
-    "noItemsFound": "No item found. Add your first item to get started."
+    "noItemsFound": "No item found. Add your first item to get started.",
+    "validation": {
+      "requiredFields": "Required Fields"
+    },
+    "deleteConfirmation": "Delete Confirmation",
+    "emptyState": "Empty State"
   },
   "locations": {
     "title": "Locations",
@@ -1159,7 +1369,14 @@
     "cancel": "Cancel",
     "update": "Update",
     "pleaseFillRequiredFields": "Please fill in all required fields",
-    "noItemsFound": "No item found. Add your first item to get started."
+    "noItemsFound": "No item found. Add your first item to get started.",
+    "validation": {
+      "requiredFields": "Required Fields"
+    },
+    "deleteConfirmation": "Delete Confirmation",
+    "emptyState": "Empty State",
+    "selectEmirate": "Select Emirate",
+    "selectCenter": "Select Center"
   },
   "greenHouseTypes": {
     "title": "Green House Types",
@@ -1181,7 +1398,12 @@
     "cancel": "Cancel",
     "update": "Update",
     "pleaseFillRequiredFields": "Please fill in all required fields",
-    "noItemsFound": "No item found. Add your first item to get started."
+    "noItemsFound": "No item found. Add your first item to get started.",
+    "validation": {
+      "requiredFields": "Required Fields"
+    },
+    "deleteConfirmation": "Delete Confirmation",
+    "emptyState": "Empty State"
   },
   "fodderTypes": {
     "title": "FodderTypes Management",
@@ -1203,6 +1425,15 @@
     "cancel": "Cancel",
     "update": "Update",
     "pleaseFillRequiredFields": "Please fill in all required fields",
-    "noItemsFound": "No items found. Add your first item to get started."
+    "noItemsFound": "No items found. Add your first item to get started.",
+    "validation": {
+      "requiredFields": "Required Fields"
+    },
+    "updateSuccess": "Update Success",
+    "addSuccess": "Add Success",
+    "deleteConfirmation": "Delete Confirmation",
+    "deleteSuccess": "Delete Success",
+    "subtitle": "Subtitle",
+    "emptyState": "Empty State"
   }
 }

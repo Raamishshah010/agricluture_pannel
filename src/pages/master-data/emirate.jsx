@@ -268,10 +268,13 @@ export default function Emirates() {
                                 className="px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors disabled:opacity-60 flex items-center gap-2"
                             >
                                 {loading && (
-                                    <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" className="opacity-25" />
-                                        <path fill="currentColor" d="M4 12a8 8 0 018-8v8z" className="opacity-75" />
-                                    </svg>
+                                    <>
+                                        <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" className="opacity-25" />
+                                            <path fill="currentColor" d="M4 12a8 8 0 018-8v8z" className="opacity-75" />
+                                        </svg>
+                                        <span className="sr-only">{t('common.loading')}</span>
+                                    </>
                                 )}
                                 {editingEmirate ? t('emirates.update') : t('emirates.add')}
                             </button>

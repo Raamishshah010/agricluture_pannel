@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, X, User, CheckCircle, Loader2 } from 'lucide-react';
+import { useTranslation } from '../../hooks/useTranslation';
 import service from '../../services/farmerService';
 
 export const UserSearchSelect = ({ onSelect, selectedUser = null, placeholder = "Search users..." }) => {
+    const t = useTranslation();
     const [searchQuery, setSearchQuery] = useState('');
     const [users, setUsers] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -109,7 +111,7 @@ export const UserSearchSelect = ({ onSelect, selectedUser = null, placeholder = 
                         <button
                             onClick={handleClearSelection}
                             className="ml-2 p-2 hover:bg-gray-100 rounded-full transition-colors"
-                            title="Clear selection"
+                            title={t('manageFarms.clear')}
                         >
                             <X className="w-5 h-5 text-gray-500" />
                         </button>
@@ -142,7 +144,7 @@ export const UserSearchSelect = ({ onSelect, selectedUser = null, placeholder = 
 
                                 {!error && users.length === 0 && !isLoading && (
                                     <div className="p-4 text-center text-gray-500">
-                                        <p className="text-sm">No users found</p>
+                                        <p className="text-sm">{t('common.components.noResultsFound')}</p>
                                     </div>
                                 )}
 

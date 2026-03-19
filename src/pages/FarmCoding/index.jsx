@@ -289,7 +289,7 @@ const FarmCodingRequest = () => {
     const data = prepareDataForExport();
     
     if (data.length === 0) {
-      toast.error('No data to export');
+      toast.error(t('common.noDataToExport') || 'No data to export');
       setShowDownloadMenu(false);
       return;
     }
@@ -314,7 +314,7 @@ const FarmCodingRequest = () => {
     const data = prepareDataForExport();
     
     if (data.length === 0) {
-      toast.error('No data to export');
+      toast.error(t('common.noDataToExport') || 'No data to export');
       setShowDownloadMenu(false);
       return;
     }

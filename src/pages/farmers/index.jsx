@@ -289,7 +289,7 @@ const downloadPDF = async () => {
       toast.success(t('farmers.downloadSuccess'));
     } catch (error) {
       console.error('PDF Error:', error);
-      toast.error('Failed to generate PDF');
+      toast.error(t('farmers.toast.pdfGenerationFailed'));
     }
 };
 
@@ -318,8 +318,11 @@ const downloadPDF = async () => {
 
     // Add metadata
     const metadataRow = query.trim()
-      ? [[`Total Records: ${allFarmers.length}`, `Filter Applied: ${query}`]]
-      : [[`Total Records: ${allFarmers.length}`]];
+      ? [[
+          `${t('farmers.download.totalRecords')} ${allFarmers.length}`,
+          `${t('farmers.download.filterApplied')} ${query}`,
+        ]]
+      : [[`${t('farmers.download.totalRecords')} ${allFarmers.length}`]];
 
     XLSX.utils.sheet_add_aoa(worksheet, metadataRow, { origin: -1 });
 
@@ -370,9 +373,9 @@ const downloadPDF = async () => {
     ].join("\n");
 
     // Add metadata at the bottom
-    csvContent += `\n\nTotal Records: ${allFarmers.length}`;
+    csvContent += `\n\n${t('farmers.download.totalRecords')} ${allFarmers.length}`;
     if (query.trim()) {
-      csvContent += `\nFilter Applied: ${query}`;
+      csvContent += `\n${t('farmers.download.filterApplied')} ${query}`;
     }
 
     // Add BOM for proper UTF-8 encoding (supports Arabic)

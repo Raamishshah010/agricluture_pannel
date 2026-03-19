@@ -29,13 +29,15 @@ export default function ArticleCategories() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingData, setEditingData] = useState(null);
     const [formData, setFormData] = useState({
-        name: ''
+        name: '',
+        nameInArabic: ''
     });
 
     const openAddModal = () => {
         setEditingData(null);
         setFormData({
             name: '',
+            nameInArabic: ''
         });
         setIsModalOpen(true);
     };
@@ -44,6 +46,7 @@ export default function ArticleCategories() {
         setEditingData(category);
         setFormData({
             name: category.name,
+            nameInArabic: category.nameInArabic || ''
         });
         setIsModalOpen(true);
     };
@@ -62,8 +65,8 @@ export default function ArticleCategories() {
     };
 
     const handleSubmit = async () => {
-        if (!formData.name) {
-            alert('Please fill in all required fields');
+        if (!formData.name || !formData.nameInArabic.trim()) {
+            alert('Please fill in all required fields in both languages');
             return;
         }
 
@@ -115,7 +118,7 @@ export default function ArticleCategories() {
             <div className="max-w-7xl mx-auto">
                 <div className="mb-8 flex flex-col-reverse md:flex-row mt-2 justify-between items-center">
                     <div>
-                        <h1 className="text-xl md:text-3xl font-bold text-gray-900">Article Sub Categories</h1>
+                        <h1 className="text-xl md:text-3xl font-bold text-gray-900">Article Categories</h1>
                     </div>
                     <button
                         onClick={openAddModal}
@@ -137,6 +140,7 @@ export default function ArticleCategories() {
                             <thead className="bg-gray-100 border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Name</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Arabic Name</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Created At</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Actions</th>
                                 </tr>
@@ -145,20 +149,21 @@ export default function ArticleCategories() {
                                 {list.map((category) => (
                                     <tr key={category.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 text-sm font-medium text-gray-900">{category.name}</td>
+                                        <td className="px-6 py-4 text-sm text-gray-700">{category.nameInArabic || '—'}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600">{formatDate(category.createdAt)}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2">
                                                 <button
                                                     onClick={() => openEditModal(category)}
                                                     className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title="Edit"
+                                                    title={t('common.edit')}
                                                 >
                                                     <Edit2 size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(category.id)}
                                                     className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
-                                                    title="Delete"
+                                                    title={t('common.delete')}
                                                 >
                                                     <Trash2 size={18} />
                                                 </button>
@@ -172,13 +177,13 @@ export default function ArticleCategories() {
 
                     {!loading && list.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
-                            No crops found. Add your first category to get started.
+                            <p>{t('articles.category.empty') || 'No categories found. Add your first category to get started.'}</p>
                         </div>
                     )}
                 </div>
 
                 <div className="mt-4 text-sm text-gray-600">
-                    Total Crops: {list.length}
+                    Total Categories: {list.length}
                 </div>
             </div>
 
@@ -210,6 +215,19 @@ export default function ArticleCategories() {
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                         placeholder="e.g., Weats"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Arabic Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="nameInArabic"
+                                        value={formData.nameInArabic}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        placeholder="مثال: مهارات الزراعة"
                                     />
                                 </div>
                             </div>

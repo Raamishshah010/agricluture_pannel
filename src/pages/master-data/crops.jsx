@@ -177,7 +177,7 @@ export default function Crops() {
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
                                 <Search className="w-5 h-5 text-green-600" />
-                                Search Crops
+                                {t('crops.searchCrops')}
                             </h3>
                             {searchQuery && (
                                 <button
@@ -253,14 +253,14 @@ export default function Crops() {
                                                         <button
                                                             onClick={() => openEditModal(crop)}
                                                             className="p-2 text-blue-600 hover:bg-blue-50 rounded"
-                                                            title="Edit"
+                                                            title={t('crops.edit')}
                                                         >
                                                             <Edit2 size={18} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleDelete(crop.id)}
                                                             className="p-2 text-red-600 hover:bg-red-50 rounded"
-                                                            title="Delete"
+                                                            title={t('crops.delete')}
                                                         >
                                                             <Trash2 size={18} />
                                                         </button>
@@ -306,7 +306,7 @@ export default function Crops() {
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                    placeholder="e.g., Wheat"
+                                    placeholder={t('crops.cropNameEnglishPlaceholder')}
                                 />
                             </div>
 
@@ -320,7 +320,7 @@ export default function Crops() {
                                     value={formData.scientificName}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                    placeholder="مثال: قمح"
+                                    placeholder={t('crops.cropNameArabicPlaceholder')}
                                 />
                             </div>
 
@@ -354,7 +354,7 @@ export default function Crops() {
                                     value={formData.cultivationDuration}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                    placeholder="e.g., 120–150 days"
+                                    placeholder={t('crops.cultivationDurationPlaceholder')}
                                 />
                             </div>
 
@@ -388,10 +388,13 @@ export default function Crops() {
                                 className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg disabled:opacity-50 flex items-center gap-2"
                             >
                                 {loading && (
-                                    <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-                                    </svg>
+                                    <>
+                                        <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                        </svg>
+                                        <span className="sr-only">{t('common.loading')}</span>
+                                    </>
                                 )}
                                 {editingCrop ? t('crops.update') : t('crops.add')}
                             </button>

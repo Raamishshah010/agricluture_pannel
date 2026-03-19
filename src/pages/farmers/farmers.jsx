@@ -139,7 +139,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                         </svg>
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium">Total Farmers</p>
+                        <p className="text-sm text-gray-500 font-medium">{t('farmers.stats.totalFarmers')}</p>
                         <p className="text-3xl font-bold text-gray-900">{list.length}</p>
                     </div>
                 </div>
@@ -224,7 +224,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                                             <button
                                                 onClick={() => handleFarms(farmer)}
                                                 className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-medium text-xs shadow-sm hover:shadow-md flex items-center gap-1.5 whitespace-nowrap"
-                                                title="View Farms"
+                                                title={t('farmers.farmers.viewFarms')}
                                             >
                                                 <Eye size={14} />
                                                 {t('farmers.farmers.viewFarms')}
@@ -259,7 +259,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                             </svg>
                         </div>
                         <p className="text-gray-500 font-medium">{t('farmers.farmers.noDataFound')}</p>
-                        <p className="text-sm text-gray-400 mt-1">Add your first farmer to get started</p>
+                        <p className="text-sm text-gray-400 mt-1">{t('farmers.farmers.emptyCTA')}</p>
                     </div>
                 )}
             </div>
@@ -283,7 +283,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                                         {editingItem ? t('farmers.farmers.edit') : t('farmers.farmers.add')}
                                     </h2>
                                     <p className="text-sm text-gray-500">
-                                        {editingItem ? 'Update farmer information' : 'Add a new farmer to the system'}
+                                        {editingItem ? t('farmers.modal.description.edit') : t('farmers.modal.description.add')}
                                     </p>
                                 </div>
                             </div>
@@ -438,7 +438,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
-                                            <span>Loading...</span>
+                                            <span>{t('common.loading')}</span>
                                         </>
                                     ) : (
                                         <>

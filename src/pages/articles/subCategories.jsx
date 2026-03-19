@@ -15,6 +15,7 @@ export default function SubCategories() {
     const [editingSubCat, setEditingSubCat] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
+        nameInArabic: '',
         image: null,
         categoryId: ''
     });
@@ -52,7 +53,7 @@ export default function SubCategories() {
     const openAddModal = () => {
         fetchCategories();
         setEditingSubCat(null);
-        setFormData({ name: '', image: null, categoryId: '' });
+        setFormData({ name: '', nameInArabic: '', image: null, categoryId: '' });
         setImagePreview('');
         setIsModalOpen(true);
     };
@@ -62,6 +63,7 @@ export default function SubCategories() {
         setEditingSubCat(subCat);
         setFormData({
             name: subCat.name || '',
+            nameInArabic: subCat.nameInArabic || '',
             image: null,           // only send new file if changed
             categoryId: subCat.categoryId || ''
         });
@@ -73,7 +75,7 @@ export default function SubCategories() {
         setIsModalOpen(false);
         setEditingSubCat(null);
         setImagePreview('');
-        setFormData(prev => ({ ...prev, image: null }));
+        setFormData(prev => ({ ...prev, image: null, nameInArabic: '' }));
     };
 
     const handleFileChange = (e) => {
@@ -90,8 +92,8 @@ export default function SubCategories() {
     };
 
     const handleSubmit = async () => {
-        if (!formData.name.trim() || !formData.categoryId) {
-            toast.error('Name and category are required');
+        if (!formData.name.trim() || !formData.nameInArabic.trim() || !formData.categoryId) {
+            toast.error('English name, Arabic name, and category are required');
             return;
         }
         if (!editingSubCat && !formData.image) {
@@ -102,6 +104,7 @@ export default function SubCategories() {
         const payload = new FormData();
         payload.append('name', formData.name);
         payload.append('categoryId', formData.categoryId);
+        payload.append('nameInArabic', formData.nameInArabic);
 
         if (formData.image instanceof File) {
             payload.append('file', formData.image);
@@ -192,6 +195,9 @@ export default function SubCategories() {
                                                 Name
                                             </th>
                                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                                Arabic Name
+                                            </th>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                                 Created At
                                             </th>
                                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider w-32">
@@ -219,6 +225,9 @@ export default function SubCategories() {
                                                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
                                                     {subCat.name || '—'}
                                                 </td>
+                                                <td className="px-6 py-4 text-sm text-gray-700">
+                                                    {subCat.nameInArabic || '—'}
+                                                </td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">
                                                     {formatDate(subCat.createdAt)}
                                                 </td>
@@ -227,14 +236,14 @@ export default function SubCategories() {
                                                         <button
                                                             onClick={() => openEditModal(subCat)}
                                                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                            title="Edit sub-category"
+                                                            title={t('common.edit')}
                                                         >
                                                             <Edit2 size={18} />
                                                         </button>
                                                         <button
                                                             onClick={() => handleDelete(subCat.id)}
                                                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                                            title="Delete sub-category"
+                                                            title={t('common.delete')}
                                                         >
                                                             <Trash2 size={18} />
                                                         </button>
@@ -248,8 +257,8 @@ export default function SubCategories() {
 
                             {subCategories.length === 0 && (
                                 <div className="py-16 text-center text-gray-500">
-                                    <p className="text-lg">No sub-categories yet</p>
-                                    <p className="mt-2">Click "Add Sub-Category" to create one</p>
+                                    <p className="text-lg">{t('articles.subCategories.empty.noItems') || 'No sub-categories yet'}</p>
+                                    <p className="mt-2">{t('articles.subCategories.empty.cta') || 'Click "Add Sub-Category" to create one'}</p>
                                 </div>
                             )}
                         </>
@@ -315,6 +324,21 @@ export default function SubCategories() {
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                     placeholder="e.g. Technology News, Health Tips"
+                                />
+                            </div>
+
+                            {/* Arabic Name */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Arabic Name <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    name="nameInArabic"
+                                    value={formData.nameInArabic}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    placeholder="مثال: أخبار التكنولوجيا"
                                 />
                             </div>
 

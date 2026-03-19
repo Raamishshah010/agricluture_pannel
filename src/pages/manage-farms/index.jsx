@@ -425,7 +425,7 @@ export default function Index(props) {
                     <button
                         onClick={() => setActiveTab("farm-new")}
                         className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 font-medium"
-                        title="Add Farm"
+                        title={t('manageFarms.addFarm')}
                     >
                         {t('manageFarms.addFarm')}
                     </button>

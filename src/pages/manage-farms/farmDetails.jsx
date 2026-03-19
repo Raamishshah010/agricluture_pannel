@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, User, Droplet, Sprout, Calendar, FileText, Map, CheckCircle, XCircle, ArrowLeft, Users, TreePine, Home, Pencil, SquarePenIcon, Download, ChevronDown } from 'lucide-react';
 import useStore from '../../store/store';
+import { useTranslation } from '../../hooks/useTranslation';
 import PolygonDisplayComponent from '../../components/displayPolygon';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -9,6 +10,7 @@ import { amiriFontBase64 } from '../../assets/AmiriFont';
 import { toast } from 'react-toastify';
 
 const FarmDetails = ({ farm, handleBack, handleEdit }) => {
+    const t = useTranslation();
     const {
         fruitTypes,
         vegetableTypes,
@@ -757,9 +759,9 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl shadow-2xl p-8 mb-6 text-white">
                     <div className="flex items-center justify-between flex-wrap gap-4">
                         <div className="flex-1">
-                            <button title='Edit Farm' className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-sm font-semibold" onClick={() => handleEdit(farm)}>
+                            <button title={t('manageFarms.farms.edit')} className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-sm font-semibold" onClick={() => handleEdit(farm)}>
                                 <SquarePenIcon size={14} />
-                                <span>Edit</span>
+                                <span>{t('manageFarms.farms.edit')}</span>
                             </button>
                             <h1 className="text-4xl font-bold mb-2" dir="rtl">{farm.farmName}</h1>
                             <div className="flex flex-wrap gap-4 text-sm opacity-90">

@@ -26,21 +26,21 @@ export const LoginPage = () => {
 
     let newErrors = {};
     if (!email) {
-      newErrors.email = "Please enter your email";
+      newErrors.email = t("auth.errors.emailRequired");
     } else if (!emailRegex.test(email)) {
-      newErrors.emailFormat = "Please enter a valid email address";
+      newErrors.emailFormat = t("auth.errors.emailInvalid");
     } else {
       const domain = email.split("@")[1]?.toLowerCase();
       if (domain) {
         if (/\.[a-z]{2,}\1$/i.test(domain)) {
-          newErrors.emailFormat = "Please enter a valid email address";
+          newErrors.emailFormat = t("auth.errors.emailInvalid");
         }
         if (domain.startsWith("gmaill.")) {
-          newErrors.emailFormat = "Did you mean gmail.com?";
+          newErrors.emailFormat = t("auth.errors.emailGmailSuggestion");
         }
       }
     }
-    if (!password) newErrors.password = "Please enter your password";
+    if (!password) newErrors.password = t("auth.errors.passwordRequired");
 
     setErrors(newErrors);
 
@@ -51,7 +51,9 @@ export const LoginPage = () => {
         setAdminToken(res.token);
         navigate("/dashboard");
       } catch (error) {
-        toast.error(error?.response?.data?.message || error.message);
+        toast.error(
+          error?.response?.data?.message || t("auth.toast.loginFailed")
+        );
       }
     }
   };

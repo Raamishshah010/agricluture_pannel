@@ -47,7 +47,7 @@ export default function Coders() {
         const res = await service.getCoders();
         setList(res.data.coders);
       } catch (err) {
-        toast.error(err.message);
+        toast.error(err.response?.data?.message || t("coders.toast.fetchFail"));
       } finally {
         setLoading(false);
       }
@@ -111,7 +111,7 @@ export default function Coders() {
       !formData.phoneNumber ||
       (!editingItem && !formData.password)
     ) {
-      alert(t("coders.fillRequiredFields"));
+      toast.error(t("coders.fillRequiredFields"));
       return;
     }
     try {
@@ -196,8 +196,8 @@ const downloadPDF = () => {
 
     // Title
     doc.setFontSize(18);
-    const title = isArabic ? "قائمة المبرمجين" : "Coders List"; 
-    doc.text(title, isArabic ? 196 : 14, 22, { align: isArabic ? 'right' : 'left' });
+    const title = t("coders.downloadListTitle");
+    doc.text(title, isArabic ? 196 : 14, 22, { align: isArabic ? "right" : "left" });
 
     // 4. THE FIX: Table Width & Margin
     autoTable(doc, {
@@ -304,17 +304,17 @@ const downloadPDF = () => {
             <div className="flex flex-wrap gap-3">
               {/* Download Dropdown */}
               <div className="relative">
-                <button
-                  onClick={() => setIsDownloadOpen(!isDownloadOpen)}
-                  className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
-                >
-                  <Download size={20} />
-                  <span className="font-medium">Download</span>
-                  <ChevronDown
-                    size={16}
-                    className={`transition-transform duration-200 ${isDownloadOpen ? "rotate-180" : ""}`}
-                  />
-                </button>
+                  <button
+                    onClick={() => setIsDownloadOpen(!isDownloadOpen)}
+                    className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
+                  >
+                    <Download size={20} />
+                    <span className="font-medium">{t("coders.download")}</span>
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${isDownloadOpen ? "rotate-180" : ""}`}
+                    />
+                  </button>
 
                 {isDownloadOpen && (
                   <>
@@ -344,10 +344,10 @@ const downloadPDF = () => {
                         </div>
                         <div>
                           <div className="font-medium text-gray-900">
-                            PDF Format
+                            {t("coders.downloadOptions.pdf")}
                           </div>
                           <div className="text-xs text-gray-500">
-                            Printable document
+                            {t("coders.downloadOptions.pdfHint")}
                           </div>
                         </div>
                       </button>
@@ -372,10 +372,10 @@ const downloadPDF = () => {
                         </div>
                         <div>
                           <div className="font-medium text-gray-900">
-                            Excel Format
+                            {t("coders.downloadOptions.excel")}
                           </div>
                           <div className="text-xs text-gray-500">
-                            Spreadsheet file
+                            {t("coders.downloadOptions.excelHint")}
                           </div>
                         </div>
                       </button>
@@ -400,10 +400,10 @@ const downloadPDF = () => {
                         </div>
                         <div>
                           <div className="font-medium text-gray-900">
-                            CSV Format
+                            {t("coders.downloadOptions.csv")}
                           </div>
                           <div className="text-xs text-gray-500">
-                            Comma-separated
+                            {t("coders.downloadOptions.csvHint")}
                           </div>
                         </div>
                       </button>
@@ -611,8 +611,8 @@ const downloadPDF = () => {
                   </h2>
                   <p className="text-sm text-gray-500">
                     {editingItem
-                      ? "Update coder information"
-                      : "Add a new coder to the system"}
+                      ? t("coders.modalDescription.edit")
+                      : t("coders.modalDescription.add")}
                   </p>
                 </div>
               </div>

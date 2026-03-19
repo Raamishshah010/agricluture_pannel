@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { X, Edit2, Trash2, Plus, Search, FileText } from 'lucide-react';
+import useTranslation from '../../hooks/useTranslation';
 
 export default function CoverTypes() {
+    const t = useTranslation();
     const [items, setItems] = useState([
         { id: 1, name: 'Plastic Cover', nameInArrabic: 'غطاء بلاستيكي', createdAt: '2025-10-27T00:00:00Z' },
         { id: 2, name: 'Glass Cover', nameInArrabic: 'غطاء زجاجي', createdAt: '2025-10-27T00:00:00Z' },
@@ -15,35 +17,6 @@ export default function CoverTypes() {
         name: '',
         nameInArrabic: ''
     });
-
-    // Mock translation function
-    const t = (key) => {
-        const translations = {
-            'coverTypes.title': 'CoverType Management',
-            'coverTypes.subtitle': 'Manage your cover types',
-            'coverTypes.add': 'Add Cover Type',
-            'coverTypes.nameArabic': 'NAME (ARABIC)',
-            'coverTypes.nameEnglish': 'NAME (ENGLISH)',
-            'coverTypes.createdAt': 'CREATED AT',
-            'coverTypes.actions': 'ACTIONS',
-            'coverTypes.edit': 'Edit',
-            'coverTypes.delete': 'Delete',
-            'coverTypes.noItemsFound': 'No items found',
-            'coverTypes.totalItems': 'Total Cover Types',
-            'coverTypes.searchResults': 'Search Results',
-            'coverTypes.editItem': 'Edit Item',
-            'coverTypes.addNewItem': 'Add New Item',
-            'coverTypes.nameArabicLabel': 'Name (Arabic)',
-            'coverTypes.nameEnglishLabel': 'Name (English)',
-            'coverTypes.cancel': 'Cancel',
-            'coverTypes.update': 'Update',
-            'coverTypes.fillRequiredFields': 'Please fill in all required fields',
-            'coverTypes.deleteConfirm': 'Are you sure you want to delete this item?',
-            'coverTypes.searchPlaceholder': 'Name (English)',
-            'coverTypes.found': 'Found'
-        };
-        return translations[key] || key;
-    };
 
     const filteredItems = items.filter(item => 
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -273,7 +246,7 @@ export default function CoverTypes() {
                                         value={formData.nameInArrabic}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                        placeholder="Enter item name in Arabic"
+                                        placeholder={t('coverTypes.nameArabicPlaceholder')}
                                     />
                                 </div>
                                 <div>
@@ -286,7 +259,7 @@ export default function CoverTypes() {
                                         value={formData.name}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                                        placeholder="e.g., Plastic Cover"
+                                        placeholder={t('coverTypes.nameEnglishPlaceholder')}
                                     />
                                 </div>
                             </div>
@@ -309,7 +282,7 @@ export default function CoverTypes() {
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
-                                            Loading...
+                                            {t('common.loading')}
                                         </>
                                     ) : (
                                         <>{editingItem ? t('coverTypes.update') : t('coverTypes.add')}</>

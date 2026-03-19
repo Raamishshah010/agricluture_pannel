@@ -98,7 +98,9 @@ export const Farms = () => {
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-width: 150px;">
           <h3 style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold; color: #F59E0B;">${location.crop}</h3>
           <p style="margin: 0 0 4px 0; font-size: 12px; color: #333;">${location.name}</p>
-          <p style="margin: 0; font-size: 12px; color: #666;">Orange in this area is about ${location.area}</p>
+          <p style="margin: 0; font-size: 12px; color: #666;">
+            ${t('farms.popupAreaLabel')} {location.area}
+          </p>
         </div>
       `);
     });

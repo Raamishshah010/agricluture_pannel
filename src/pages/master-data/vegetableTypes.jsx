@@ -144,7 +144,7 @@ export default function VegetableType() {
                         <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <p className="text-xs font-medium text-blue-900 mb-1">Total Vegetable Types</p>
+                                    <p className="text-xs font-medium text-blue-900 mb-1">{t('vegetableTypes.totalItems')}</p>
                                     <p className="text-2xl font-bold text-blue-900">{items.length}</p>
                                 </div>
                                 <div className="bg-blue-100 p-3 rounded-lg">
@@ -158,7 +158,7 @@ export default function VegetableType() {
                         <div className="bg-green-50 rounded-lg p-4 border border-green-100">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <p className="text-xs font-medium text-green-900 mb-1">Search Results</p>
+                                    <p className="text-xs font-medium text-green-900 mb-1">{t('vegetableTypes.searchResults')}</p>
                                     <p className="text-2xl font-bold text-green-900">{filteredItems.length}</p>
                                 </div>
                                 <div className="bg-green-100 p-3 rounded-lg">
@@ -172,11 +172,11 @@ export default function VegetableType() {
                     <div className="bg-green-50 rounded-lg p-4 mb-6">
                         <div className="flex items-center gap-2 mb-3">
                             <Search size={18} className="text-green-700" />
-                            <h3 className="text-sm font-semibold text-green-900">Search Vegetable Types</h3>
+                            <h3 className="text-sm font-semibold text-green-900">{t('vegetableTypes.searchHeading')}</h3>
                         </div>
                         <input
                             type="text"
-                            placeholder="Name (English)"
+                            placeholder={t('vegetableTypes.nameEnglishPlaceholder')}
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
