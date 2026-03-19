@@ -75,7 +75,6 @@ const Emirates = () => {
   const [fruitType, setFruitType] = useState(null);
   const [vegetableType, setVegetableType] = useState(null);
   const [fodderType, setFodderType] = useState(null);
-  const [crop, setCrop] = useState(null);
   const [greenhouseType, setGreenhouseType] = useState(null);
   const [farmingSystem, setFarmingSystem] = useState(null);
   const [irrigationSystem, setIrrigationSystem] = useState(null);
@@ -141,7 +140,6 @@ const Emirates = () => {
     fruitType,
     vegetableType,
     fodderType,
-    crop,
     greenhouseType,
     farmingSystem,
     irrigationSystem,
@@ -218,14 +216,6 @@ const Emirates = () => {
           ) >= 0
       );
     }
-    if (crop) {
-      filteredFarms = filteredFarms.filter(
-        (it) =>
-          it.crops.greenhouses.findIndex(
-            (greenhouse) => greenhouse.cropId === crop?.id
-          ) >= 0
-      );
-    }
     if (greenhouseType) {
       filteredFarms = filteredFarms.filter(
         (it) =>
@@ -253,7 +243,6 @@ const Emirates = () => {
     fruitType,
     vegetableType,
     fodderType,
-    crop,
     greenhouseType,
     irrigationSystem,
     farmingSystem,
@@ -564,7 +553,6 @@ const Emirates = () => {
     setVegetableType(null);
     setFodderType(null);
     setFarmingSystem(null);
-    setCrop(null);
     setGreenhouseType(null);
     setIrrigationSystem(null);
   };
@@ -749,13 +737,6 @@ const Emirates = () => {
                   value={fodderType}
                   onChange={setFodderType}
                   placeholder={t("filters.fodder")}
-                />
-                <Dropdown
-                  classes="w-[180px]"
-                  options={crops}
-                  value={crop}
-                  onChange={setCrop}
-                  placeholder={t("filters.crop")}
                 />
                 <Dropdown
                   classes="w-[180px]"

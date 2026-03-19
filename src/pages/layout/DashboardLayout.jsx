@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight, BarChart3, MapPin, Layers, Wheat, Sprout, TrendingUp, Settings, HelpCircle, User, Globe, X, Maximize2, Search, Bell, TrendingUpDown, Grid2X2Plus, List, Newspaper, Users, Flag, ListMusic, ShieldHalf, Footprints, ArrowUp01, Ship, SunSnow, AudioWaveform, Dam, House, LogOut, Sticker, BarChart2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, BarChart3, MapPin, Layers, Wheat, TrendingUp, Settings, HelpCircle, User, Globe, X, Maximize2, Search, Bell, TrendingUpDown, Grid2X2Plus, List, Newspaper, Users, Flag, ListMusic, ShieldHalf, Footprints, ArrowUp01, Ship, SunSnow, AudioWaveform, Dam, House, LogOut, Sticker, BarChart2 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLocation } from 'react-router-dom';
 import Overview from '../Overview';
@@ -138,7 +138,6 @@ const DashboardLayout = () => {
       label: t('common.components.dashboard.masterData'),
       hasSubmenu: true,
       submenuItems: [
-        { id: 'crops-management', icon: Sprout, label: t('common.components.dashboard.cropsManagement') },
         { id: 'Fruit Types', icon: Wheat, label: t('common.components.dashboard.fruitTypes') },
         { id: 'Vegetable Types', icon: Wheat, label: t('common.components.dashboard.vegetableTypes') },
         { id: 'Cover Types', icon: Wheat, label: t('common.components.dashboard.coverTypes') },
@@ -153,7 +152,6 @@ const DashboardLayout = () => {
         { id: 'articles', icon: Newspaper, label: t('common.components.dashboard.articles') },
         { id: 'possessions', icon: ListMusic, label: t('common.components.dashboard.possessions') },
         { id: 'farming-system', icon: Footprints, label: t('common.components.dashboard.farmingSystems') },
-        // { id: 'crop-types', icon: Sprout, label: t('common.components.dashboard.cropTypes') },
         { id: 'irrigation-system', icon: Ship, label: t('common.components.dashboard.irrigationSystem') },
         { id: 'external-irrigation-system', icon: AudioWaveform, label: t('common.components.dashboard.externalIrrigationSystem') },
         { id: 'green-house-types', icon: House, label: t('common.components.dashboard.greenHouseTypes') },

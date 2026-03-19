@@ -23,6 +23,15 @@ const GreenhouseDashboard = () => {
     const [isExporting, setIsExporting] = useState(false);
     
     const isLTR = lang.includes('en');
+    const areaUnit = t('translation.sqmUnit');
+
+    const formatAreaRangeLabel = useCallback((min, max) => {
+        if (max === Infinity) {
+            return `${min}+ ${areaUnit}`;
+        }
+
+        return `${min}-${max} ${areaUnit}`;
+    }, [areaUnit]);
 
     // Helper function to localize dropdown options
     const getLocalizedOptions = useCallback((options) => {
@@ -244,11 +253,11 @@ const GreenhouseDashboard = () => {
 
         // Area Distribution by Size
         const sizeRanges = [
-            { label: '0-1000', min: 0, max: 1000 },
-            { label: '1000-2000', min: 1000, max: 2000 },
-            { label: '2000-3000', min: 2000, max: 3000 },
-            { label: '3000-5000', min: 3000, max: 5000 },
-            { label: '5000+', min: 5000, max: Infinity },
+            { label: formatAreaRangeLabel(0, 1000), min: 0, max: 1000 },
+            { label: formatAreaRangeLabel(1000, 2000), min: 1000, max: 2000 },
+            { label: formatAreaRangeLabel(2000, 3000), min: 2000, max: 3000 },
+            { label: formatAreaRangeLabel(3000, 5000), min: 3000, max: 5000 },
+            { label: formatAreaRangeLabel(5000, Infinity), min: 5000, max: Infinity },
         ];
 
         const sizeDistribution = sizeRanges.map(range => {
@@ -391,16 +400,16 @@ const GreenhouseDashboard = () => {
                 XLSX.utils.book_append_sheet(wb, ws6, t('analytics.greenhouseDashboard.sheetTopFarms'));
             XLSX.utils.book_append_sheet(wb, ws6, 'Top Farms');
 
-            // Sheet 7: Size Distribution
+            // Sheet 7: Area Distribution
             const sizeData = [
-                ['Greenhouse Size Distribution'],
+                ['Greenhouse Area Distribution'],
                 [],
-                ['Size Range (sqm)', 'Number of Farms'],
+                ['Area Range (sqm)', 'Number of Farms'],
                 ...analytics.sizeDistribution.map(item => [item.size, item.farms])
             ];
             const ws7 = XLSX.utils.aoa_to_sheet(sizeData);
             ws7['!cols'] = [{ wch: 20 }, { wch: 20 }];
-            XLSX.utils.book_append_sheet(wb, ws7, 'Size Distribution');
+            XLSX.utils.book_append_sheet(wb, ws7, 'Area Distribution');
 
             // Generate and download
             const timestamp = new Date().toISOString().split('T')[0];
@@ -748,7 +757,7 @@ const GreenhouseDashboard = () => {
                         </ResponsiveContainer>
                     </div>
 
-                    {/* Size Distribution */}
+                    {/* Area Distribution */}
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition-shadow">
                         <div className="flex items-center gap-2 mb-4">
                             <Activity className="w-5 h-5 text-cyan-600" />
@@ -840,7 +849,7 @@ const GreenhouseDashboard = () => {
                                             </td>
                                             <td className="px-6 py-4">
                                                 <span className="inline-flex items-center px-3 py-1 rounded-lg bg-emerald-50 text-xs font-bold text-emerald-700 border border-emerald-200">
-                                                    {farm.area.toLocaleString()} sqm
+                                                    {farm.area.toLocaleString()} {areaUnit}
                                                 </span>
                                             </td>
                                         </tr>
