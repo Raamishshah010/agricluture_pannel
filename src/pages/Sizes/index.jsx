@@ -734,7 +734,7 @@ const Sizes = () => {
                                     <PolarGrid stroke="#e5e7eb" />
                                     <PolarAngleAxis dataKey="emirate" tick={{ fontSize: 10, fill: '#6b7280' }} />
                                     <PolarRadiusAxis angle={90} tick={{ fontSize: 10 }} />
-                                    <Radar name="Avg Size" dataKey="avgSize" stroke="#10B981" fill="#10B981" fillOpacity={0.5} />
+                                    <Radar name={t('sizes.avgFarmSize')} dataKey="avgSize" stroke="#10B981" fill="#10B981" fillOpacity={0.5} />
                                     <Tooltip content={<CustomTooltip />} />
                                 </RadarChart>
                             </ResponsiveContainer>

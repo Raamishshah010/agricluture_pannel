@@ -185,7 +185,7 @@ export default function Index(props) {
             'Emirate\nالإمارة',
             'Center\nالمركز',
             'Location\nالموقع',
-            'Size\nالحجم',
+            'Area\nالمساحة',
             'Status\nالحالة'
         ];
 
@@ -264,7 +264,7 @@ export default function Index(props) {
                 'Emirate | الإمارة': getEmirateName(farm.emirate) || '',
                 'Center | المركز': getCenterName(farm.serviceCenter) || '',
                 'Location | الموقع': getLocationName(farm.location) || '',
-                'Size | الحجم': farm.size ? Math.round(farm.size).toString() : '',
+                'Area | المساحة': farm.size ? Math.round(farm.size).toString() : '',
                 'Status | الحالة': farm.status || ''
             }))
         );
@@ -286,7 +286,7 @@ export default function Index(props) {
             'Emirate | الإمارة',
             'Center | المركز',
             'Location | الموقع',
-            'Size | الحجم',
+            'Area | المساحة',
             'Status | الحالة'
         ];
 

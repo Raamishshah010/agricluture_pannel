@@ -51,14 +51,14 @@
     "deleteSelected": "حذف المحددين"
   },
   "sizes": {
-    "title": "إجمالي مسارات المزارع المسجلة في الإمارات!",
-    "farmSizes": "أحجام المزارع",
+    "title": "إجمالي مساحات المزارع المسجلة في الإمارات!",
+    "farmSizes": "مساحات المزارع",
     "downloadReport": "تنزيل التقرير",
     "filterTitle": "المرشحات",
     "clearAll": "مسح الكل",
-    "avgFarmSize": "متوسط الحجم",
-    "medianSize": "الحجم الوسيط",
-    "mostCommonRange": "نطاق الحجم الأكثر شيوعًا",
+    "avgFarmSize": "متوسط المساحة",
+    "medianSize": "المساحة الوسيطة",
+    "mostCommonRange": "نطاق المساحة الأكثر شيوعًا",
     "farmsInCommonRange": "المزارع في النطاق الأكثر شيوعًا",
     "ranges": {
       "from0To500": "0-500",
@@ -69,7 +69,7 @@
       "above2500": "2500+"
     },
     "export": {
-      "title": "لوحة تحليلات أحجام المزارع",
+      "title": "لوحة تحليلات المساحات",
       "generatedOn": "تم إنشاؤه في:",
       "filtersApplied": "المرشحات المطبقة:",
       "metric": "المؤشر",
@@ -83,8 +83,8 @@
       "exporting": "جارٍ التصدير..."
     },
     "map": {
-      "sizeLabel": "الحجم",
-      "unit": "فدان",
+      "sizeLabel": "المساحة",
+      "unit": "متر²",
       "rangeLabel": "النطاق",
       "coordinatesLabel": "الإحداثيات",
       "viewDetails": "عرض التفاصيل"
@@ -622,7 +622,7 @@
     "farmProperties": "خصائص المزرعة",
     "farmSerial": "مسلسل المزرعة",
     "accountNo": "رقم الحساب",
-    "size": "الحجم",
+    "size": "المساحة",
     "possessionStyle": "أسلوب الاستحواذ",
     "farmingSystem": "نظام الزراعة",
     "landUseDistribution": "توزيع استخدامات الأراضي",
@@ -699,7 +699,7 @@
       "back": "رجوع",
       "farms": "المزارع",
       "name": "الاسم",
-      "size": "الحجم",
+      "size": "المساحة",
       "createdAt": "تاريخ الإنشاء",
       "actions": "الإجراءات",
       "viewDetails": "عرض التفاصيل",
@@ -1173,7 +1173,7 @@
       "emirate": "الإمارة",
       "center": "المركز",
       "location": "الموقع",
-      "size": "الحجم",
+      "size": "المساحة",
       "status": "الحالة",
       "actions": "الإجراءات",
       "assignCoder": "تعيين المبرمج",

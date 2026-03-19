@@ -1,6 +1,7 @@
 import React from 'react';
 import { MapPin, User, Droplet, Sprout, Calendar, FileText, Map, CheckCircle, XCircle, ArrowLeft, Users, TreePine, Home } from 'lucide-react';
 import useStore from '../../store/store';
+import useTranslation from '../../hooks/useTranslation';
 
 const FarmDetails = ({ farm, handleBack }) => {
     const {
@@ -12,6 +13,7 @@ const FarmDetails = ({ farm, handleBack }) => {
         language: lang
     } = useStore((state) => state);
     const isLTR = lang.includes('en');
+    const t = useTranslation();
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
@@ -178,7 +180,7 @@ const FarmDetails = ({ farm, handleBack }) => {
                     <InfoCard icon={Home} title={isLTR ? "Farm Properties" : "خصائص المزرعة"} gradient="from-green-50 to-lime-50">
                         <InfoRow label={isLTR ? "Farm Serial" : "مسلسل المزرعة"} value={farm.farmSerial} />
                         <InfoRow label={isLTR ? `Account No` : `رقم الحساب`} value={farm.accountNo} />
-                        <InfoRow label={isLTR ? `Size` : `الحجم`} value={`${Math.round(farm.size)} ha`} />
+                        <InfoRow label={t('size')} value={`${Math.round(farm.size)} ha`} />
                         <InfoRow label={isLTR ? `Possession Style` : `أسلوب الاستحواذ`} value={isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic} />
                         <InfoRow label={isLTR ? `Farming System` : `نظام الزراعة`} value={farm.farmingSystem?.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ')} />
                     </InfoCard>

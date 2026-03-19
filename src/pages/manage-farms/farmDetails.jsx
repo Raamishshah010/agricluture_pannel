@@ -613,7 +613,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             [isLTR ? 'Farm Serial' : 'مسلسل المزرعة', farm.farmSerial],
             [isLTR ? 'Status' : 'الحالة', farm.status],
             [isLTR ? 'Total Area' : 'المساحة الإجمالية', `${Math.round(farm.totalArea)} ${isLTR ? 'ha' : 'هكتار'}`],
-            [isLTR ? 'Size' : 'الحجم', `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
+            [t('farmCodingDetails.size'), `${Math.round(farm.size)} ${isLTR ? 'ha' : 'هكتار'}`],
             [isLTR ? 'Possession Style' : 'أسلوب الاستحواذ', getPossessionStyleName()],
             [isLTR ? 'Farming System' : 'نظام الزراعة', getFarmingSystemNames()],
             [isLTR ? 'Workers' : 'العمال', farm.noOfWorkers || 0],

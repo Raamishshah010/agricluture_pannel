@@ -285,7 +285,7 @@ const FarmDetails = ({ farm, handleBack }) => {
                             }
                             valueClass={farm.updatingData && farm.updatingData.accountNo ? 'text-orange-600 font-semibold' : ''}
                         />
-                        <InfoRow label={isLTR ? `Size` : `الحجم`} value={`${Math.round(farm.size)} ha`} />
+                        <InfoRow label={t('size')} value={`${Math.round(farm.size)} ha`} />
                         <InfoRow
                             label={isLTR ? `Possession Style` : `أسلوب الاستحواذ`}
                             value={

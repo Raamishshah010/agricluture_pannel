@@ -116,7 +116,7 @@
     "selectGreenhouseType": "Select Greenhouse Type",
     "selectCoverType": "Select Cover Type",
     "avgAreaPerGreenhouse": "Avg Area Per Greenhouse",
-    "title": "Farm Size Dashboard",
+    "title": "Farm Area Dashboard",
     "other": "Other"
   },
   "status": {
@@ -273,7 +273,7 @@
       "emirate": "Emirate",
       "center": "Center",
       "location": "Location",
-      "size": "Size",
+      "size": "Area",
       "status": "Status",
       "actions": "Actions",
       "assignCoder": "Assign Coder",
@@ -302,8 +302,8 @@
       "pdf": "PDF Format",
       "pdfHint": "Printable document"
     },
-    "minSize": "Min Size",
-    "maxSize": "Max Size"
+    "minSize": "Min Area",
+    "maxSize": "Max Area"
   },
   "overview": {
     "selectEmirate": "Select Emirate",
@@ -440,7 +440,7 @@
         "analytics": "Analytics",
         "overview": "Overview",
         "emirates": "Emirates",
-        "sizes": "Sizes",
+        "sizes": "Areas",
         "crops": "Crops",
         "greenhouses": "Greenhouses",
         "farmAnalytics": "Farm Analytics",
@@ -589,7 +589,7 @@
     "coderInformation": "Coder Information",
     "relatedFarms": "Related Farms",
     "farmLocation": "Farm Location",
-    "farmSize": "Farm Size",
+    "farmSize": "Farm Area",
     "active": "Active",
     "noFarmsAssigned": "No Farms Assigned",
     "noFarmsAvailable": "No Farms Available",
@@ -632,7 +632,7 @@
     "farmProperties": "Farm Properties",
     "farmSerial": "Farm Serial",
     "accountNo": "Account No",
-    "size": "Size",
+    "size": "Area",
     "possessionStyle": "Possession Style",
     "farmingSystem": "Farming System",
     "landUseDistribution": "Land Use Distribution",
@@ -709,7 +709,7 @@
       "back": "Back",
       "farms": "Farms",
       "name": "Name",
-      "size": "Size",
+        "size": "Area",
       "createdAt": "Created At",
       "actions": "Actions",
       "viewDetails": "View Details",

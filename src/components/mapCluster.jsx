@@ -68,7 +68,7 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
                             ${farm.farmName}
                         </h3>
                         <p style="margin: 4px 0; color: #374151; font-size: 14px;">
-                            <strong>Size:</strong> ${farm.totalArea || 'N/A'} acres
+                            <strong>${t('sizes.map.sizeLabel')}:</strong> ${farm.totalArea || t('nA')} ${t('sizes.map.unit')}
                         </p>
                         <p style="margin: 4px 0; color: #6b7280; font-size: 12px;">
                             Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}
