@@ -154,7 +154,7 @@ export default function Index(props) {
   };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
+    if (!dateString) return t('common.nA');
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
@@ -306,9 +306,9 @@ const downloadPDF = async () => {
         [t("farmers.image")]: farmer.image
           ? t("farmers.imageAvailable")
           : t("farmers.noImage"),
-        [t("farmers.name")]: farmer.name || t("farmers.noData"),
-        [t("farmers.phoneNumber")]: farmer.phoneNumber || t("farmers.noData"),
-        [t("farmers.emirateId")]: farmer.emirateId || t("farmers.noData"),
+        [t("farmers.name")]: farmer.name || t('common.nA'),
+        [t("farmers.phoneNumber")]: farmer.phoneNumber || t('common.nA'),
+        [t("farmers.emirateId")]: farmer.emirateId || t('common.nA'),
         [t("farmers.createdAt")]: formatDate(farmer.createdAt),
       })),
     );

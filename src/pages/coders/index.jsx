@@ -889,7 +889,7 @@ const downloadPDF = () => {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.emirateId")}</label>
-                      <p className="text-gray-900 font-medium">{selectedCoder.emirateId || "N/A"}</p>
+                      <p className="text-gray-900 font-medium">{selectedCoder.emirateId || t('common.nA')}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.email")}</label>
@@ -897,7 +897,7 @@ const downloadPDF = () => {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.phoneNumber")}</label>
-                      <p className="text-gray-900 font-medium">{selectedCoder.phoneNumber || "N/A"}</p>
+                      <p className="text-gray-900 font-medium">{selectedCoder.phoneNumber || t('common.nA')}</p>
                     </div>
                     <div className="md:col-span-2">
                       <label className="text-sm font-medium text-gray-600">{t("coders.createdAt")}</label>
@@ -921,10 +921,10 @@ const downloadPDF = () => {
                               <div>
                                 <h4 className="font-medium text-gray-900">{farmer.name}</h4>
                                 <p className="text-sm text-gray-600 mt-1">
-                                  {t("coders.farmLocation")}: {farmer.location || "N/A"}
+                                  {t("coders.farmLocation")}: {farmer.location || t('common.nA')}
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  {t("coders.farmSize")}: {farmer.size || "N/A"}
+                                  {t("coders.farmSize")}: {farmer.size || t('common.nA')}
                                 </p>
                               </div>
                               <div className="flex items-center gap-2">
