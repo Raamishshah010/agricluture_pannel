@@ -28,7 +28,7 @@ const loadGoogleMapsScript = (includeDrawing = false) => {
 
     const script = document.createElement('script');
     const libraries = includeDrawing ? '&libraries=drawing' : '';
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}${libraries}`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&loading=async${libraries}`;
     script.async = true;
     script.defer = true;
     

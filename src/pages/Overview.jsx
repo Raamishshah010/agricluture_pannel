@@ -15,7 +15,7 @@ const Overview = () => {
   const [isExpanded] = useState(false);
   const [categories, setCategories] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
-  const { farms, emirates, centers, locations, irrigationSystems, farmingSystems, language: lang } = useStore(st => st);
+  const { farms, emirates, centers, locations, irrigationSystems, farmingSystems, dashboardLoading, language: lang } = useStore(st => st);
   const [emirate, setEmirate] = useState(null);
   const [center, setCenter] = useState(null);
   const [selectedFarm, setSelectedFarm] = useState(null);
@@ -364,6 +364,60 @@ const Overview = () => {
   };
 
   const activeFiltersCount = [emirate, center, location, irrigationSystem, farmingSystem].filter(Boolean).length;
+  const isMasterDataLoading = dashboardLoading.masterData;
+  const isFarmsLoading = dashboardLoading.farms;
+
+  if (activeTab.includes('overview') && (isMasterDataLoading || isFarmsLoading)) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100 animate-pulse">
+        <div className="bg-white/90 backdrop-blur-2xl border-b border-gray-200/70 shadow-lg sticky top-0 z-50">
+          <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="h-8 w-64 rounded-xl bg-gray-200" />
+              <div className="h-10 w-32 rounded-xl bg-gray-200" />
+            </div>
+            <div className="flex flex-wrap gap-3 items-center">
+              <div className="h-11 w-48 rounded-xl bg-gray-200" />
+              <div className="h-11 w-40 rounded-xl bg-gray-200" />
+              <div className="h-11 w-40 rounded-xl bg-gray-200" />
+              <div className="h-11 w-44 rounded-xl bg-gray-200" />
+              <div className="h-11 w-44 rounded-xl bg-gray-200" />
+            </div>
+          </div>
+        </div>
+
+        <div className="flex flex-col lg:flex-row min-h-[calc(100vh-140px)]">
+          <div className="flex-1 p-4 sm:p-6 lg:p-8 space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <div className="h-36 rounded-3xl bg-white shadow-sm border border-gray-100" />
+              <div className="h-36 rounded-3xl bg-white shadow-sm border border-gray-100" />
+            </div>
+            <div className="rounded-3xl bg-white shadow-xl border border-gray-100 overflow-hidden">
+              <div className="p-5 border-b border-gray-100 bg-gray-50">
+                <div className="h-6 w-44 rounded-lg bg-gray-200" />
+                <div className="mt-2 h-4 w-64 rounded-lg bg-gray-200" />
+              </div>
+              <div className="p-2">
+                <div className="h-[420px] rounded-2xl bg-gray-100" />
+              </div>
+            </div>
+          </div>
+
+          <div className="w-full lg:w-[440px] xl:w-[500px] bg-gradient-to-b from-white/60 to-gray-50/60 backdrop-blur-xl border-l border-gray-200/70 p-5 sm:p-6 lg:p-8 space-y-6">
+            <div className="h-32 rounded-3xl bg-white/90 shadow-sm border border-gray-100" />
+            <div className="space-y-5">
+              <div className="h-8 w-56 rounded-lg bg-gray-200" />
+              <div className="space-y-4">
+                <div className="h-32 rounded-2xl bg-white shadow-sm border border-gray-100" />
+                <div className="h-32 rounded-2xl bg-white shadow-sm border border-gray-100" />
+                <div className="h-32 rounded-2xl bg-white shadow-sm border border-gray-100" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return activeTab.includes("overview") ? (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100">

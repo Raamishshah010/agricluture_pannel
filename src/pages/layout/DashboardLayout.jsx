@@ -1,47 +1,49 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight, BarChart3, MapPin, Layers, Wheat, TrendingUp, Settings, HelpCircle, User, Globe, X, Maximize2, Search, Bell, TrendingUpDown, Grid2X2Plus, List, Newspaper, Users, Flag, ListMusic, ShieldHalf, Footprints, ArrowUp01, Ship, SunSnow, AudioWaveform, Dam, House, LogOut, Sticker, BarChart2 } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLocation } from 'react-router-dom';
-import Overview from '../Overview';
-import Emirates from '../Emirates/index';
-import Sizes from '../Sizes/index';
 import logo from '../../assets/logo.png'
-import CropsDashboard from '../Crops/index';
-import Crops from '../master-data/crops';
-import EmiratesManagment from '../master-data/emirate';
-import Varities from '../master-data/Varieties';
-import ArticleCategories from '../articles/category';
-import SubCategories from '../articles/subCategories';
-import Articles from '../articles/articles';
-import FarmCodingRequest from '../FarmCoding';
-import AdminAdd from '../AdminAdd';
-import AdminManage from '../AdminManage';
-import Coders from '../coders';
-import Farmers from '../farmers';
-import ManageFarms from '../manage-farms';
-import Possessions from '../master-data/possession';
-import FarmingSystem from '../master-data/farmingSystem';
-import Regions from '../master-data/regions';
-import CropTypes from '../master-data/cropTypes';
-import CultivationMethods from '../master-data/cultivationMethods';
-import Locations from '../master-data/locations';
-import GreenHouseTypes from '../master-data/greenHouseTypes';
-import WaterSources from '../master-data/waterSources';
-import CourageTypes from '../master-data/courageTypes';
-import Seasons from '../master-data/seasons';
-import Centers from '../master-data/center';
-import FodderTypes from '../master-data/fodderTypes';
-import CoverTypes from '../master-data/coverTypes';
-import FruitTypes from '../master-data/fruitTypes';
-import VegetableTypes from '../master-data/vegetableTypes';
-import IrrigationSystem from '../master-data/irrigationSystem';
-import ExternalIrrigationSystem from '../master-data/externalIrrigationSystem';
 import { generateOTP } from '../../utils';
 import useStore from '../../store/store';
 import { useNavigate } from "react-router-dom";
-import LiveStocks from '../master-data/livestock';
-import GreenhouseDashboard from '../GreenhouseDashboard';
-import FarmAnalytics from '../farmsAnalytics';
+import Loader from '../../components/Loader';
+
+const Overview = lazy(() => import('../Overview'));
+const Emirates = lazy(() => import('../Emirates/index'));
+const Sizes = lazy(() => import('../Sizes/index'));
+const CropsDashboard = lazy(() => import('../Crops/index'));
+const Crops = lazy(() => import('../master-data/crops'));
+const EmiratesManagment = lazy(() => import('../master-data/emirate'));
+const Varities = lazy(() => import('../master-data/Varieties'));
+const ArticleCategories = lazy(() => import('../articles/category'));
+const SubCategories = lazy(() => import('../articles/subCategories'));
+const Articles = lazy(() => import('../articles/articles'));
+const FarmCodingRequest = lazy(() => import('../FarmCoding'));
+const AdminAdd = lazy(() => import('../AdminAdd'));
+const AdminManage = lazy(() => import('../AdminManage'));
+const Coders = lazy(() => import('../coders'));
+const Farmers = lazy(() => import('../farmers'));
+const ManageFarms = lazy(() => import('../manage-farms'));
+const Possessions = lazy(() => import('../master-data/possession'));
+const FarmingSystem = lazy(() => import('../master-data/farmingSystem'));
+const Regions = lazy(() => import('../master-data/regions'));
+const CropTypes = lazy(() => import('../master-data/cropTypes'));
+const CultivationMethods = lazy(() => import('../master-data/cultivationMethods'));
+const Locations = lazy(() => import('../master-data/locations'));
+const GreenHouseTypes = lazy(() => import('../master-data/greenHouseTypes'));
+const WaterSources = lazy(() => import('../master-data/waterSources'));
+const CourageTypes = lazy(() => import('../master-data/courageTypes'));
+const Seasons = lazy(() => import('../master-data/seasons'));
+const Centers = lazy(() => import('../master-data/center'));
+const FodderTypes = lazy(() => import('../master-data/fodderTypes'));
+const CoverTypes = lazy(() => import('../master-data/coverTypes'));
+const FruitTypes = lazy(() => import('../master-data/fruitTypes'));
+const VegetableTypes = lazy(() => import('../master-data/vegetableTypes'));
+const IrrigationSystem = lazy(() => import('../master-data/irrigationSystem'));
+const ExternalIrrigationSystem = lazy(() => import('../master-data/externalIrrigationSystem'));
+const LiveStocks = lazy(() => import('../master-data/livestock'));
+const GreenhouseDashboard = lazy(() => import('../GreenhouseDashboard'));
+const FarmAnalytics = lazy(() => import('../farmsAnalytics'));
 
 const DashboardLayout = () => {
   const t = useTranslation();
@@ -533,7 +535,9 @@ const DashboardLayout = () => {
             </div>
           </div>
         </header>
-        <MainContent />
+        <Suspense fallback={<div className="flex-1 flex items-center justify-center bg-gray-50"><Loader message={t('common.loading')} /></div>}>
+          <MainContent />
+        </Suspense>
       </div>
     </div>
   );

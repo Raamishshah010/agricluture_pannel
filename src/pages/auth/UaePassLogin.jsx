@@ -1,20 +1,17 @@
 import { Loader2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useTranslation from '../../hooks/useTranslation';
 import { API_BASE_URL } from "../../utils";
+import useStore from '../../store/store';
 
-const AUTH_BASE = "https://stg-id.uaepass.ae/idshub";
-const CLIENT_ID = "sandbox_stage";
-const SCOPES = [
-  "urn:uae:digitalid:profile:general",
-  "urn:uae:digitalid:profile:general:profileType",
-  "urn:uae:digitalid:profile:general:unifiedId",
-].join(" ");
-const ACR_VALUES = "urn:safelayer:tws:policies:authentication:level:low";
 const STATE_KEY = "uae-pass-state";
+const ENVIRONMENT_KEY = "uae-pass-environment";
 
-const CALLBACK_PATH = "/api/ue-pass/callback";
-const REDIRECT_URI = `${API_BASE_URL}${CALLBACK_PATH}`;
+const ENVIRONMENT_OPTIONS = [
+  { value: "staging", labelKey: "auth.uaePassStaging" },
+  { value: "production", labelKey: "auth.uaePassProduction" },
+];
 
 const formatValue = (value) => {
   if (value === null || value === undefined) {
@@ -53,13 +50,37 @@ const decodePayload = (encoded) => {
   return JSON.parse(window.atob(normalized));
 };
 
+const requestAuthorizationUrl = async (environment, state) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/ue-pass/authorize?environment=${encodeURIComponent(environment)}&state=${encodeURIComponent(state)}`,
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    }
+  );
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data?.message || "Unable to prepare UAE Pass authorization");
+  }
+
+  return data;
+};
+
 export const UaePassLogin = () => {
   const t = useTranslation();
+  const navigate = useNavigate();
+  const { setAdminToken } = useStore((state) => state);
   const [statusMessage, setStatusMessage] = useState(t('auth.readyToStart'));
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState("");
   const [stateMismatch, setStateMismatch] = useState(false);
+  const [selectedEnvironment, setSelectedEnvironment] = useState(
+    typeof window !== "undefined" ? window.sessionStorage.getItem(ENVIRONMENT_KEY) || "staging" : "staging"
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -78,8 +99,19 @@ export const UaePassLogin = () => {
       }
       setStateMismatch(false);
       setUserData(parsed.user);
-      setStatusMessage("User data received from the backend redirect.");
+      if (parsed.token) {
+        window.sessionStorage.setItem("adminToken", parsed.token);
+        setAdminToken(parsed.token);
+      }
+      if (parsed.environment) {
+        window.sessionStorage.setItem(ENVIRONMENT_KEY, parsed.environment);
+        setSelectedEnvironment(parsed.environment);
+      }
+      setStatusMessage(t('auth.loginCompleted'));
       setError("");
+      if (parsed.token) {
+        navigate("/dashboard", { replace: true });
+      }
     } catch (decodeError) {
       setError(t('auth.payloadDecodeFailed'));
       setStatusMessage(t('auth.payloadDecodeFailedStatus'));
@@ -89,22 +121,24 @@ export const UaePassLogin = () => {
     }
   }, []);
 
-  const handleLoginClick = () => {
+  const handleLoginClick = async (environment) => {
     setError("");
     setStatusMessage(t('auth.preparingLogin'));
+    setSelectedEnvironment(environment);
     const stateValue = generateStateValue();
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem(STATE_KEY, stateValue);
+      window.sessionStorage.setItem(ENVIRONMENT_KEY, environment);
     }
-    const params = new URLSearchParams();
-    params.set("response_type", "code");
-    params.set("client_id", CLIENT_ID);
-    params.set("scope", SCOPES);
-    params.set("state", stateValue);
-    params.set("redirect_uri", REDIRECT_URI);
-    params.set("acr_values", ACR_VALUES);
     setLoading(true);
-    window.location.href = `${AUTH_BASE}/authorize?${params.toString()}`;
+    try {
+      const { authorizationUrl } = await requestAuthorizationUrl(environment, stateValue);
+      window.location.assign(authorizationUrl);
+    } catch (requestError) {
+      setError(requestError.message);
+      setStatusMessage(t('auth.readyToStart'));
+      setLoading(false);
+    }
   };
 
   const resetFlow = () => {
@@ -115,6 +149,8 @@ export const UaePassLogin = () => {
     setLoading(false);
     if (typeof window !== "undefined") {
       window.sessionStorage.removeItem(STATE_KEY);
+      window.sessionStorage.removeItem(ENVIRONMENT_KEY);
+      setAdminToken(null);
       const cleanUrl = `${window.location.origin}${window.location.pathname}`;
       window.history.replaceState({}, "", cleanUrl);
     }
@@ -132,14 +168,36 @@ export const UaePassLogin = () => {
     <div className="min-h-screen w-full bg-slate-950 text-slate-100 flex items-center justify-center p-4">
       <div className="w-full max-w-5xl rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl p-8 space-y-6">
         <div className="space-y-2">
-          <p className="text-sm uppercase tracking-[0.4em] text-slate-400">{t('auth.uaePassDemo')}</p>
+          <p className="text-sm uppercase tracking-[0.4em] text-slate-400">{t('auth.uaePassLogin')}</p>
           <h1 className="text-3xl font-semibold text-white">{t('auth.loginWithUaePass')}</h1>
           <p className="text-slate-300 max-w-3xl">{t('auth.uaePassDescription')}</p>
         </div>
 
+        <div className="grid gap-3 md:grid-cols-2">
+          {ENVIRONMENT_OPTIONS.map((option) => {
+            const isActive = selectedEnvironment === option.value;
+
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setSelectedEnvironment(option.value)}
+                className={`rounded-2xl border px-4 py-3 text-left transition ${
+                  isActive
+                    ? "border-emerald-400 bg-emerald-400/10 text-white shadow-[0_10px_35px_rgba(16,185,129,0.15)]"
+                    : "border-white/10 bg-white/5 text-slate-300 hover:border-white/20 hover:bg-white/10"
+                }`}
+              >
+                <div className="text-xs uppercase tracking-[0.3em] text-slate-400">{t('auth.uaePassEnvironment')}</div>
+                <div className="mt-1 text-lg font-semibold">{t(option.labelKey)}</div>
+              </button>
+            );
+          })}
+        </div>
+
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <button
-            onClick={handleLoginClick}
+            onClick={() => handleLoginClick(selectedEnvironment)}
             disabled={loading}
             className="flex items-center justify-center gap-2 rounded-2xl border border-white/30 bg-gradient-to-r from-emerald-500 to-sky-500 px-6 py-3 text-lg font-semibold text-slate-950 transition hover:shadow-[0_10px_40px_rgba(16,185,129,0.35)] disabled:opacity-60 disabled:cursor-wait"
           >
@@ -147,7 +205,7 @@ export const UaePassLogin = () => {
             <span>{t('auth.loginWithUaePass')}</span>
           </button>
           <div className="text-sm text-slate-300">
-            {t('auth.redirectUri')} <span className="text-slate-50">{REDIRECT_URI}</span>
+            {t('auth.redirectUri')} <span className="text-slate-50">{API_BASE_URL}/api/ue-pass/callback</span>
           </div>
         </div>
 

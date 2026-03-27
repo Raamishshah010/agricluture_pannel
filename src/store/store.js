@@ -19,7 +19,11 @@ const useStore = create((set) => ({
     farmers: [],
     livestocks: [],
     language: 'en',
-    loading: true,
+    dashboardLoading: {
+        masterData: Boolean(sessionStorage.getItem('adminToken')),
+        farms: Boolean(sessionStorage.getItem('adminToken')),
+        farmers: Boolean(sessionStorage.getItem('adminToken')),
+    },
     adminToken: sessionStorage.getItem('adminToken'),
     setCrops: (fruitTypes) => {
         set({ ...fruitTypes });
@@ -29,10 +33,13 @@ const useStore = create((set) => ({
             language: lang
         })
     },
-    setLoading: (pay) => {
-        set({
-            loading: pay
-        })
+    setDashboardLoading: (section, value) => {
+        set((state) => ({
+            dashboardLoading: {
+                ...state.dashboardLoading,
+                [section]: value,
+            },
+        }))
     },
     setFarms: (farms) => {
         set({

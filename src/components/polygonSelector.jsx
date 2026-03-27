@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Trash2, Edit3, X, MapPin } from 'lucide-react';
+import useGoogleMaps from '../hooks/useGoogleMaps';
 import { useTranslation } from '../hooks/useTranslation';
-
-const GOOGLE_MAPS_API_KEY = 'AIzaSyAuJYLmzmglhCpBYTn0BjbJhjWYg0fPEEA';
 
 const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
   const t = useTranslation();
@@ -11,33 +10,15 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
   const [polygons, setPolygons] = useState([]);
   const [marker, setMarker] = useState(null);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
-  const [apiLoaded, setApiLoaded] = useState(false);
   const mapRef = useRef(null);
   const previewPolygonsRef = useRef([]);
+  const { apiLoaded } = useGoogleMaps(true);
   
   const validCoordinates = (coordinates &&
     typeof coordinates.lat !== 'number' &&
     typeof coordinates.lng !== 'number')
     ? { lat: Number(coordinates.lat), lng: Number(coordinates.lng) }
     : coordinates;
-
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=drawing`;
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setApiLoaded(true);
-    script.onerror = () => {
-      console.error('Failed to load Google Maps API');
-    };
-    document.head.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!apiLoaded || !mapRef.current || map || !window.google?.maps?.drawing) return;
