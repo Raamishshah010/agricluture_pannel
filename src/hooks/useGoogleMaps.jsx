@@ -7,6 +7,39 @@ let isLoading = false;
 let isLoaded = false;
 let loadPromise = null;
 
+const isGoogleMapsReady = (includeDrawing) => {
+  const maps = window.google?.maps;
+  if (!maps || typeof maps.Map !== 'function') {
+    return false;
+  }
+
+  if (!includeDrawing) {
+    return true;
+  }
+
+  return typeof maps.drawing?.DrawingManager === 'function';
+};
+
+const waitForGoogleMapsReady = (includeDrawing, timeoutMs = 15000) => new Promise((resolve, reject) => {
+  const startedAt = Date.now();
+
+  const check = () => {
+    if (isGoogleMapsReady(includeDrawing)) {
+      resolve();
+      return;
+    }
+
+    if (Date.now() - startedAt >= timeoutMs) {
+      reject(new Error('Google Maps API loaded, but the Map constructor was not ready in time'));
+      return;
+    }
+
+    window.setTimeout(check, 50);
+  };
+
+  check();
+});
+
 const loadGoogleMapsScript = (includeDrawing = false) => {
   if (isLoaded) {
     return Promise.resolve();
@@ -19,7 +52,7 @@ const loadGoogleMapsScript = (includeDrawing = false) => {
   isLoading = true;
   
   loadPromise = new Promise((resolve, reject) => {
-    if (window.google && window.google.maps) {
+    if (isGoogleMapsReady(includeDrawing)) {
       isLoaded = true;
       isLoading = false;
       resolve();
@@ -33,9 +66,17 @@ const loadGoogleMapsScript = (includeDrawing = false) => {
     script.defer = true;
     
     script.onload = () => {
-      isLoaded = true;
-      isLoading = false;
-      resolve();
+      waitForGoogleMapsReady(includeDrawing)
+        .then(() => {
+          isLoaded = true;
+          isLoading = false;
+          resolve();
+        })
+        .catch((error) => {
+          isLoading = false;
+          loadPromise = null;
+          reject(error);
+        });
     };
     
     script.onerror = () => {
