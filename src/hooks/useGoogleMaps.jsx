@@ -60,36 +60,17 @@ const loadGoogleMapsScript = (includeDrawing = false) => {
     }
 
     const script = document.createElement('script');
-    const libraries = ['marker'];
-    if (includeDrawing) {
-      libraries.push('drawing');
-    }
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&loading=async&libraries=${libraries.join(',')}`;
+    const libraries = includeDrawing ? '&libraries=drawing' : '';
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&loading=async${libraries}`;
     script.async = true;
     script.defer = true;
     
     script.onload = () => {
       waitForGoogleMapsReady(includeDrawing)
         .then(() => {
-          const importPromises = [];
-          if (typeof window.google?.maps?.importLibrary === 'function') {
-            importPromises.push(window.google.maps.importLibrary('marker'));
-            if (includeDrawing) {
-              importPromises.push(window.google.maps.importLibrary('drawing'));
-            }
-          }
-
-          Promise.all(importPromises)
-            .then(() => {
-              isLoaded = true;
-              isLoading = false;
-              resolve();
-            })
-            .catch((error) => {
-              isLoading = false;
-              loadPromise = null;
-              reject(error);
-            });
+          isLoaded = true;
+          isLoading = false;
+          resolve();
         })
         .catch((error) => {
           isLoading = false;

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Loader } from 'lucide-react';
 import useTranslation from '../../hooks/useTranslation';
-import useGoogleMaps from '../../hooks/useGoogleMaps';
 
   const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
   const t = useTranslation();
@@ -9,23 +8,9 @@ import useGoogleMaps from '../../hooks/useGoogleMaps';
   const [map, setMap] = useState(null);
   const markersRef = useRef([]);
   const markerClustererRef = useRef(null);
-  const { apiLoaded, error } = useGoogleMaps(false);
-
-  const createMarkerContent = (color) => {
-    const element = document.createElement('div');
-    element.style.width = '18px';
-    element.style.height = '18px';
-    element.style.borderRadius = '9999px';
-    element.style.background = color;
-    element.style.border = '2px solid white';
-    element.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.35)';
-    return element;
-  };
 
   // Initialize map
   useEffect(() => {
-    if (!apiLoaded || !mapRef.current || map || !window.google?.maps) return;
-
     if (mapRef.current && !map) {
       const googleMap = new window.google.maps.Map(mapRef.current, {
         center: { lat: 25.403027, lng: 55.523542 }, // Center of UAE
@@ -34,7 +19,7 @@ import useGoogleMaps from '../../hooks/useGoogleMaps';
       });
       setMap(googleMap);
     }
-  }, [apiLoaded, map]);
+  }, [map]);
 
   const ranges = [
     { id: 'from0To500', label: t('sizes.ranges.from0To500'), min: 0, max: 500 },
@@ -56,16 +41,10 @@ import useGoogleMaps from '../../hooks/useGoogleMaps';
 
   // Add markers and clustering
   useEffect(() => {
-    if (!apiLoaded || !map || !window.google?.maps || !farms || farms.length === 0) return;
+    if (!map || !window.google || !farms || farms.length === 0) return;
 
     // Clear existing markers
-    markersRef.current.forEach((marker) => {
-      if (typeof marker.setMap === 'function') {
-        marker.setMap(null);
-      } else {
-        marker.map = null;
-      }
-    });
+    markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
 
     // Clear existing clusterer
@@ -95,10 +74,17 @@ import useGoogleMaps from '../../hooks/useGoogleMaps';
       const color = rangeColors[matchedRange.id] || '#10B981';
 
       // Create marker WITHOUT map property (clusterer will handle it)
-      const marker = new window.google.maps.marker.AdvancedMarkerElement({
+      const marker = new window.google.maps.Marker({
         position: { lat, lng },
         title: farm.farmName,
-        content: createMarkerContent(color),
+        icon: {
+          path: window.google.maps.SymbolPath.CIRCLE,
+          scale: 10,
+          fillColor: color,
+          fillOpacity: 0.9,
+          strokeColor: color,
+          strokeWeight: 2,
+        }
       });
     
       // Info window content
@@ -216,29 +202,7 @@ import useGoogleMaps from '../../hooks/useGoogleMaps';
         markerClustererRef.current.setMap(null);
       }
     };
-  }, [apiLoaded, map, farms, onFarmClick]);
-
-  if (error) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center text-gray-600 px-6">
-          <div className="font-semibold text-gray-900 mb-2">{t('common.components.errorLoading')}</div>
-          <div className="text-sm">{error.message}</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!apiLoaded) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <Loader className="w-10 h-10 animate-spin mx-auto text-green-600" />
-          <div className="mt-3 text-sm text-gray-600">{t('common.components.loadingMap')}</div>
-        </div>
-      </div>
-    );
-  }
+  }, [map, farms, onFarmClick]);
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-100">

@@ -11,17 +11,6 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
     const markerClustererRef = useRef(null);
     const { apiLoaded, error } = useGoogleMaps(false);
 
-    const createMarkerContent = (color) => {
-        const element = document.createElement('div');
-        element.style.width = '18px';
-        element.style.height = '18px';
-        element.style.borderRadius = '9999px';
-        element.style.background = color;
-        element.style.border = '2px solid white';
-        element.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.35)';
-        return element;
-    };
-
     // Initialize map
     useEffect(() => {
         if (!apiLoaded || !mapRef.current || map || !window.google?.maps) {
@@ -43,13 +32,7 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
         if (!apiLoaded || !map || !window.google?.maps || !farms || farms.length === 0) return;
 
         // Clear existing markers
-        markersRef.current.forEach((marker) => {
-            if (typeof marker.setMap === 'function') {
-                marker.setMap(null);
-            } else {
-                marker.map = null;
-            }
-        });
+        markersRef.current.forEach(marker => marker.setMap(null));
         markersRef.current = [];
 
         // Clear existing clusterer
@@ -70,10 +53,17 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
             }
 
             // Create marker WITHOUT map property (clusterer will handle it)
-            const marker = new window.google.maps.marker.AdvancedMarkerElement({
+            const marker = new window.google.maps.Marker({
                 position: { lat, lng },
                 title: farm.farmName,
-                content: createMarkerContent('#10b981'),
+                icon: {
+                    path: window.google.maps.SymbolPath.CIRCLE,
+                    scale: 10,
+                    fillColor: '#10b981',
+                    fillOpacity: 0.9,
+                    strokeColor: '#059669',
+                    strokeWeight: 2,
+                }
             });
 
             // Add info window

@@ -11,17 +11,6 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
   const polygonRef = useRef(null);
   const markerRef = useRef(null);
 
-  const createMarkerContent = () => {
-    const element = document.createElement('div');
-    element.style.width = '18px';
-    element.style.height = '18px';
-    element.style.borderRadius = '9999px';
-    element.style.background = '#2563EB';
-    element.style.border = '2px solid white';
-    element.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.35)';
-    return element;
-  };
-
   const { apiLoaded } = useGoogleMaps(false);
 
   const validCoordinates = coordinates;
@@ -47,7 +36,7 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
         polygonRef.current = null;
       }
       if (markerRef.current) {
-        markerRef.current.map = null;
+        markerRef.current.setMap(null);
         markerRef.current = null;
       }
     };
@@ -61,7 +50,7 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
       polygonRef.current = null;
     }
     if (markerRef.current) {
-      markerRef.current.map = null;
+      markerRef.current.setMap(null);
       markerRef.current = null;
     }
 
@@ -98,11 +87,10 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
       }
     } else {
       // If no polygon, show center marker
-      const marker = new window.google.maps.marker.AdvancedMarkerElement({
+      const marker = new window.google.maps.Marker({
         position: validCoordinates,
         map: map,
         title: 'Location',
-        content: createMarkerContent(),
       });
       markerRef.current = marker;
     }
