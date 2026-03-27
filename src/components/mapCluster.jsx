@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MapPin, Loader } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
+import useGoogleMaps from '../hooks/useGoogleMaps';
 
 const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
     const t = useTranslation();
@@ -8,9 +9,14 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
     const [map, setMap] = useState(null);
     const markersRef = useRef([]);
     const markerClustererRef = useRef(null);
+    const { apiLoaded, error } = useGoogleMaps(false);
 
     // Initialize map
     useEffect(() => {
+        if (!apiLoaded || !mapRef.current || map || !window.google?.maps) {
+            return;
+        }
+
         if (mapRef.current && !map) {
             const googleMap = new window.google.maps.Map(mapRef.current, {
                 center: { lat: 25.403027, lng: 55.523542 }, // Center of UAE
@@ -19,11 +25,11 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
             });
             setMap(googleMap);
         }
-    }, [map]);
+    }, [apiLoaded, map]);
 
     // Add markers and clustering
     useEffect(() => {
-        if (!map || !window.google || !farms || farms.length === 0) return;
+        if (!apiLoaded || !map || !window.google?.maps || !farms || farms.length === 0) return;
 
         // Clear existing markers
         markersRef.current.forEach(marker => marker.setMap(null));
@@ -172,7 +178,29 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
                 markerClustererRef.current.setMap(null);
             }
         };
-    }, [map, farms, onFarmClick]);
+    }, [apiLoaded, map, farms, onFarmClick]);
+
+    if (error) {
+        return (
+            <div className="w-full h-screen flex items-center justify-center bg-gray-100">
+                <div className="text-center text-gray-600 px-6">
+                    <div className="font-semibold text-gray-900 mb-2">{t('common.components.errorLoading')}</div>
+                    <div className="text-sm">{error.message}</div>
+                </div>
+            </div>
+        );
+    }
+
+    if (!apiLoaded) {
+        return (
+            <div className="w-full h-screen flex items-center justify-center bg-gray-100">
+                <div className="text-center">
+                    <Loader className="w-10 h-10 animate-spin mx-auto text-green-600" />
+                    <div className="mt-3 text-sm text-gray-600">{t('common.components.loadingMap')}</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full h-screen flex flex-col bg-gray-100">
