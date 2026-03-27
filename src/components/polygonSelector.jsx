@@ -13,6 +13,17 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
   const mapRef = useRef(null);
   const previewPolygonsRef = useRef([]);
   const { apiLoaded } = useGoogleMaps(true);
+
+  const createMarkerContent = () => {
+    const element = document.createElement('div');
+    element.style.width = '18px';
+    element.style.height = '18px';
+    element.style.borderRadius = '9999px';
+    element.style.background = '#2563EB';
+    element.style.border = '2px solid white';
+    element.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.35)';
+    return element;
+  };
   
   const validCoordinates = (coordinates &&
     typeof coordinates.lat !== 'number' &&
@@ -31,10 +42,11 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
       streetViewControl: true,
     });
 
-    const defaultMarker = new window.google.maps.Marker({
+    const defaultMarker = new window.google.maps.marker.AdvancedMarkerElement({
       position: validCoordinates,
       map: googleMap,
       title: 'Location',
+      content: createMarkerContent(),
     });
 
     const drawingMgr = new window.google.maps.drawing.DrawingManager({
@@ -73,7 +85,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
       drawingMgr.setDrawingMode(null);
 
       if (defaultMarker) {
-        defaultMarker.setMap(null);
+        defaultMarker.map = null;
       }
 
       // // Hide preview polygons when drawing new one
@@ -113,7 +125,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
     previewPolygonsRef.current = [];
     if (!coords) {
       if (marker && map) {
-        marker.setMap(map);
+        marker.map = map;
       }
       return;
     }
@@ -123,7 +135,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
     if (Array.isArray(coords)) {
       if (coords.length === 0) {
         if (marker && map) {
-          marker.setMap(map);
+          marker.map = map;
         }
         return;
       }
@@ -184,7 +196,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
 
     if (hasValidPolygon) {
       if (marker) {
-        marker.setMap(null);
+        marker.map = null;
       }
 
       try {
@@ -194,7 +206,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
       }
     } else {
       if (marker && map) {
-        marker.setMap(map);
+        marker.map = map;
       }
     }
   }, [map, coords]);
