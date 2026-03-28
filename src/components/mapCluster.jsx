@@ -1,64 +1,205 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Loader } from 'lucide-react';
+import { Loader } from 'lucide-react';
 import { useTranslation } from '../hooks/useTranslation';
 import useGoogleMaps from '../hooks/useGoogleMaps';
 
-const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
+const GoogleMapWithClustering = ({ farms = [], onFarmClick }) => {
     const t = useTranslation();
+
     const mapRef = useRef(null);
     const [map, setMap] = useState(null);
     const markersRef = useRef([]);
-    const markerClustererRef = useRef(null);
+    const clustererRef = useRef(null);
+
     const { apiLoaded, error } = useGoogleMaps(false);
 
-    // Initialize map
-    useEffect(() => {
-        if (!apiLoaded || !mapRef.current || map || !window.google?.maps) {
-            return;
+    const isDev = process.env.NODE_ENV !== 'production';
+
+    /* =========================================================
+       🔢 STRING → NUMBER (ULTRA ROBUST)
+    ========================================================= */
+    const toNumber = (value) => {
+        if (value === null || value === undefined) return NaN;
+        if (typeof value === 'number') return value;
+
+        if (typeof value === 'string') {
+            const arabicMap = {
+                '\u0660': '0', '\u0661': '1', '\u0662': '2', '\u0663': '3', '\u0664': '4',
+                '\u0665': '5', '\u0666': '6', '\u0667': '7', '\u0668': '8', '\u0669': '9',
+                '\u06F0': '0', '\u06F1': '1', '\u06F2': '2', '\u06F3': '3', '\u06F4': '4',
+                '\u06F5': '5', '\u06F6': '6', '\u06F7': '7', '\u06F8': '8', '\u06F9': '9'
+            };
+
+            let s = value.trim();
+
+            // Normalize Arabic digits
+            s = s.replace(/[\u0660-\u0669\u06F0-\u06F9]/g, ch => arabicMap[ch] || ch);
+
+            // Replace Arabic comma
+            s = s.replace(/\u060C/g, ',');
+
+            // Remove trailing commas
+            s = s.replace(/,+$/, '');
+
+            // Remove invalid chars except digits, dot, minus
+            s = s.replace(/[^\d.\-]/g, '');
+
+            // ✅ FIX: multiple dots → keep first only
+            const parts = s.split('.');
+            if (parts.length > 2) {
+                s = parts[0] + '.' + parts.slice(1).join('');
+            }
+
+            return Number(s);
         }
 
-        if (mapRef.current && !map) {
-            const googleMap = new window.google.maps.Map(mapRef.current, {
-                center: { lat: 25.403027, lng: 55.523542 }, // Center of UAE
-                zoom: 9,
-                mapTypeId: 'hybrid',
-            });
-            setMap(googleMap);
+        return Number(value);
+    };
+
+    /* =========================================================
+       📍 NORMALIZE (HANDLE SCALED VALUES)
+    ========================================================= */
+    const normalizeCoord = (num, type) => {
+        if (isNaN(num)) return NaN;
+
+        const isValid = (n) => {
+            if (type === 'lat') return n >= -90 && n <= 90;
+            if (type === 'lng') return n >= -180 && n <= 180;
+            return false;
+        };
+
+        // If already valid → return
+        if (isValid(num)) return num;
+
+        // Try different scaling factors
+        const scales = [1e6, 1e5, 1e7, 1e4];
+
+        for (let scale of scales) {
+            const scaled = num / scale;
+            if (isValid(scaled)) {
+                return scaled;
+            }
         }
+
+        return NaN; // ❌ truly invalid
+    };
+    /* =========================================================
+       🧠 PARSE ANY COORD FORMAT
+    ========================================================= */
+    const parseCoords = (coords) => {
+        if (!coords) return null;
+
+        let lat, lng;
+
+        // OBJECT
+        if (typeof coords === 'object' && !Array.isArray(coords)) {
+            const maybeLat =
+                coords.lat ?? coords.latitude ?? coords.Lat ?? coords.Latitude;
+
+            const maybeLng =
+                coords.lng ?? coords.lon ?? coords.longitude ??
+                coords.Lng ?? coords.Longitude;
+
+            lat = normalizeCoord(toNumber(maybeLat), 'lat');
+            lng = normalizeCoord(toNumber(maybeLng), 'lng');
+        }
+
+        // ARRAY
+        else if (Array.isArray(coords) && coords.length >= 2) {
+            const a = normalizeCoord(toNumber(coords[0]), 'lat');
+            const b = normalizeCoord(toNumber(coords[1]), 'lng');
+
+            if (a >= -90 && a <= 90 && b >= -180 && b <= 180) {
+                lat = a; lng = b;
+            } else if (b >= -90 && b <= 90 && a >= -180 && a <= 180) {
+                lat = b; lng = a;
+            }
+        }
+
+        // STRING
+        else if (typeof coords === 'string') {
+            let s = coords.trim().replace(/\u060C/g, ',');
+
+            const parts = s.split(/[,\s]+/).filter(Boolean);
+
+            if (parts.length >= 2) {
+                const a = normalizeCoord(toNumber(parts[0]), 'lat');
+                const b = normalizeCoord(toNumber(parts[1]), 'lng');
+
+                if (a >= -90 && a <= 90 && b >= -180 && b <= 180) {
+                    lat = a; lng = b;
+                } else if (b >= -90 && b <= 90 && a >= -180 && a <= 180) {
+                    lat = b; lng = a;
+                }
+            }
+        }
+
+        // FINAL VALIDATION
+        if (
+            isNaN(lat) ||
+            isNaN(lng) ||
+            lat < -90 || lat > 90 ||
+            lng < -180 || lng > 180
+        ) {
+            return null;
+        }
+
+        return { lat, lng };
+    };
+
+    /* =========================================================
+       🗺️ INIT MAP
+    ========================================================= */
+    useEffect(() => {
+        if (!apiLoaded || !mapRef.current || map || !window.google?.maps) return;
+
+        const googleMap = new window.google.maps.Map(mapRef.current, {
+            center: { lat: 25.403027, lng: 55.523542 },
+            zoom: 8,
+            mapTypeId: 'hybrid',
+        });
+
+        setMap(googleMap);
     }, [apiLoaded, map]);
 
-    // Add markers and clustering
+    /* =========================================================
+       📍 MARKERS + CLUSTERING
+    ========================================================= */
     useEffect(() => {
-        if (!apiLoaded || !map || !window.google?.maps || !farms || farms.length === 0) return;
+        if (!apiLoaded || !map || !farms.length) return;
 
-        // Clear existing markers
-        markersRef.current.forEach(marker => marker.setMap(null));
+        // Cleanup old markers
+        markersRef.current.forEach(m => m.setMap(null));
         markersRef.current = [];
 
-        // Clear existing clusterer
-        if (markerClustererRef.current) {
-            markerClustererRef.current.clearMarkers();
-            markerClustererRef.current.setMap(null);
+        if (clustererRef.current) {
+            clustererRef.current.clearMarkers();
+            clustererRef.current.setMap(null);
         }
 
-        // Create markers for each farm (without adding to map directly)
-        const markers = farms.map(farm => {
-            const lat = Number(farm.coordinates?.lat);
-            const lng = Number(farm.coordinates?.lng);
+        const bounds = new window.google.maps.LatLngBounds();
 
-            // Skip if coordinates are invalid
-            if (isNaN(lat) || isNaN(lng)) {
-                console.warn(`Invalid coordinates for farm: ${farm.farmName}`);
+        const markers = farms.map((farm) => {
+            const parsed = parseCoords(farm.coordinates);
+
+            if (!parsed) {
+                if (isDev) {
+                    console.warn('❌ Invalid coordinates', {
+                        farm: farm.farmName,
+                        raw: farm.coordinates
+                    });
+                }
                 return null;
             }
 
-            // Create marker WITHOUT map property (clusterer will handle it)
+            const { lat, lng } = parsed;
+
             const marker = new window.google.maps.Marker({
                 position: { lat, lng },
                 title: farm.farmName,
                 icon: {
                     path: window.google.maps.SymbolPath.CIRCLE,
-                    scale: 10,
+                    scale: 9,
                     fillColor: '#10b981',
                     fillOpacity: 0.9,
                     strokeColor: '#059669',
@@ -66,37 +207,18 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
                 }
             });
 
-            // Add info window
+            bounds.extend({ lat, lng });
+
             const infoWindow = new window.google.maps.InfoWindow({
                 content: `
-                    <div style="padding: 12px; font-family: system-ui; min-width: 200px;">
-                        <h3 style="margin: 0 0 8px 0; color: #059669; font-size: 16px; font-weight: bold;">
-                            ${farm.farmName}
-                        </h3>
-                        <p style="margin: 4px 0; color: #374151; font-size: 14px;">
-                            <strong>${t('sizes.map.sizeLabel')}:</strong> ${farm.totalArea || t('nA')} ${t('sizes.map.unit')}
+                    <div style="padding:10px;min-width:200px;font-family:sans-serif">
+                        <h3 style="margin:0 0 6px;color:#059669">${farm.farmName}</h3>
+                        <p style="margin:4px 0">
+                            <b>${t('sizes.map.sizeLabel')}:</b> 
+                            ${farm.totalArea || t('nA')} ${t('sizes.map.unit')}
                         </p>
-                        <p style="margin: 4px 0; color: #6b7280; font-size: 12px;">
-                            Coordinates: ${lat.toFixed(4)}, ${lng.toFixed(4)}
-                        </p>
-                        <button 
-                            id="view-farm-${farm.id}"
-                            style="
-                                margin-top: 12px;
-                                padding: 10px 16px;
-                                background-color: #10b981;
-                                color: white;
-                                border: none;
-                                border-radius: 6px;
-                                font-size: 14px;
-                                font-weight: 500;
-                                cursor: pointer;
-                                width: 100%;
-                                transition: background-color 0.2s;
-                            "
-                            onmouseover="this.style.backgroundColor='#059669'"
-                            onmouseout="this.style.backgroundColor='#10b981'"
-                        >
+                        <button id="farm-${farm.id}" 
+                            style="margin-top:8px;padding:8px;background:#10b981;color:white;border:none;border-radius:5px;cursor:pointer;width:100%">
                             ${t('common.components.viewDetails')}
                         </button>
                     </div>
@@ -105,111 +227,69 @@ const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
 
             marker.addListener('click', () => {
                 infoWindow.open(map, marker);
-                
-                // Wait for info window to render, then add button click listener
+
                 setTimeout(() => {
-                    const button = document.getElementById(`view-farm-${farm.id}`);
-                    if (button) {
-                        button.onclick = () => {
-                            if (onFarmClick) {
-                                onFarmClick(farm);
-                            }
-                        };
-                    }
+                    const btn = document.getElementById(`farm-${farm.id}`);
+                    if (btn) btn.onclick = () => onFarmClick?.(farm);
                 }, 50);
             });
 
             return marker;
-        }).filter(marker => marker !== null);
+        }).filter(Boolean);
 
         markersRef.current = markers;
 
-        // Initialize MarkerClusterer
-        const initializeClusterer = () => {
-            if (window.markerClusterer && markers.length > 0) {
-                markerClustererRef.current = new window.markerClusterer.MarkerClusterer({
-                    map,
-                    markers,
-                    algorithm: new window.markerClusterer.SuperClusterAlgorithm({ 
-                        radius: 150, // Increased radius for better clustering
-                        maxZoom: 16  // Clusters will break apart at zoom level 16
-                    }),
-                });
-                console.log('Clusterer initialized with', markers.length, 'markers');
-            }
+        if (markers.length) {
+            map.fitBounds(bounds);
+        }
+
+        const initClusterer = () => {
+            clustererRef.current = new window.markerClusterer.MarkerClusterer({
+                map,
+                markers,
+                algorithm: new window.markerClusterer.SuperClusterAlgorithm({
+                    radius: 140,
+                    maxZoom: 16,
+                }),
+            });
         };
 
         if (window.markerClusterer) {
-            initializeClusterer();
+            initClusterer();
         } else {
-            // Check if script is already being loaded
-            const existingScript = document.querySelector('script[src*="markerclusterer"]');
-            
-            if (!existingScript) {
-                // Load MarkerClusterer library
-                const script = document.createElement('script');
-                script.src = 'https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js';
-                script.async = true;
-                script.onload = () => {
-                    console.log('MarkerClusterer library loaded');
-                    initializeClusterer();
-                };
-                script.onerror = () => {
-                    console.error('Failed to load MarkerClusterer library');
-                };
-                document.head.appendChild(script);
-            } else {
-                // Script exists, wait for it to load
-                const checkClusterer = setInterval(() => {
-                    if (window.markerClusterer) {
-                        clearInterval(checkClusterer);
-                        initializeClusterer();
-                    }
-                }, 100);
-                
-                // Timeout after 5 seconds
-                setTimeout(() => clearInterval(checkClusterer), 5000);
-            }
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js';
+            script.async = true;
+            script.onload = initClusterer;
+            document.head.appendChild(script);
         }
 
         return () => {
-            if (markerClustererRef.current) {
-                markerClustererRef.current.clearMarkers();
-                markerClustererRef.current.setMap(null);
-            }
+            clustererRef.current?.clearMarkers();
         };
+
     }, [apiLoaded, map, farms, onFarmClick]);
 
+    /* =========================================================
+       🎨 UI STATES
+    ========================================================= */
     if (error) {
         return (
-            <div className="w-full h-screen flex items-center justify-center bg-gray-100">
-                <div className="text-center text-gray-600 px-6">
-                    <div className="font-semibold text-gray-900 mb-2">{t('common.components.errorLoading')}</div>
-                    <div className="text-sm">{error.message}</div>
-                </div>
+            <div className="flex items-center justify-center h-screen text-red-600">
+                {error.message}
             </div>
         );
     }
 
     if (!apiLoaded) {
         return (
-            <div className="w-full h-screen flex items-center justify-center bg-gray-100">
-                <div className="text-center">
-                    <Loader className="w-10 h-10 animate-spin mx-auto text-green-600" />
-                    <div className="mt-3 text-sm text-gray-600">{t('common.components.loadingMap')}</div>
-                </div>
+            <div className="flex items-center justify-center h-screen">
+                <Loader className="animate-spin text-green-600" />
             </div>
         );
     }
 
-    return (
-        <div className="w-full h-screen flex flex-col bg-gray-100">
-            {/* Map Container */}
-            <div className="flex-1 relative">
-                <div ref={mapRef} className="w-full h-full" />
-            </div>
-        </div>
-    );
+    return <div ref={mapRef} className="w-full h-screen" />;
 };
 
 export default GoogleMapWithClustering;

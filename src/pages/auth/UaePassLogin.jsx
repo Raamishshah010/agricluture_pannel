@@ -86,10 +86,15 @@ export const UaePassLogin = () => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const payload = params.get("payload");
+    console.log('UAE-PASS:raw-location', window.location.href);
     if (!payload) return;
 
     try {
       const parsed = decodePayload(payload);
+      console.log('UAE-PASS:decoded-payload', parsed);
+      console.log('UAE-PASS:decoded-request', parsed.request);
+      console.log('UAE-PASS:decoded-tokenResponse', parsed.tokenResponse);
+      console.log('UAE-PASS:decoded-userResponse', parsed.userResponse);
       const storedState = window.sessionStorage.getItem(STATE_KEY);
       if (!storedState || parsed.state !== storedState) {
         setStateMismatch(true);
@@ -113,6 +118,7 @@ export const UaePassLogin = () => {
         navigate("/dashboard", { replace: true });
       }
     } catch (decodeError) {
+      console.error('UAE-PASS:payload-decode-error', decodeError);
       setError(t('auth.payloadDecodeFailed'));
       setStatusMessage(t('auth.payloadDecodeFailedStatus'));
     } finally {
