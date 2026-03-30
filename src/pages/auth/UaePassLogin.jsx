@@ -90,6 +90,21 @@ export const UaePassLogin = () => {
     console.log('UAE-PASS:raw-location', window.location.href);
     if (!payload) return;
 
+    // If a staging-admin flow started, forward the payload to the staging admin page
+    try {
+      const isStagingAdmin = window.sessionStorage.getItem('stagingAdmin');
+      const env = window.sessionStorage.getItem(ENVIRONMENT_KEY);
+      if (isStagingAdmin === 'true' || env === 'staging') {
+        // clear the flag and forward the payload to the staging admin page
+        window.sessionStorage.removeItem('stagingAdmin');
+        const forwardUrl = `${window.location.origin}/ue-pass-staging-admin?payload=${encodeURIComponent(payload)}`;
+        window.location.replace(forwardUrl);
+        return;
+      }
+    } catch (e) {
+      console.warn('Failed to forward to staging admin page', e);
+    }
+
     try {
       const parsed = decodePayload(payload);
       console.log('UAE-PASS:decoded-payload', parsed);

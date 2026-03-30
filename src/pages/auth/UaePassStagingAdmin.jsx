@@ -110,12 +110,21 @@ export const UaePassStagingAdmin = () => {
 
         // No admin token: attempt to create admin via backend API
         setStatusMessage('Creating admin account (staging)...');
+        console.log('UAE-PASS-STAGING: sending create-admin payload', receivedUser);
         const resp = await fetch(`${API_BASE_URL}/api/admin/create-from-uaepass`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(receivedUser)
         });
-        const body = await resp.json();
+        let body;
+        try {
+          body = await resp.json();
+        } catch (e) {
+          const text = await resp.text();
+          console.error('UAE-PASS-STAGING: non-json response', text);
+          throw new Error('Invalid response from server');
+        }
+        console.log('UAE-PASS-STAGING: create-admin response', resp.status, body);
         if (!resp.ok || !body.success) {
           throw new Error(body.message || 'Failed to create admin');
         }
@@ -148,6 +157,8 @@ export const UaePassStagingAdmin = () => {
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem(STATE_KEY, stateValue);
       window.sessionStorage.setItem(ENVIRONMENT_KEY, 'staging');
+      // Mark that this login flow expects the staging admin page to receive the payload
+      window.sessionStorage.setItem('stagingAdmin', 'true');
     }
     setLoading(true);
     try {
