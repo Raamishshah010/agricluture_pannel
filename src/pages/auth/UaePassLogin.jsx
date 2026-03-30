@@ -135,6 +135,26 @@ export const UaePassLogin = () => {
       if (adminToken) {
         window.sessionStorage.setItem("adminToken", adminToken);
         setAdminToken(adminToken);
+
+
+        if (appToken) {
+          window.sessionStorage.setItem('token', appToken);
+        }
+
+        if (parsed.environment) {
+          window.sessionStorage.setItem(ENVIRONMENT_KEY, parsed.environment);
+          setSelectedEnvironment(parsed.environment);
+        }
+
+        setStatusMessage(t('auth.loginCompleted'));
+        setError("");
+
+        // Navigate to dashboard only when admin token is present
+        if (adminToken) {
+          navigate("/dashboard", { replace: true });
+        }
+
+
       } else {
         // ensure adminToken cleared if present
         window.sessionStorage.removeItem('adminToken');
@@ -147,22 +167,7 @@ export const UaePassLogin = () => {
         setStatusMessage(notAdminStatus);
       }
 
-      if (appToken) {
-        window.sessionStorage.setItem('token', appToken);
-      }
 
-      if (parsed.environment) {
-        window.sessionStorage.setItem(ENVIRONMENT_KEY, parsed.environment);
-        setSelectedEnvironment(parsed.environment);
-      }
-
-      setStatusMessage(t('auth.loginCompleted'));
-      setError("");
-
-      // Navigate to dashboard only when admin token is present
-      if (adminToken) {
-        navigate("/dashboard", { replace: true });
-      }
     } catch (decodeError) {
       console.error('UAE-PASS:payload-decode-error', decodeError);
       setError(t('auth.payloadDecodeFailed'));
@@ -239,11 +244,10 @@ export const UaePassLogin = () => {
                 key={option.value}
                 type="button"
                 onClick={() => setSelectedEnvironment(option.value)}
-                className={`rounded-2xl border px-4 py-3 text-left transition ${
-                  isActive
+                className={`rounded-2xl border px-4 py-3 text-left transition ${isActive
                     ? "border-emerald-400 bg-emerald-400/10 text-white shadow-[0_10px_35px_rgba(16,185,129,0.15)]"
                     : "border-white/10 bg-white/5 text-slate-300 hover:border-white/20 hover:bg-white/10"
-                }`}
+                  }`}
               >
                 <div className="text-xs uppercase tracking-[0.3em] text-slate-400">{t('auth.uaePassEnvironment')}</div>
                 <div className="mt-1 text-lg font-semibold">{t(option.labelKey)}</div>
