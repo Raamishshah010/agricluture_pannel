@@ -16,7 +16,7 @@ import { toast } from "react-toastify";
 
 
 function App() {
-  const { setCrops, setFarms, setFarmers, setDashboardLoading, adminToken, setAdminToken } = useStore((state) => state);
+  const { setCrops, setFarms, setFarmers, setDashboardLoading, adminToken, setAdminToken, setAdmin } = useStore((state) => state);
   useEffect(() => {
     if (!adminToken) {
       const token = sessionStorage.getItem('adminToken');
@@ -39,6 +39,17 @@ function App() {
         toast.error(err.message);
       } finally {
         setDashboardLoading('masterData', false);
+      }
+    };
+
+    const loadCurrentAdmin = async () => {
+      try {
+        const resp = await service.getCurrentAdmin();
+        if (resp && resp.admin) {
+          setAdmin(resp.admin);
+        }
+      } catch (err) {
+        console.warn('Failed to load current admin', err.message || err);
       }
     };
 
@@ -66,8 +77,8 @@ function App() {
       }
     };
 
-    void Promise.allSettled([loadMasterData(), loadFarms(), loadFarmers()]);
-  }, [adminToken, setCrops, setFarms, setFarmers, setDashboardLoading, setAdminToken]);
+    void Promise.allSettled([loadCurrentAdmin(), loadMasterData(), loadFarms(), loadFarmers()]);
+  }, [adminToken, setCrops, setFarms, setFarmers, setDashboardLoading, setAdminToken, setAdmin]);
   return (
     <Router>
       <Routes>

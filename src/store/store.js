@@ -25,6 +25,7 @@ const useStore = create((set) => ({
         farmers: Boolean(sessionStorage.getItem('adminToken')),
     },
     adminToken: sessionStorage.getItem('adminToken'),
+    admin: (typeof window !== 'undefined' && sessionStorage.getItem('admin')) ? JSON.parse(sessionStorage.getItem('admin')) : null,
     setCrops: (fruitTypes) => {
         set({ ...fruitTypes });
     },
@@ -55,6 +56,14 @@ const useStore = create((set) => ({
         set({
             adminToken: token
         })
+    }
+    ,
+    setAdmin: (admin) => {
+        if (typeof window !== 'undefined') {
+            if (admin) sessionStorage.setItem('admin', JSON.stringify(admin));
+            else sessionStorage.removeItem('admin');
+        }
+        set({ admin });
     }
 }));
 

@@ -50,7 +50,7 @@ const DashboardLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [farmsNumber, setFarmsNumber] = useState(1);
-  const { language, setLanguage, setAdminToken } = useStore(st => st);
+  const { language, setLanguage, setAdminToken, admin } = useStore(st => st);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -444,10 +444,13 @@ const DashboardLayout = () => {
                 <div className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
                   <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 text-gray-600" />
                 </div>
-                {!sidebarCollapsed && (
+                    {!sidebarCollapsed && (
                   <div className="flex-1 min-w-0">
                     <p className={`text-xs sm:text-sm md:text-base font-medium text-gray-800 truncate ${isRTL ? 'text-right' : 'text-left'}`}>
-                      {t('common.components.dashboard.adminName')}
+                      {(() => {
+                        if (!admin) return t('common.components.dashboard.adminName');
+                        return admin.name || admin.givenName || `${(admin.givenName || '').trim()} ${(admin.familyName || '').trim()}`.trim() || admin.email || t('common.components.dashboard.adminName');
+                      })()}
                     </p>
                     <p className={`text-[10px] sm:text-xs text-gray-500 truncate hidden sm:block ${isRTL ? 'text-right' : 'text-left'}`}>
                       {t('common.components.dashboard.adminRole')}
@@ -499,13 +502,21 @@ const DashboardLayout = () => {
         <header className="bg-white border-b px-2 md:px-6 py-2 md:py-3">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full gap-2 md:gap-0">
             <div className="flex flex-col">
-              <h1 className={`text-lg md:text-2xl font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
-                {t('common.components.dashboard.greeting')} <span className="inline-block">👋</span>
-              </h1>
-              <p className={`text-xs md:text-[14px] text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
-                {t('common.components.dashboard.welcome')}
-              </p>
-            </div>
+                  {(() => {
+                    const adminName = admin ? (admin.name || admin.givenName || `${(admin.givenName || '').trim()} ${(admin.familyName || '').trim()}`.trim() || admin.email) : null;
+                    return (
+                      <>
+                        <h1 className={`text-lg md:text-2xl font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          {t('common.components.dashboard.greeting')}{' '}
+                          {adminName ? <span className="ml-2 inline-block">{adminName}</span> : <span className="inline-block">👋</span>}
+                        </h1>
+                        <p className={`text-xs md:text-[14px] text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
+                          {t('common.components.dashboard.welcome')}
+                        </p>
+                      </>
+                    );
+                  })()}
+                </div>
             <div className={`flex items-center gap-2 md:gap-4 mt-2 md:mt-0 w-40 md:w-auto flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
               <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
                 <Search className="w-5 h-5 text-gray-700" />

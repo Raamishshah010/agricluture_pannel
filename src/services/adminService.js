@@ -38,6 +38,10 @@ export const adminService = {
     const response = await apiClient.delete(`/api/admin/admins/${id}`);
     return response.data;
   },
+  getCurrentAdmin: async () => {
+    const response = await apiClient.get('/api/admin/me');
+    return response.data;
+  },
 };
 
 export default adminService;

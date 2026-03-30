@@ -68,7 +68,7 @@ const requestAuthorizationUrl = async (environment, state) => {
 export const UaePassStagingAdmin = () => {
   const t = useTranslation();
   const navigate = useNavigate();
-  const { setAdminToken } = useStore((state) => state);
+  const { setAdminToken, setAdmin } = useStore((state) => state);
   const [statusMessage, setStatusMessage] = useState(t('auth.readyToStart'));
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -133,6 +133,7 @@ export const UaePassStagingAdmin = () => {
         if (token) {
           window.sessionStorage.setItem('adminToken', token);
           setAdminToken(token);
+          if (body.admin) setAdmin(body.admin);
           setStatusMessage('Admin created and signed in');
           navigate('/dashboard', { replace: true });
           return;

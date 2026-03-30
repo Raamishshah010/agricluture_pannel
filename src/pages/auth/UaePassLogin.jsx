@@ -126,7 +126,7 @@ export const UaePassLogin = () => {
 
       // Determine tokens: adminToken (for admin panel) and appToken (for app/mobile)
       const adminToken = parsed.adminToken || parsed.token || null;
-      const appToken = parsed.appToken || parsed.appToken || null;
+      const appToken = parsed.appToken || null;
 
       if (adminToken) {
         window.sessionStorage.setItem("adminToken", adminToken);
