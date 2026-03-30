@@ -158,7 +158,6 @@ export const UaePassStagingAdmin = () => {
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem(STATE_KEY, stateValue);
       window.sessionStorage.setItem(ENVIRONMENT_KEY, 'staging');
-      // Mark that this login flow expects the staging admin page to receive the payload
       window.sessionStorage.setItem('stagingAdmin', 'true');
     }
     setLoading(true);

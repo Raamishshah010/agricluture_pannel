@@ -90,23 +90,27 @@ export const UaePassLogin = () => {
     console.log('UAE-PASS:raw-location', window.location.href);
     if (!payload) return;
 
-    // If a staging-admin flow started, forward the payload to the staging admin page
-    try {
-      const isStagingAdmin = window.sessionStorage.getItem('stagingAdmin');
-      const env = window.sessionStorage.getItem(ENVIRONMENT_KEY);
-      if (isStagingAdmin === 'true' || env === 'staging') {
-        // clear the flag and forward the payload to the staging admin page
-        window.sessionStorage.removeItem('stagingAdmin');
-        const forwardUrl = `${window.location.origin}/ue-pass-staging-admin?payload=${encodeURIComponent(payload)}`;
-        window.location.replace(forwardUrl);
-        return;
-      }
-    } catch (e) {
-      console.warn('Failed to forward to staging admin page', e);
-    }
+    // NOTE: Do not forward based on possibly-stale session storage environment.
+    // We will perform forwarding only after decoding the payload and when an
+    // explicit `stagingAdmin` flag is set. This prevents accidental forwarding
+    // when a previous session left `uae-pass-environment` as 'staging'.
 
     try {
       const parsed = decodePayload(payload);
+
+      // If a staging-admin flow started, forward the payload to the staging admin page
+      try {
+        const isStagingAdmin = window.sessionStorage.getItem('stagingAdmin');
+        if (isStagingAdmin === 'true' && parsed.environment === 'staging') {
+          // clear the flag and forward the payload to the staging admin page
+          window.sessionStorage.removeItem('stagingAdmin');
+          const forwardUrl = `${window.location.origin}/ue-pass-staging-admin?payload=${encodeURIComponent(payload)}`;
+          window.location.replace(forwardUrl);
+          return;
+        }
+      } catch (e) {
+        console.warn('Failed to forward to staging admin page', e);
+      }
       console.log('UAE-PASS:decoded-payload', parsed);
       console.log('UAE-PASS:decoded-request', parsed.request);
       console.log('UAE-PASS:decoded-tokenResponse', parsed.tokenResponse);
