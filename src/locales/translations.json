@@ -819,6 +819,9 @@
     "startOver": "Start over",
     "readyToStart": "Ready to start the handshake"
   },
+    ,
+    "notAdmin": "You are not registered as an admin for this dashboard.",
+    "notAdminStatus": "Access to admin dashboard denied."
   "reset": {
     "title": "Reset Password",
     "description": "Create a new password for your account.",

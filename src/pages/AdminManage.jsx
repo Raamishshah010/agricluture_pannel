@@ -54,18 +54,28 @@ export default function AdminManage() {
       setAdmins(prev => {
         if (!updatedAdmin) return prev;
 
+        const uid = updatedAdmin.id || updatedAdmin._id || (typeof updatedAdmin === 'string' ? updatedAdmin : null);
+
         if (isEdit) {
-          return prev.map(a =>
-            a.id === updatedAdmin.id ? updatedAdmin : a
-          );
+          return prev.map(a => {
+            const aid = a.id || a._id;
+            if (!aid || !uid) return a;
+            return (String(aid) === String(uid)) ? { ...a, ...updatedAdmin } : a;
+          });
         }
 
-        if (prev.some(a => a.id === updatedAdmin.id)) return prev;
+        if (prev.some(a => {
+          const aid = a.id || a._id;
+          return aid && uid && String(aid) === String(uid);
+        })) return prev;
 
-        return [...prev, updatedAdmin];
+        // ensure new admin has an `id` field
+        const newAdmin = { ...(updatedAdmin || {}), id: updatedAdmin.id || updatedAdmin._id };
+        return [...prev, newAdmin];
       });
 
-      navigate(location.pathname, { replace: true, state: {} });
+      // replace current history entry and clear state
+      navigate(location.pathname, { replace: true, state: null });
     }
   }, [location, navigate]);
 

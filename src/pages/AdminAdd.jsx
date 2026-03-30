@@ -58,7 +58,11 @@ export default function AdminAdd() {
     try {
       if (editAdmin && editAdmin.id) {
         const saved = await adminService.updateAdmin(editAdmin.id, payload);
-        savedItem = saved || { id: editAdmin.id, ...payload };
+        // normalize response shape (some APIs return { admin: {...} })
+        let savedAdmin = saved;
+        if (saved && saved.admin) savedAdmin = saved.admin;
+        if (savedAdmin && savedAdmin._id && !savedAdmin.id) savedAdmin.id = savedAdmin._id;
+        savedItem = savedAdmin || { id: editAdmin.id, ...payload };
         // best-effort local update
         try {
           const raw = localStorage.getItem('admins');
@@ -68,7 +72,10 @@ export default function AdminAdd() {
         } catch (e) {}
       } else {
         const saved = await adminService.createAdmin(payload);
-        savedItem = saved || { id: Date.now(), ...payload };
+        let savedAdmin = saved;
+        if (saved && saved.admin) savedAdmin = saved.admin;
+        if (savedAdmin && savedAdmin._id && !savedAdmin.id) savedAdmin.id = savedAdmin._id;
+        savedItem = savedAdmin || { id: Date.now(), ...payload };
         try {
           const raw = localStorage.getItem('admins');
           const arr = raw ? JSON.parse(raw) : [];
@@ -84,7 +91,7 @@ export default function AdminAdd() {
         const raw = localStorage.getItem('admins');
         const arr = raw ? JSON.parse(raw) : [];
         if (editAdmin && editAdmin.id) {
-          const updated = arr.map(a => a.id === editAdmin.id ? ({ id: editAdmin.id, ...payload }) : a);
+          const updated = arr.map(a => (a.id === editAdmin.id || a._id === editAdmin.id) ? ({ id: editAdmin.id, ...payload }) : a);
           savedItem = { id: editAdmin.id, ...payload };
           localStorage.setItem('admins', JSON.stringify(updated));
         } else {
