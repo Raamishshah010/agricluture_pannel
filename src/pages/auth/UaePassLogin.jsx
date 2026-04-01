@@ -5,6 +5,7 @@ import useTranslation from '../../hooks/useTranslation';
 import { API_BASE_URL } from "../../utils";
 import useStore from '../../store/store';
 import logo from '../../assets/logo.png';
+import UaePassLogo from '../../assets/UaePassLogo';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
@@ -260,9 +261,10 @@ export const UaePassLogin = () => {
           <button
             onClick={() => handleLoginClick('staging')}
             disabled={loading}
-            className="flex items-center justify-center gap-3 rounded-full bg-black px-12 py-4 text-xl font-semibold text-white transition disabled:opacity-60 disabled:cursor-wait min-w-[340px]"
+            className="flex border border-1 border-black items-center justify-center gap-3 rounded-full bg-white px-12 py-4 text-xl font-semibold text-black shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:shadow-lg active:scale-95 active:shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-emerald-400 min-w-[340px]"
           >
-            {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : null}
+            <UaePassLogo className="h-6 w-6 shrink-0" variant="onDark" />
+            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
             <span>Sign in with UAE PASS</span>
           </button>
           <div className="hidden text-sm text-slate-300">
