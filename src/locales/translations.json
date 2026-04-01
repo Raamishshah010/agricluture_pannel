@@ -49,6 +49,8 @@
     "noAdmins": "No administrators added yet",
     "clickAddAdmin": "Click \"Add Admin\" to get started",
     "notSaved": "Not saved"
+    ,
+    "fixErrors": "Please fill required fields:"
   },
   "translation": {
     "emiratesAnalytics": "Emirates Analytics",

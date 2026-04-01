@@ -14,16 +14,29 @@ export default function AdminAdd() {
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', mobile: '', password: '', emirates: '', type: '' });
   const [loading, setLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [apiError, setApiError] = useState(null);
+  const [origData, setOrigData] = useState(null);
+  const [attemptedSave, setAttemptedSave] = useState(false);
 
   useEffect(() => {
     if (editAdmin) {
-      const [firstName, ...last] = (editAdmin.name || '').split(' ');
+      const parts = (editAdmin.name || '').toString().trim().split(/\s+/).filter(Boolean);
+      const firstName = parts[0] || '';
+      const lastName = parts.slice(1).join(' ');
       setFormData({
         firstName,
-        lastName: last.join(' '),
+        lastName,
         email: editAdmin.email || '',
         mobile: editAdmin.mobile || '',
         password: '',
+        emirates: editAdmin.emirate || '',
+        type: editAdmin.type || ''
+      });
+      setOrigData({
+        firstName,
+        lastName,
+        email: editAdmin.email || '',
+        mobile: editAdmin.mobile || '',
         emirates: editAdmin.emirate || '',
         type: editAdmin.type || ''
       });
@@ -38,12 +51,46 @@ export default function AdminAdd() {
   }, [showSuccessPopup]);
 
   const handleInputChange = (k, v) => setFormData(f => ({ ...f, [k]: v }));
+  // Clear API error whenever user edits the form
+  useEffect(() => {
+    setApiError(null);
+    // any change should reset attemptedSave so validation helper isn't shown prematurely
+    setAttemptedSave(false);
+  }, [formData.firstName, formData.lastName, formData.email, formData.mobile, formData.password, formData.emirates, formData.type]);
 
   const isFormValid = () => {
-    return formData.firstName && formData.lastName && formData.email && formData.mobile && (editAdmin ? true : formData.password) && formData.emirates && formData.type;
+    // When editing: require firstName and at least one changed field (or a new password)
+    if (editAdmin) {
+      if (!formData.firstName) return false;
+      // if we don't have original data, be conservative
+      if (!origData) return Boolean(formData.email && formData.mobile && formData.type);
+
+      const nameChanged = (`${formData.firstName} ${formData.lastName}`.trim() !== `${origData.firstName} ${origData.lastName}`.trim());
+      const emailChanged = (formData.email !== origData.email);
+      const mobileChanged = (formData.mobile !== origData.mobile);
+      const emirateChanged = (formData.emirates !== origData.emirates);
+      const typeChanged = (formData.type !== origData.type);
+      const passwordSet = Boolean(formData.password);
+
+      return nameChanged || emailChanged || mobileChanged || emirateChanged || typeChanged || passwordSet;
+    }
+    // When adding: require full data including password and last name.
+    // Required for add: firstName, lastName, email, mobile, type
+    return Boolean(formData.firstName && formData.lastName && formData.email && formData.mobile && formData.type);
+  };
+
+  const getMissingFields = () => {
+    const missing = [];
+    if (!formData.firstName) missing.push(t('admin.firstName'));
+    if (!editAdmin && !formData.lastName) missing.push(t('admin.lastName'));
+    if (!formData.email) missing.push(t('admin.emailAddress'));
+    if (!formData.mobile) missing.push(t('admin.mobileNumber'));
+    if (!formData.type) missing.push(t('admin.type'));
+    return missing;
   };
 
   const save = async () => {
+    setAttemptedSave(true);
     if (!isFormValid()) return;
     const payload = {
       name: `${formData.firstName} ${formData.lastName}`,
@@ -86,6 +133,13 @@ export default function AdminAdd() {
       setShowSuccessPopup(true);
       setTimeout(() => navigate('/dashboard/manageAdmins', { state: { updatedAdmin: savedItem, isEdit: !!editAdmin } }), 800);
     } catch (e) {
+      // surface API error for the user
+      try {
+        const msg = (e && e.response && e.response.data && (e.response.data.message || e.response.data.error)) || e.message || 'Save failed';
+        setApiError(msg);
+      } catch (err) {
+        setApiError('Save failed');
+      }
       // fallback: persist locally and navigate with created item
       try {
         const raw = localStorage.getItem('admins');
@@ -180,9 +234,27 @@ export default function AdminAdd() {
         <div className="flex items-center text-gray-500"><span className="text-sm">{t('admin.notSaved')}</span></div>
         <div className="flex space-x-3">
           <button onClick={() => navigate('/dashboard/manageAdmins')} className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg">{t('admin.cancel')}</button>
-          <button onClick={save} disabled={!isFormValid()} className="px-6 py-2 bg-green-600 text-white rounded-lg">{editAdmin ? t('admin.save') : t('admin.addAdminBtn')}</button>
+          <button
+            type="button"
+            onClick={save}
+            disabled={!isFormValid()}
+            aria-disabled={!isFormValid()}
+            className={`px-6 py-2 rounded-lg text-white ${isFormValid() ? 'bg-green-600 hover:bg-green-700' : 'bg-green-400 opacity-60 cursor-not-allowed'}`}
+          >
+            {editAdmin ? t('admin.save') : t('admin.addAdminBtn')}
+          </button>
         </div>
       </div>
+
+      {/* Validation helper (only after user tried to save) */}
+      {attemptedSave && !isFormValid() && (
+        <div className="mt-3 text-sm text-red-600">
+          {t('admin.fixErrors') || 'Please fill required fields:'} {getMissingFields().join(', ')}
+        </div>
+      )}
+      {apiError && (
+        <div className="mt-2 text-sm text-red-700">{apiError}</div>
+      )}
     </div>
   );
 }

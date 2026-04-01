@@ -22,9 +22,23 @@ export const adminService = {
     const response = await apiClient.get('/api/admin/master-data');
     return response.data;
   },
-  getAdmins: async () => {
-    const response = await apiClient.get('/api/admin/admins');
-    return response.data;
+  // cached getAdmins (30s TTL) to avoid repeated network calls when components mount/unmount
+  _cachedAdmins: null,
+  _cachedAdminsAt: 0,
+  getAdmins: async (force = false) => {
+    try {
+      const now = Date.now();
+      const ttl = 30 * 1000; // 30 seconds
+      if (!force && adminService._cachedAdmins && (now - adminService._cachedAdminsAt) < ttl) {
+        return adminService._cachedAdmins;
+      }
+      const response = await apiClient.get('/api/admin/admins');
+      adminService._cachedAdmins = response.data;
+      adminService._cachedAdminsAt = Date.now();
+      return response.data;
+    } catch (err) {
+      throw err;
+    }
   },
   createAdmin: async (payload) => {
     const response = await apiClient.post('/api/admin/admins', payload);
