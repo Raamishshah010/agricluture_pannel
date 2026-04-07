@@ -11,7 +11,7 @@ export default function AdminAdd() {
   const navigate = useNavigate();
   const editAdmin = location.state && location.state.editAdmin ? location.state.editAdmin : null;
 
-  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', mobile: '', password: '', emirates: '', type: '' });
+  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', mobile: '', emirateId: '', password: '', emirates: '', type: '' });
   const [loading, setLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -28,6 +28,7 @@ export default function AdminAdd() {
         lastName,
         email: editAdmin.email || '',
         mobile: editAdmin.mobile || '',
+        emirateId: editAdmin.emirateId || editAdmin.emiratesId || editAdmin.uuid || '',
         password: '',
         emirates: editAdmin.emirate || '',
         type: editAdmin.type || ''
@@ -37,6 +38,7 @@ export default function AdminAdd() {
         lastName,
         email: editAdmin.email || '',
         mobile: editAdmin.mobile || '',
+        emirateId: editAdmin.emirateId || editAdmin.emiratesId || editAdmin.uuid || '',
         emirates: editAdmin.emirate || '',
         type: editAdmin.type || ''
       });
@@ -56,7 +58,7 @@ export default function AdminAdd() {
     setApiError(null);
     // any change should reset attemptedSave so validation helper isn't shown prematurely
     setAttemptedSave(false);
-  }, [formData.firstName, formData.lastName, formData.email, formData.mobile, formData.password, formData.emirates, formData.type]);
+  }, [formData.firstName, formData.lastName, formData.email, formData.mobile, formData.emirateId, formData.password, formData.emirates, formData.type]);
 
   const isFormValid = () => {
     // When editing: require firstName and at least one changed field (or a new password)
@@ -68,11 +70,12 @@ export default function AdminAdd() {
       const nameChanged = (`${formData.firstName} ${formData.lastName}`.trim() !== `${origData.firstName} ${origData.lastName}`.trim());
       const emailChanged = (formData.email !== origData.email);
       const mobileChanged = (formData.mobile !== origData.mobile);
+      const emirateIdChanged = (formData.emirateId !== origData.emirateId);
       const emirateChanged = (formData.emirates !== origData.emirates);
       const typeChanged = (formData.type !== origData.type);
       const passwordSet = Boolean(formData.password);
 
-      return nameChanged || emailChanged || mobileChanged || emirateChanged || typeChanged || passwordSet;
+      return nameChanged || emailChanged || mobileChanged || emirateIdChanged || emirateChanged || typeChanged || passwordSet;
     }
     // When adding: require full data including password and last name.
     // Required for add: firstName, lastName, email, mobile, type
@@ -95,6 +98,7 @@ export default function AdminAdd() {
     const payload = {
       name: `${formData.firstName} ${formData.lastName}`,
       email: formData.email,
+      emirateId: formData.emirateId,
       emirate: formData.emirates,
       type: formData.type,
       mobile: formData.mobile,
@@ -200,6 +204,16 @@ export default function AdminAdd() {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.mobileNumber')}</label>
           <input type="tel" value={formData.mobile} onChange={e => handleInputChange('mobile', e.target.value)} className="w-full px-3 py-3 border border-gray-300 rounded-lg" />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.emiratesId')}</label>
+          <input
+            type="text"
+            value={formData.emirateId}
+            onChange={e => handleInputChange('emirateId', e.target.value)}
+            placeholder={t('admin.enterEmiratesId')}
+            className="w-full px-3 py-3 border border-gray-300 rounded-lg"
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.password')}</label>

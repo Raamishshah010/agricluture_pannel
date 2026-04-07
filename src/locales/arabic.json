@@ -7,6 +7,8 @@
     "lastName": "الاسم الأخير",
     "emailAddress": "عنوان البريد الإلكتروني",
     "mobileNumber": "رقم الجوال",
+    "emiratesId": "الرقم التعريفي للإمارة",
+    "enterEmiratesId": "أدخل الرقم التعريفي للإمارة",
     "password": "كلمة المرور",
     "emirates": "الإمارات",
     "type": "النوع",

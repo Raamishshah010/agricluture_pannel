@@ -7,6 +7,8 @@
     "lastName": "Last Name",
     "emailAddress": "Email Address",
     "mobileNumber": "Mobile Number",
+    "emiratesId": "Emirates ID",
+    "enterEmiratesId": "Enter Emirates ID",
     "password": "Password",
     "emirates": "Emirates",
     "type": "Type",
