@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, Globe } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useTranslation from '../../hooks/useTranslation';
@@ -74,7 +74,7 @@ const requestAuthorizationUrl = async (environment, state) => {
 export const UaePassLogin = () => {
   const t = useTranslation();
   const navigate = useNavigate();
-  const { setAdminToken } = useStore((state) => state);
+  const { language, setLanguage, setAdminToken } = useStore((state) => state);
   const [statusMessage, setStatusMessage] = useState(t('auth.readyToStart'));
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -83,6 +83,12 @@ export const UaePassLogin = () => {
   const [selectedEnvironment, setSelectedEnvironment] = useState(
     typeof window !== "undefined" ? window.sessionStorage.getItem(ENVIRONMENT_KEY) || "staging" : "staging"
   );
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+  }, [language]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -225,6 +231,20 @@ export const UaePassLogin = () => {
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-3xl p-8 space-y-6 flex flex-col items-center">
+        <div className="w-full flex justify-end">
+          <div className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 w-fit shadow-sm space-x-3">
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="border-none bg-transparent text-gray-800 font-semibold focus:outline-none rounded-md cursor-pointer"
+              aria-label={t('auth.language')}
+            >
+              <option value="en">{t('auth.english')}</option>
+              <option value="ar">{t('auth.arabic')}</option>
+            </select>
+            <Globe className="w-4 h-4 text-gray-700" />
+          </div>
+        </div>
         <div className="space-y-2">
           <div className="flex justify-center mb-4">
             <img src={logo} alt="Mazraty Logo" className="h-48 w-auto object-contain" />
@@ -265,7 +285,7 @@ export const UaePassLogin = () => {
           >
             <UaePassLogo className="h-6 w-6 shrink-0" variant="onDark" />
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
-            <span>Sign in with UAE PASS</span>
+            <span>{t('auth.loginWithUaePass')}</span>
           </button>
           <div className="hidden text-sm text-slate-300">
             {t('auth.redirectUri')} <span className="text-slate-50">{API_BASE_URL}/api/ue-pass/callback</span>

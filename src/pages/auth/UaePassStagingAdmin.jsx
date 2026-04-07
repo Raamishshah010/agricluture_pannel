@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, Globe } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useTranslation from '../../hooks/useTranslation';
@@ -69,12 +69,18 @@ const requestAuthorizationUrl = async (environment, state) => {
 export const UaePassStagingAdmin = () => {
   const t = useTranslation();
   const navigate = useNavigate();
-  const { setAdminToken, setAdmin } = useStore((state) => state);
+  const { language, setLanguage, setAdminToken, setAdmin } = useStore((state) => state);
   const [statusMessage, setStatusMessage] = useState(t('auth.readyToStart'));
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState("");
   const [stateMismatch, setStateMismatch] = useState(false);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+  }, [language]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -110,7 +116,7 @@ export const UaePassStagingAdmin = () => {
         }
 
         // No admin token: attempt to create admin via backend API
-        setStatusMessage('Creating admin account (staging)...');
+        setStatusMessage(t('auth.creatingAdminAccount'));
         console.log('UAE-PASS-STAGING: sending create-admin payload', receivedUser);
         const resp = await fetch(`${API_BASE_URL}/api/admin/create-from-uaepass`, {
           method: 'POST',
@@ -135,7 +141,7 @@ export const UaePassStagingAdmin = () => {
           window.sessionStorage.setItem('adminToken', token);
           setAdminToken(token);
           if (body.admin) setAdmin(body.admin);
-          setStatusMessage('Admin created and signed in');
+          setStatusMessage(t('auth.adminCreatedAndSignedIn'));
           navigate('/dashboard', { replace: true });
           return;
         }
@@ -198,6 +204,20 @@ export const UaePassStagingAdmin = () => {
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center p-4">
       <div className="w-full max-w-3xl p-8 space-y-6 flex flex-col items-center">
+        <div className="w-full flex justify-end">
+          <div className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 w-fit shadow-sm space-x-3">
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="border-none bg-transparent text-gray-800 font-semibold focus:outline-none rounded-md cursor-pointer"
+              aria-label={t('auth.language')}
+            >
+              <option value="en">{t('auth.english')}</option>
+              <option value="ar">{t('auth.arabic')}</option>
+            </select>
+            <Globe className="w-4 h-4 text-gray-700" />
+          </div>
+        </div>
         <div className="space-y-2">
           <div className="flex justify-center mb-4">
             <img src={logo} alt="Mazraty Logo" className="h-48 w-auto object-contain" />
@@ -209,11 +229,11 @@ export const UaePassStagingAdmin = () => {
             onClick={startLogin}
             disabled={loading}
             className="flex border border-1 border-black items-center justify-center gap-3 rounded-full bg-white px-12 py-4 text-xl font-semibold text-black shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:shadow-lg active:scale-95 active:shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-emerald-400 min-w-[340px]"
-            aria-label="Sign in with UAE PASS (Staging)"
+            aria-label={`${t('auth.loginWithUaePass')} (${t('auth.uaePassStaging')})`}
           >
             <UaePassLogo className="h-6 w-6 shrink-0" variant="onDark" />
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
-            <span>Sign in with UAE PASS (Staging)</span>
+            <span>{`${t('auth.loginWithUaePass')} (${t('auth.uaePassStaging')})`}</span>
           </button>
         </div>
 

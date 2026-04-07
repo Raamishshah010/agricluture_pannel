@@ -9,10 +9,18 @@ export default function AdminManage() {
   const t = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const emiratesIdLabel = t('farms.emiratesId');
 
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+
+  const getAdminEmiratesId = (admin) =>
+    admin?.emirateId ||
+    admin?.emiratesId ||
+    admin?.emiratesID ||
+    admin?.emiritsId ||
+    '';
 
   /* =============================
      Load Admins
@@ -153,6 +161,7 @@ export default function AdminManage() {
     ).map(a => [
       a.name,
       a.email,
+      getAdminEmiratesId(a),
       a.emirate,
       a.type,
       a.mobile
@@ -161,6 +170,7 @@ export default function AdminManage() {
     const header = [
       t('admin.adminName'),
       t('admin.email'),
+      emiratesIdLabel,
       t('admin.emirate'),
       t('admin.adminType'),
       t('admin.mobileNumberHeader')
@@ -232,7 +242,7 @@ export default function AdminManage() {
 
       {/* Table Header */}
       <div className="px-6 py-4 border-b border-gray-200">
-        <div className="grid grid-cols-6 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider items-center">
+        <div className="grid grid-cols-7 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider items-center">
           <div>
             <input
               type="checkbox"
@@ -245,6 +255,7 @@ export default function AdminManage() {
           </div>
           <div>{t('admin.adminName')}</div>
           <div>{t('admin.email')}</div>
+          <div>{emiratesIdLabel}</div>
           <div>{t('admin.emirate')}</div>
           <div>{t('admin.adminType')}</div>
           <div>{t('admin.mobileNumberHeader')}</div>
@@ -258,7 +269,7 @@ export default function AdminManage() {
             key={admin.id}
             className="px-6 py-4 flex items-center justify-between"
           >
-            <div className="grid grid-cols-6 gap-4 text-sm text-gray-900 items-center w-full">
+            <div className="grid grid-cols-7 gap-4 text-sm text-gray-900 items-center w-full">
               <div>
                 <input
                   type="checkbox"
@@ -268,6 +279,7 @@ export default function AdminManage() {
               </div>
               <div className="font-medium">{admin.name}</div>
               <div className="truncate">{admin.email}</div>
+              <div className="truncate">{getAdminEmiratesId(admin) || '-'}</div>
               <div>{admin.emirate}</div>
               <div>{admin.type}</div>
               <div>{admin.mobile}</div>

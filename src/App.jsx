@@ -82,11 +82,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<UaePassLogin />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/conform" element={<Conform />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/ue-pass" element={<UaePassLogin />} />
+        <Route path="/ue-pass" element={<Navigate to="/" replace />} />
         <Route path="/ue-pass-staging-admin" element={<UaePassStagingAdmin />} />
 
         <Route

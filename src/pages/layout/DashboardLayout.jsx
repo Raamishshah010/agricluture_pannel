@@ -7,6 +7,7 @@ import { generateOTP } from '../../utils';
 import useStore from '../../store/store';
 import { useNavigate } from "react-router-dom";
 import Loader from '../../components/Loader';
+import { API_BASE_URL } from '../../utils';
 
 const Overview = lazy(() => import('../Overview'));
 const Emirates = lazy(() => import('../Emirates/index'));
@@ -59,18 +60,44 @@ const DashboardLayout = () => {
   const directionClass = isRTL ? 'rtl' : 'ltr';
 
   const clearAuthStorage = () => {
-    const authKeys = ['adminToken', 'admin', 'token', 'user'];
+    const authKeys = ['adminToken', 'admin', 'token', 'user', 'uae-pass-state', 'uae-pass-environment', 'stagingAdmin'];
     authKeys.forEach((key) => {
       sessionStorage.removeItem(key);
       localStorage.removeItem(key);
     });
   };
 
-  const handleLogout = () => {
+  const getUaePassEnvironment = () => {
+    if (typeof window === 'undefined') return 'staging';
+    return sessionStorage.getItem('uae-pass-environment') || 'staging';
+  };
+
+  const handleLogout = async () => {
     if (window.confirm(t('common.components.dashboard.logout') + "?")) {
       clearAuthStorage();
       setAdminToken(null);
-      navigate('/');
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/ue-pass/logout-url?environment=${encodeURIComponent(getUaePassEnvironment())}`,
+          {
+            method: 'GET',
+            headers: {
+              Accept: 'application/json',
+            },
+          }
+        );
+
+        const data = await response.json();
+        if (response.ok && data?.logoutUrl) {
+          window.location.assign(data.logoutUrl);
+          return;
+        }
+      } catch (error) {
+        console.warn('Failed to prepare UAE Pass logout URL', error);
+      }
+
+      navigate('/', { replace: true });
     }
   };
 
