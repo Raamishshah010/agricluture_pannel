@@ -817,6 +817,7 @@
     "stateMismatch": "The backend returned a state that does not match the one stored before redirecting.",
     "stateMismatchMessage": "The returned state value does not match the stored one.",
     "stateHandshakeFailed": "The state handshake failed after returning from UAE Pass.",
+    "uaePassCancelled": "UAE Pass login was cancelled.",
     "payloadDecodeFailed": "Unable to read the payload returned from the backend.",
     "payloadDecodeFailedStatus": "Failed to decode the redirected payload.",
     "preparingLogin": "Preparing UAE Pass login...",

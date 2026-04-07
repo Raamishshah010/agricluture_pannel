@@ -806,6 +806,7 @@
     "stateMismatch": "أعاد الخادم حالة لا تتطابق مع الحالة المخزنة قبل إعادة التوجيه.",
     "stateMismatchMessage": "القيمة المرجعة للحالة لا تتطابق مع القيمة المخزنة.",
     "stateHandshakeFailed": "فشل تبادل الحالة بعد العودة من UAE Pass.",
+    "uaePassCancelled": "تم إلغاء تسجيل الدخول عبر UAE Pass.",
     "payloadDecodeFailed": "يتعذر قراءة الحمولة المرجعة من الخادم الخلفي.",
     "payloadDecodeFailedStatus": "فشل فك ترميز الحمولة بعد إعادة التوجيه.",
     "preparingLogin": "جارٍ إعداد تسجيل الدخول عبر UAE Pass...",
