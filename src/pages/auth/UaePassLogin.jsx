@@ -310,7 +310,7 @@ export const UaePassLogin = () => {
         <div className={`rounded-2xl bg-slate-900/60 border border-slate-800/80 p-4 space-y-2 ${error || stateMismatch || userData ? '' : 'hidden'}`}>
           <p className="text-xs uppercase tracking-[0.3em] text-slate-500">{t('auth.status')}</p>
           <p className="text-sm text-slate-200">{statusMessage}</p>
-          {error && <p className="text-sm text-rose-400">{error}</p>}
+          {error && <p className="rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 border border-red-200">{error}</p>}
           {stateMismatch && (
             <p className="text-sm text-amber-300">
               {t('auth.stateMismatch')}
