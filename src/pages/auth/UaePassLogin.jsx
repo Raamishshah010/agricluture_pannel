@@ -6,11 +6,10 @@ import { API_BASE_URL } from "../../utils";
 import useStore from '../../store/store';
 import logo from '../../assets/logo.png';
 import UaePassLogo from '../../assets/UaePassLogo';
+import { getUaePassOutcome } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
-
-const CANCELLED_ERRORS = new Set(["access_denied", "user_cancelled", "cancelled"]);
 
 const ENVIRONMENT_OPTIONS = [
   { value: "staging", labelKey: "auth.uaePassStaging" },
@@ -125,16 +124,15 @@ export const UaePassLogin = () => {
       console.log('UAE-PASS:decoded-tokenResponse', parsed.tokenResponse);
       console.log('UAE-PASS:decoded-userResponse', parsed.userResponse);
 
-      if (parsed.cancelled || CANCELLED_ERRORS.has(String(parsed.error || '').toLowerCase())) {
+      const outcome = getUaePassOutcome(parsed, t);
+      if (outcome.kind !== 'success') {
         setLoading(false);
         setUserData(null);
         setStateMismatch(false);
         setAdminToken(null);
         window.sessionStorage.removeItem('adminToken');
-        setError('');
-        setStatusMessage(
-          parsed.errorDescription || t('auth.uaePassCancelled') || 'UAE Pass login was cancelled.'
-        );
+        setError(outcome.errorMessage);
+        setStatusMessage(outcome.statusMessage);
         return;
       }
 
@@ -216,8 +214,8 @@ export const UaePassLogin = () => {
       const { authorizationUrl } = await requestAuthorizationUrl(environment, stateValue);
       window.location.assign(authorizationUrl);
     } catch (requestError) {
-      setError(requestError.message);
-      setStatusMessage(t('auth.readyToStart'));
+      setError(requestError.message || t('auth.uaePassAuthorizationFailedDetail'));
+      setStatusMessage(t('auth.uaePassAuthorizationFailedStatus'));
       setLoading(false);
     }
   };

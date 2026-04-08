@@ -6,6 +6,7 @@ import { API_BASE_URL } from "../../utils";
 import useStore from '../../store/store';
 import logo from '../../assets/logo.png';
 import UaePassLogo from '../../assets/UaePassLogo';
+import { getUaePassOutcome } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
@@ -93,6 +94,18 @@ export const UaePassStagingAdmin = () => {
       try {
         const parsed = decodePayload(payload);
         console.log('UAE-PASS-STAGING:decoded-payload', parsed);
+        const outcome = getUaePassOutcome(parsed, t);
+        if (outcome.kind !== 'success') {
+          setLoading(false);
+          setUserData(null);
+          setStateMismatch(false);
+          setAdminToken(null);
+          window.sessionStorage.removeItem('adminToken');
+          setError(outcome.errorMessage);
+          setStatusMessage(outcome.statusMessage);
+          return;
+        }
+
         const storedState = window.sessionStorage.getItem(STATE_KEY);
         if (!storedState || parsed.state !== storedState) {
           setStateMismatch(true);
@@ -172,8 +185,8 @@ export const UaePassStagingAdmin = () => {
       const { authorizationUrl } = await requestAuthorizationUrl('staging', stateValue);
       window.location.assign(authorizationUrl);
     } catch (requestError) {
-      setError(requestError.message);
-      setStatusMessage(t('auth.readyToStart'));
+      setError(requestError.message || t('auth.uaePassAuthorizationFailedDetail'));
+      setStatusMessage(t('auth.uaePassAuthorizationFailedStatus'));
       setLoading(false);
     }
   };
