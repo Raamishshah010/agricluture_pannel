@@ -138,9 +138,9 @@ export const UaePassLogin = () => {
 
       const storedState = window.sessionStorage.getItem(STATE_KEY);
       if (!storedState || parsed.state !== storedState) {
-        setStateMismatch(true);
+        setStateMismatch(false);
         setError(t('auth.stateMismatchMessage'));
-        setStatusMessage(t('auth.stateHandshakeFailed'));
+        setStatusMessage('');
         return;
       }
       setStateMismatch(false);
@@ -183,16 +183,15 @@ export const UaePassLogin = () => {
 
         // Inform the user clearly that they are not an admin
         const notAdminMsg = t('auth.notAdmin') || 'You are not registered as an admin for this dashboard.';
-        const notAdminStatus = t('auth.notAdminStatus') || 'Access to admin dashboard denied.';
         setError(notAdminMsg);
-        setStatusMessage(notAdminStatus);
+        setStatusMessage('');
       }
 
 
     } catch (decodeError) {
       console.error('UAE-PASS:payload-decode-error', decodeError);
       setError(t('auth.payloadDecodeFailed'));
-      setStatusMessage(t('auth.payloadDecodeFailedStatus'));
+      setStatusMessage('');
       setLoading(false);
     } finally {
       const cleanUrl = `${window.location.origin}${window.location.pathname}`;
@@ -215,7 +214,7 @@ export const UaePassLogin = () => {
       window.location.assign(authorizationUrl);
     } catch (requestError) {
       setError(requestError.message || t('auth.uaePassAuthorizationFailedDetail'));
-      setStatusMessage(t('auth.uaePassAuthorizationFailedStatus'));
+      setStatusMessage('');
       setLoading(false);
     }
   };
@@ -307,16 +306,7 @@ export const UaePassLogin = () => {
           </div>
         </div>
 
-        <div className={`rounded-2xl bg-slate-900/60 border border-slate-800/80 p-4 space-y-2 ${error || stateMismatch || userData ? '' : 'hidden'}`}>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">{t('auth.status')}</p>
-          <p className="text-sm text-slate-200">{statusMessage}</p>
-          {error && <p className="rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 border border-red-200">{error}</p>}
-          {stateMismatch && (
-            <p className="text-sm text-amber-300">
-              {t('auth.stateMismatch')}
-            </p>
-          )}
-        </div>
+        {error && <p className="text-sm font-medium text-red-600">{error}</p>}
 
         {summaryRows.length > 0 && (
           <section className="space-y-3 hidden">

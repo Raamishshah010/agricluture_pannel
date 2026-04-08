@@ -108,9 +108,9 @@ export const UaePassStagingAdmin = () => {
 
         const storedState = window.sessionStorage.getItem(STATE_KEY);
         if (!storedState || parsed.state !== storedState) {
-          setStateMismatch(true);
+          setStateMismatch(false);
           setError(t('auth.stateMismatchMessage'));
-          setStatusMessage(t('auth.stateHandshakeFailed'));
+          setStatusMessage('');
           return;
         }
         setStateMismatch(false);
@@ -124,6 +124,7 @@ export const UaePassStagingAdmin = () => {
           window.sessionStorage.setItem("adminToken", adminToken);
           setAdminToken(adminToken);
           setStatusMessage(t('auth.loginCompleted'));
+          setError('');
           navigate('/dashboard', { replace: true });
           return;
         }
@@ -155,6 +156,7 @@ export const UaePassStagingAdmin = () => {
           setAdminToken(token);
           if (body.admin) setAdmin(body.admin);
           setStatusMessage(t('auth.adminCreatedAndSignedIn'));
+          setError('');
           navigate('/dashboard', { replace: true });
           return;
         }
@@ -163,7 +165,7 @@ export const UaePassStagingAdmin = () => {
       } catch (err) {
         console.error('UAE-PASS-STAGING:error', err);
         setError(err.message || String(err));
-        setStatusMessage(t('auth.payloadDecodeFailedStatus'));
+        setStatusMessage('');
       } finally {
         const cleanUrl = `${window.location.origin}${window.location.pathname}`;
         window.history.replaceState({}, "", cleanUrl);
@@ -186,7 +188,7 @@ export const UaePassStagingAdmin = () => {
       window.location.assign(authorizationUrl);
     } catch (requestError) {
       setError(requestError.message || t('auth.uaePassAuthorizationFailedDetail'));
-      setStatusMessage(t('auth.uaePassAuthorizationFailedStatus'));
+      setStatusMessage('');
       setLoading(false);
     }
   };
@@ -250,14 +252,7 @@ export const UaePassStagingAdmin = () => {
           </button>
         </div>
 
-        <div className={`rounded-2xl bg-slate-900/60 border border-slate-800/80 p-4 space-y-2 ${error || stateMismatch || userData ? '' : 'hidden'}`}>
-          <p className="text-xs uppercase tracking-[0.3em] text-slate-500">{t('auth.status')}</p>
-          <p className="text-sm text-slate-200">{statusMessage}</p>
-          {error && <p className="rounded-md bg-white px-3 py-2 text-sm font-medium text-red-600 border border-red-200">{error}</p>}
-          {stateMismatch && (
-            <p className="text-sm text-amber-300">{t('auth.stateMismatch')}</p>
-          )}
-        </div>
+        {error && <p className="text-sm font-medium text-red-600">{error}</p>}
 
         {summaryRows.length > 0 && (
           <section className="space-y-3 hidden">
