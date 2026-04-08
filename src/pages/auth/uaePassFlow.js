@@ -1,9 +1,10 @@
-const CANCELLED_ERRORS = new Set(["access_denied", "user_cancelled", "cancelled"]);
+const CANCELLED_ERRORS = new Set(["access_denied", "user_cancelled", "cancelled", "cancelledonapp"]);
 
 const ERROR_STATUS_KEYS = {
   access_denied: "auth.uaePassCancelledStatus",
   user_cancelled: "auth.uaePassCancelledStatus",
   cancelled: "auth.uaePassCancelledStatus",
+  cancelledonapp: "auth.uaePassCancelledStatus",
   missing_code: "auth.uaePassMissingCodeStatus",
   missing_state: "auth.uaePassMissingStateStatus",
   authorize_failed: "auth.uaePassAuthorizationFailedStatus",
