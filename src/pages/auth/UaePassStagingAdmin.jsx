@@ -101,8 +101,8 @@ export const UaePassStagingAdmin = () => {
           setStateMismatch(false);
           setAdminToken(null);
           window.sessionStorage.removeItem('adminToken');
-          setError(outcome.errorMessage);
-          setStatusMessage(outcome.statusMessage);
+          setError(outcome.statusMessage);
+          setStatusMessage('');
           return;
         }
 
