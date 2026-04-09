@@ -48,9 +48,18 @@ const decodePayload = (encoded) => {
   return JSON.parse(window.atob(normalized));
 };
 
-const requestAuthorizationUrl = async (environment, state) => {
+const requestAuthorizationUrl = async (environment, state, language) => {
+  const params = new URLSearchParams({
+    environment,
+    state,
+  });
+
+  if (language === "ar") {
+    params.set("ui_locales", "ar");
+  }
+
   const response = await fetch(
-    `${API_BASE_URL}/api/ue-pass/authorize?environment=${encodeURIComponent(environment)}&state=${encodeURIComponent(state)}`,
+    `${API_BASE_URL}/api/ue-pass/authorize?${params.toString()}`,
     {
       method: "GET",
       headers: {
@@ -184,7 +193,7 @@ export const UaePassStagingAdmin = () => {
     }
     setLoading(true);
     try {
-      const { authorizationUrl } = await requestAuthorizationUrl('staging', stateValue);
+      const { authorizationUrl } = await requestAuthorizationUrl('staging', stateValue, language);
       window.location.assign(authorizationUrl);
     } catch (requestError) {
       setError(requestError.message || t('auth.uaePassAuthorizationFailedDetail'));
