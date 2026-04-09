@@ -304,11 +304,11 @@ export const UaePassLogin = () => {
           <button
             onClick={() => handleLoginClick('staging')}
             disabled={loading}
-            className="flex border border-1 border-black items-center justify-center gap-3 rounded-full bg-white px-12 py-4 text-xl font-semibold text-black shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:shadow-lg active:scale-95 active:shadow-md disabled:opacity-60 disabled:cursor-not-allowed disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-emerald-400 min-w-[340px]"
+            className="flex w-full max-w-full items-center justify-center gap-2 rounded-full border border-1 border-black bg-white px-5 py-3 text-center text-base font-semibold text-black shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:shadow-lg active:scale-95 active:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-emerald-400 sm:w-auto sm:max-w-[340px] sm:gap-3 sm:px-10 sm:py-4 sm:text-lg md:text-xl"
           >
             <UaePassLogo className="h-6 w-6 shrink-0" variant="onDark" />
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
-            <span>{t('auth.loginWithUaePass')}</span>
+            <span className="whitespace-normal leading-tight">{t('auth.loginWithUaePass')}</span>
           </button>
           <div className="hidden text-sm text-slate-300">
             {t('auth.redirectUri')} <span className="text-slate-50">{API_BASE_URL}/api/ue-pass/callback</span>
