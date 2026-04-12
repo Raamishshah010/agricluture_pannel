@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight, BarChart3, MapPin, Layers, Wheat, TrendingUp, Settings, HelpCircle, User, Globe, X, Maximize2, Search, Bell, TrendingUpDown, Grid2X2Plus, List, Newspaper, Users, Flag, ListMusic, ShieldHalf, Footprints, ArrowUp01, Ship, SunSnow, AudioWaveform, Dam, House, LogOut, Sticker, BarChart2, UserCheck } from 'lucide-react';
+import { ChevronDown, ChevronRight, BarChart3, MapPin, Layers, Wheat, TrendingUp, HelpCircle, User, Globe, X, Maximize2, Search, Bell, TrendingUpDown, Grid2X2Plus, List, Newspaper, Users, Flag, ListMusic, ShieldHalf, Footprints, ArrowUp01, Ship, SunSnow, AudioWaveform, Dam, House, LogOut, Sticker, BarChart2, UserCheck } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.png'
@@ -46,6 +46,7 @@ const ExternalIrrigationSystem = lazy(() => import('../master-data/externalIrrig
 const LiveStocks = lazy(() => import('../master-data/livestock'));
 const GreenhouseDashboard = lazy(() => import('../GreenhouseDashboard'));
 const FarmAnalytics = lazy(() => import('../farmsAnalytics'));
+const HelpCenter = lazy(() => import('../help-center'));
 
 const DashboardLayout = () => {
   const t = useTranslation();
@@ -201,7 +202,6 @@ const DashboardLayout = () => {
         { id: 'manageAdmins', icon: BarChart3, label: t('common.components.dashboard.manageAdmins') },
       ]
     },
-    { id: 'settings', icon: Settings, label: t('common.components.dashboard.settings') },
     { id: 'help', icon: HelpCircle, label: t('common.components.dashboard.helpCenter') }
   ];
 
@@ -282,6 +282,8 @@ const DashboardLayout = () => {
           return <GreenhouseDashboard />;
         case 'farmAnalytics':
           return <FarmAnalytics />;
+        case 'help':
+          return <HelpCenter />;
         default:
           return <Overview />;
       }

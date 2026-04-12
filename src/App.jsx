@@ -17,6 +17,11 @@ import { toast } from "react-toastify";
 
 function App() {
   const { setCrops, setFarms, setFarmers, setDashboardLoading, adminToken, setAdminToken, setAdmin } = useStore((state) => state);
+  const sortFarmersByCreatedAtDesc = (farmers = []) => [...farmers].sort((a, b) => {
+    const aTime = new Date(a?.createdAt || 0).getTime();
+    const bTime = new Date(b?.createdAt || 0).getTime();
+    return bTime - aTime;
+  });
   useEffect(() => {
     if (!adminToken) {
       const token = sessionStorage.getItem('adminToken');
@@ -69,7 +74,7 @@ function App() {
       setDashboardLoading('farmers', true);
       try {
         const res = await farmerService.getAllFarmers();
-        setFarmers(res.data);
+        setFarmers(sortFarmersByCreatedAtDesc(res.data));
       } catch (err) {
         toast.error(err.message);
       } finally {

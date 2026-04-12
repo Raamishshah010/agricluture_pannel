@@ -15,6 +15,11 @@ import { amiriFontBase64 } from "../../assets/AmiriFont"; // Amiri font import k
 
 export default function Index(props) {
   const t = useTranslation();
+  const sortFarmersByCreatedAtDesc = (farmers = []) => [...farmers].sort((a, b) => {
+    const aTime = new Date(a?.createdAt || 0).getTime();
+    const bTime = new Date(b?.createdAt || 0).getTime();
+    return bTime - aTime;
+  });
   const [list, setList] = useState([]);
   const [farms, setFarms] = useState([]);
   const [activeTab, setActiveTab] = useState(
@@ -81,7 +86,7 @@ export default function Index(props) {
           setLoading(true);
           const res = await service.getFarmers(1, 50, "");
           if (requestId !== requestSequenceRef.current) return;
-          setList(res.data);
+          setList(sortFarmersByCreatedAtDesc(res.data));
           setCount(res.pagination.totalPages);
         } catch (err) {
           if (requestId === requestSequenceRef.current) {
@@ -110,7 +115,7 @@ export default function Index(props) {
           setLoading(true);
           const res = await service.getFarmers(1, 50, normalizedQuery);
           if (requestId !== requestSequenceRef.current) return;
-          setList(res.data);
+          setList(sortFarmersByCreatedAtDesc(res.data));
           setLoading(false);
           setCount(res.pagination.totalPages);
         } catch (err) {
@@ -145,7 +150,7 @@ export default function Index(props) {
       setLoading(true);
       const res = await service.getFarmers(currentPage, 50, query.trim());
       if (requestId !== requestSequenceRef.current) return;
-      setList(res.data);
+      setList(sortFarmersByCreatedAtDesc(res.data));
       setCount(res.pagination.totalPages);
       setPage(currentPage);
     } catch (err) {

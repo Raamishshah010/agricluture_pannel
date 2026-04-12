@@ -7,6 +7,11 @@ import { toast } from 'react-toastify';
 
 export default function Farmers({ list, handleFarms, setList }) {
     const t = useTranslation();
+    const sortFarmersByCreatedAtDesc = (farmers = []) => [...farmers].sort((a, b) => {
+        const aTime = new Date(a?.createdAt || 0).getTime();
+        const bTime = new Date(b?.createdAt || 0).getTime();
+        return bTime - aTime;
+    });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -17,7 +22,8 @@ export default function Farmers({ list, handleFarms, setList }) {
         email: '',
         phoneNumber: '',
         image: '',
-        password: ''
+        password: '',
+        isCoder: false,
     });
 
     const openAddModal = () => {
@@ -28,7 +34,8 @@ export default function Farmers({ list, handleFarms, setList }) {
             emirateId: '',
             phoneNumber: '',
             image: '',
-            password: ''
+            password: '',
+            isCoder: false,
         });
         setIsModalOpen(true);
     };
@@ -42,6 +49,7 @@ export default function Farmers({ list, handleFarms, setList }) {
             phoneNumber: coder.phoneNumber || '',
             image: coder.image || '',
             password: '',
+            isCoder: !!coder.isCoder,
         });
         setIsModalOpen(true);
     };
@@ -78,20 +86,21 @@ export default function Farmers({ list, handleFarms, setList }) {
             fd.append('emirateId', formData.emirateId);
             fd.append('phoneNumber', formData.phoneNumber);
             fd.append('password', formData.password);
+            fd.append('isCoder', String(!!formData.isCoder));
             if (!editingItem) {
                 fd.append('autoApprove', 'true');
             }
 
             if (editingItem) {
                 const res = await service.update(editingItem.id, fd);
-                setList(prev => prev.map(coder =>
+                setList(prev => sortFarmersByCreatedAtDesc(prev.map(coder =>
                     coder.id === editingItem.id
                         ? res.data.farmer
                         : coder
-                ));
+                )));
             } else {
                 const res = await service.addFarmer(fd);
-                setList(prev => [...prev, res.data.farmer]);
+                setList(prev => sortFarmersByCreatedAtDesc([...prev, res.data.farmer]));
             }
 
             closeModal();
@@ -105,7 +114,7 @@ export default function Farmers({ list, handleFarms, setList }) {
     const handleDelete = async (id) => {
         if (window.confirm(t('farmers.farmers.deleteConfirm'))) {
             await service.delete(id);
-            setList(prev => prev.filter(coder => coder.id !== id));
+            setList(prev => sortFarmersByCreatedAtDesc(prev.filter(coder => coder.id !== id)));
         }
     };
 
@@ -200,6 +209,14 @@ export default function Farmers({ list, handleFarms, setList }) {
                                     <td className="px-4 py-3">
                                         <div className="font-semibold text-gray-900 text-sm">{farmer.name}</div>
                                         <div className="text-xs text-gray-500">{farmer.email}</div>
+                                        <div className="mt-2 flex flex-wrap gap-2">
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${farmer.isCoder
+                                                ? 'bg-violet-50 text-violet-700 border-violet-200'
+                                                : 'bg-gray-100 text-gray-600 border-gray-200'
+                                                }`}>
+                                                {t('farmers.farmers.coder')}: {farmer.isCoder ? t('common.yes') : t('common.no')}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td className="px-4 py-3">
                                         <div className="flex items-center gap-2">
@@ -437,6 +454,26 @@ export default function Farmers({ list, handleFarms, setList }) {
                                             )}
                                         </button>
                                     </div>
+                                </div>
+
+                                <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-4">
+                                    <label className="flex items-start gap-3 cursor-pointer select-none">
+                                        <input
+                                            type="checkbox"
+                                            name="isCoder"
+                                            checked={formData.isCoder}
+                                            onChange={handleInputChange}
+                                            className="mt-1 h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                                        />
+                                        <div>
+                                            <div className="text-sm font-semibold text-gray-800">
+                                                {t('farmers.farmers.coder')}
+                                            </div>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Mark this farmer as a coder so they appear in the coder list and related farm assignment flows.
+                                            </p>
+                                        </div>
+                                    </label>
                                 </div>
                             </div>
 
