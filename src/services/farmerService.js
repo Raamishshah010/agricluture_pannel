@@ -34,6 +34,14 @@ export const farmerService = {
         const response = await apiClient.get('/api/farmer/search?query=' + query);
         return response.data;
     },
+    getPendingApprovals: async (limit = 100) => {
+        const response = await apiClient.get(`/api/farmer/pending-approvals?limit=${limit}`);
+        return response.data;
+    },
+    updateApprovalStatus: async (id, payload) => {
+        const response = await apiClient.patch(`/api/farmer/${id}/approval`, payload);
+        return response.data;
+    },
     addCoder: async (payload) => {
         const response = await apiClient.post('/api/farmer/add-coder', payload, {
             headers: {

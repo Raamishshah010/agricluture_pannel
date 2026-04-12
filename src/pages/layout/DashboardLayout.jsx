@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
-import { ChevronDown, ChevronRight, BarChart3, MapPin, Layers, Wheat, TrendingUp, Settings, HelpCircle, User, Globe, X, Maximize2, Search, Bell, TrendingUpDown, Grid2X2Plus, List, Newspaper, Users, Flag, ListMusic, ShieldHalf, Footprints, ArrowUp01, Ship, SunSnow, AudioWaveform, Dam, House, LogOut, Sticker, BarChart2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, BarChart3, MapPin, Layers, Wheat, TrendingUp, Settings, HelpCircle, User, Globe, X, Maximize2, Search, Bell, TrendingUpDown, Grid2X2Plus, List, Newspaper, Users, Flag, ListMusic, ShieldHalf, Footprints, ArrowUp01, Ship, SunSnow, AudioWaveform, Dam, House, LogOut, Sticker, BarChart2, UserCheck } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLocation } from 'react-router-dom';
 import logo from '../../assets/logo.png'
@@ -25,6 +25,7 @@ const AdminManage = lazy(() => import('../AdminManage'));
 const Coders = lazy(() => import('../coders'));
 const Farmers = lazy(() => import('../farmers'));
 const ManageFarms = lazy(() => import('../manage-farms'));
+const FarmerApprovals = lazy(() => import('../farmer-approvals'));
 const Possessions = lazy(() => import('../master-data/possession'));
 const FarmingSystem = lazy(() => import('../master-data/farmingSystem'));
 const Regions = lazy(() => import('../master-data/regions'));
@@ -158,6 +159,7 @@ const DashboardLayout = () => {
     { id: 'manageFarms', icon: BarChart3, label: t('common.components.dashboard.manageFarms') },
     { id: 'manageCoders', icon: Users, label: t('common.components.dashboard.manageCoders') },
     { id: 'manageFarmers', icon: Users, label: t('common.components.dashboard.manageFarmers') },
+    { id: 'farmer approvals', icon: UserCheck, label: t('common.components.dashboard.farmerApprovals') },
   ];
 
   const otherItems = [
@@ -250,6 +252,8 @@ const DashboardLayout = () => {
           return <Coders />;
         case 'manageFarms':
           return <ManageFarms number={farmsNumber} />;
+        case 'farmer approvals':
+          return <FarmerApprovals />;
         case 'possessions':
           return <Possessions />;
         case 'farming-system':

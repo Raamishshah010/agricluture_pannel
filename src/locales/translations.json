@@ -456,6 +456,7 @@
         "manageFarms": "Manage Farms",
         "manageCoders": "Manage Coders",
         "manageFarmers": "Manage Farmers",
+        "farmerApprovals": "Farmer Approvals",
         "masterData": "Master Data",
         "cropsManagement": "Crops Management",
         "fruitTypes": "Fruit Types",
@@ -518,8 +519,9 @@
         "changeStatus": "Change Status",
         "changeFarmStatus": "Change Farm Status",
         "selectStatus": "Select Status",
-        "approve": "Approve",
-        "suspended": "Suspended",
+      "approve": "Approve",
+      "reject": "Reject",
+      "suspended": "Suspended",
         "suspensionReason": "Suspension Reason",
         "provideSuspensionReason": "Please provide the reason for suspension...",
         "cancel": "Cancel",
@@ -748,6 +750,22 @@
       "enterPhone": "Enter phone number",
       "password": "Password",
       "emptyCTA": "Add your first farmer to get started"
+    },
+    "farmerApprovals": {
+      "title": "Farmer Approvals",
+      "subtitle": "Review farmers registered from the mobile app and approve or reject them.",
+      "searchPlaceholder": "Search by name, email, phone, or Emirates ID",
+      "pendingBadge": "Pending approval",
+      "emptyState": "No farmers are waiting for approval.",
+      "approveConfirm": "Approve this farmer?",
+      "rejectConfirm": "Reject this farmer?",
+      "approveSuccess": "Farmer approved successfully",
+      "rejectSuccess": "Farmer rejected successfully",
+      "approveFail": "Failed to approve farmer",
+      "rejectFail": "Failed to reject farmer",
+      "loadFail": "Failed to load pending approvals",
+      "statusLabel": "Status",
+      "pendingCount": "Pending approvals"
     },
     "modal": {
       "description": {
