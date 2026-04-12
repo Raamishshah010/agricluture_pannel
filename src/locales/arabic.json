@@ -378,6 +378,10 @@
     "clearAllFilter": "مسح الفلتر",
     "search": "بحث",
     "download": "تنزيل",
+    "downloadOptions": {
+      "pdf": "تنسيق PDF",
+      "excel": "تنسيق Excel"
+    },
     "export": "تصدير",
     "import": "استيراد",
     "add": "إضافة",
@@ -985,7 +989,10 @@
         "colFarmId": "رقم المزرعة",
         "colCenter": "المركز",
         "colGreenhouses": "عدد البيوت المحمية",
-        "colArea": "المساحة (هكتار)"
+        "colArea": "المساحة (هكتار)",
+        "colTotalAreaSqm": "إجمالي المساحة (متر مربع)",
+        "colNumberOfGreenhouses": "عدد البيوت المحمية",
+        "colAverageAreaPerGreenhouseSqm": "متوسط المساحة لكل بيت محمي (متر مربع)"
       }
     },
     "greenhouseDashboard": {

@@ -78,6 +78,9 @@ export default function Farmers({ list, handleFarms, setList }) {
             fd.append('emirateId', formData.emirateId);
             fd.append('phoneNumber', formData.phoneNumber);
             fd.append('password', formData.password);
+            if (!editingItem) {
+                fd.append('autoApprove', 'true');
+            }
 
             if (editingItem) {
                 const res = await service.update(editingItem.id, fd);
@@ -452,7 +455,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                 </div>
             )}
 
-            <style jsx>{`
+            <style>{`
                 @keyframes fadeIn {
                     from { opacity: 0; }
                     to { opacity: 1; }

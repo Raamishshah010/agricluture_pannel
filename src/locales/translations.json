@@ -388,6 +388,10 @@
     "filter": "Filter",
     "search": "Search",
     "download": "Download",
+    "downloadOptions": {
+      "pdf": "PDF Format",
+      "excel": "Excel Format"
+    },
     "export": "Export",
     "selected": "selected",
     "import": "Import",
@@ -1022,7 +1026,10 @@
         "colFarmId": "Farm ID",
         "colCenter": "Center",
         "colGreenhouses": "Greenhouses",
-        "colArea": "Area (ha)"
+        "colArea": "Area (ha)",
+        "colTotalAreaSqm": "Total Area (sqm)",
+        "colNumberOfGreenhouses": "Number of Greenhouses",
+        "colAverageAreaPerGreenhouseSqm": "Average Area per Greenhouse (sqm)"
       }
     },
     "greenhouseDashboard": {

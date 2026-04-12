@@ -123,6 +123,9 @@ export default function Coders() {
       fd.append("emirateId", formData.emirateId);
       fd.append("phoneNumber", formData.phoneNumber);
       fd.append("password", formData.password);
+      if (!editingItem) {
+        fd.append("autoApprove", "true");
+      }
 
       if (editingItem) {
       const res = await service.update(editingItem.id, fd);
@@ -964,7 +967,7 @@ const downloadPDF = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeIn {
           from {
             opacity: 0;

@@ -6,6 +6,9 @@ import { toast } from 'react-toastify';
 import useStore from '../../store/store';
 import Dropdown from '../../components/dropdownWithSearch';
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { amiriFontBase64 } from '../../assets/AmiriFont';
 
 const FarmAnalytics = () => {
   const t = useTranslation();
@@ -25,6 +28,7 @@ const FarmAnalytics = () => {
   } = useStore((st) => st);
 
   const isLTR = lang.includes('en');
+  const isArabic = !isLTR;
   
   // Geographic filters
   const [region, setRegion] = useState(null);
@@ -352,6 +356,187 @@ const FarmAnalytics = () => {
     };
   }, [filteredFarms, emirates, centers, fruitTypes, vegetableTypes, fodderTypes, greenHouseTypes, farmingSystems, coverTypes, isLTR]);
 
+  const addPdfFont = (doc) => {
+    if (!isArabic) return;
+    doc.addFileToVFS('Amiri-Regular.ttf', amiriFontBase64);
+    doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+    doc.setFont('Amiri');
+  };
+
+  const buildPdfTable = (doc, title, headers, rows, startY) => {
+    if (!rows.length) return startY;
+
+    const tableHeaders = isArabic ? [...headers].reverse() : headers;
+    const tableRows = rows.map((row) => (isArabic ? [...row].reverse() : row));
+
+    doc.setFontSize(12);
+    doc.text(title, isArabic ? 282 : 14, startY, { align: isArabic ? 'right' : 'left' });
+
+    autoTable(doc, {
+      startY: startY + 4,
+      head: [tableHeaders],
+      body: tableRows,
+      theme: 'grid',
+      margin: { left: 14, right: 14 },
+      styles: {
+        font: isArabic ? 'Amiri' : 'helvetica',
+        fontSize: 9,
+        halign: isArabic ? 'right' : 'left',
+        cellPadding: 2.5,
+      },
+      headStyles: {
+        fillColor: [5, 150, 105],
+        textColor: [255, 255, 255],
+        font: isArabic ? 'Amiri' : 'helvetica',
+        halign: isArabic ? 'right' : 'left',
+      },
+    });
+
+    return (doc.lastAutoTable?.finalY || startY + 10) + 10;
+  };
+
+  const exportToPdf = () => {
+    setIsExporting(true);
+
+    try {
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      addPdfFont(doc);
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const title = t('analytics.farmAnalytics.export.title') || 'Farm Analytics Report';
+      const generatedOn = `${t('analytics.farmAnalytics.export.generatedOn')} ${new Date().toLocaleString()}`;
+
+      doc.setFontSize(18);
+      doc.text(title, isArabic ? pageWidth - 14 : 14, 16, { align: isArabic ? 'right' : 'left' });
+      doc.setFontSize(10);
+      doc.text(generatedOn, isArabic ? pageWidth - 14 : 14, 23, { align: isArabic ? 'right' : 'left' });
+
+      let currentY = 30;
+
+      currentY = buildPdfTable(
+        doc,
+        t('analytics.farmAnalytics.export.appliedFilters'),
+        [t('analytics.farmAnalytics.export.metric'), t('analytics.farmAnalytics.export.value')],
+        [
+          [t('analytics.farmAnalytics.export.region'), region ? (isLTR ? region.name : region.nameInArrabic) : t('status.all')],
+          [t('analytics.farmAnalytics.export.emirate'), selectedEmirate ? (isLTR ? selectedEmirate.name : selectedEmirate.nameInArrabic) : t('status.all')],
+          [t('analytics.farmAnalytics.export.center'), selectedCenter ? (isLTR ? selectedCenter.name : selectedCenter.nameInArrabic) : t('status.all')],
+          [t('analytics.farmAnalytics.export.location'), location ? (isLTR ? location.name : location.nameInArrabic) : t('status.all')],
+        ],
+        currentY
+      );
+
+      currentY = buildPdfTable(
+        doc,
+        t('analytics.farmAnalytics.export.sheetSummary'),
+        [t('analytics.farmAnalytics.export.metric'), t('analytics.farmAnalytics.export.value')],
+        [
+          [t('analytics.farmAnalytics.export.totalFarms'), analytics.totalFarms],
+          [t('analytics.farmAnalytics.export.totalCultivatedArea'), analytics.totalCultivatedArea],
+          [t('analytics.farmAnalytics.export.totalGreenhouseArea'), analytics.totalGreenhouseArea],
+          [t('analytics.farmAnalytics.export.avgWellsPerFarm'), analytics.avgWellsPerFarm],
+          [t('analytics.farmAnalytics.export.groundwaterOnly'), analytics.waterSources.groundwater],
+          [t('analytics.farmAnalytics.export.desalinatedOnly'), analytics.waterSources.desalinated],
+          [t('analytics.farmAnalytics.export.both'), analytics.waterSources.both],
+        ],
+        currentY
+      );
+
+      currentY = buildPdfTable(
+        doc,
+        t('analytics.farmAnalytics.export.sheetByEmirate'),
+        [
+          t('analytics.farmAnalytics.export.colEmirate'),
+          t('analytics.farmAnalytics.export.colNumberOfFarms'),
+          t('analytics.farmAnalytics.export.colTotalArea'),
+        ],
+        analytics.farmsByEmirateData.map((item) => [item.name, item.value, item.area.toFixed(2)]),
+        currentY
+      );
+
+      currentY = buildPdfTable(
+        doc,
+        t('analytics.farmAnalytics.export.sheetLandUse'),
+        [
+          t('analytics.farmAnalytics.export.colCategory'),
+          t('analytics.farmAnalytics.export.colPercentage'),
+          t('analytics.farmAnalytics.export.colNumberOfFarms'),
+        ],
+        analytics.landUseData.map((item) => [item.name, `${item.value}%`, item.count]),
+        currentY
+      );
+
+      currentY = buildPdfTable(
+        doc,
+        t('analytics.farmAnalytics.export.sheetByCenter'),
+        [
+          t('analytics.farmAnalytics.export.colServiceCenter'),
+          t('analytics.farmAnalytics.export.colNumberOfFarms'),
+          t('analytics.farmAnalytics.export.colTotalArea'),
+        ],
+        analytics.farmsByCenterData.map((item) => [item.name, item.count, item.area.toFixed(2)]),
+        currentY
+      );
+
+      if (analytics.topFruits.length) {
+        currentY = buildPdfTable(
+          doc,
+          t('analytics.farmAnalytics.export.sheetTopFruits'),
+          [
+            t('analytics.farmAnalytics.export.colFruitType'),
+            t('analytics.farmAnalytics.export.colNumberOfFarms'),
+          ],
+          analytics.topFruits.map((item) => [item.name, item.count]),
+          currentY
+        );
+      }
+
+      if (analytics.topVegetables.length) {
+        currentY = buildPdfTable(
+          doc,
+          t('analytics.farmAnalytics.export.sheetTopVegetables'),
+          [
+            t('analytics.farmAnalytics.export.colVegetableType'),
+            t('analytics.farmAnalytics.export.colNumberOfFarms'),
+          ],
+          analytics.topVegetables.map((item) => [item.name, item.count]),
+          currentY
+        );
+      }
+
+      if (analytics.farmsWithGreenhouses.length) {
+        buildPdfTable(
+          doc,
+          t('analytics.farmAnalytics.export.sheetTopFarms'),
+          [
+            t('analytics.farmAnalytics.export.colFarmId'),
+            t('analytics.farmAnalytics.export.colEmirate'),
+            t('analytics.farmAnalytics.export.colServiceCenter'),
+            t('analytics.farmAnalytics.export.colGreenhouses'),
+            t('analytics.farmAnalytics.export.colTotalAreaSqm'),
+          ],
+          analytics.farmsWithGreenhouses.map((farm) => [
+            farm.id,
+            farm.emirate,
+            farm.center,
+            farm.greenhouses,
+            farm.area.toFixed(2),
+          ]),
+          currentY
+        );
+      }
+
+      const timestamp = new Date().toISOString().split('T')[0];
+      const prefix = t('analytics.farmAnalytics.export.filenamePrefix') || 'farm_analytics';
+      doc.save(`${prefix}_${timestamp}.pdf`);
+    } catch (error) {
+      console.error('PDF export failed:', error);
+      toast.error(t('farmers.toast.pdfGenerationFailed') || t('analytics.farmAnalytics.export.exportFailed'));
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   // Export to Excel
   const exportToExcel = () => {
     setIsExporting(true);
@@ -551,14 +736,24 @@ const FarmAnalytics = () => {
                 <p className="text-sm text-gray-500 mt-0.5">{t('translation.statsSubTitle')}</p>
               </div>
             </div>
-            <button 
-              onClick={exportToExcel}
-              disabled={isExporting}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Download className="w-4 h-4" />
-              {isExporting ? t('analytics.farmAnalytics.export.exporting') : t('analytics.farmAnalytics.export.exportReport')}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={exportToPdf}
+                disabled={isExporting}
+                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Download className="w-4 h-4" />
+                {isExporting ? t('analytics.farmAnalytics.export.exporting') : (t('common.downloadOptions.pdf') || 'PDF')}
+              </button>
+              <button
+                onClick={exportToExcel}
+                disabled={isExporting}
+                className="flex items-center gap-2 px-5 py-2.5 bg-white text-emerald-700 rounded-xl border border-emerald-200 hover:bg-emerald-50 transition-all shadow-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Download className="w-4 h-4" />
+                {isExporting ? t('analytics.farmAnalytics.export.exporting') : (t('common.downloadOptions.excel') || 'Excel')}
+              </button>
+            </div>
           </div>
 
           {/* Filters */}

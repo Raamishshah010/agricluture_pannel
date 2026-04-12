@@ -6,6 +6,9 @@ import Dropdown from '../../components/dropdownWithSearch';
 import useTranslation from '../../hooks/useTranslation';
 import { toast } from 'react-toastify';
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { amiriFontBase64 } from '../../assets/AmiriFont';
 
 const GreenhouseDashboard = () => {
     const t = useTranslation();
@@ -23,6 +26,7 @@ const GreenhouseDashboard = () => {
     const [isExporting, setIsExporting] = useState(false);
     
     const isLTR = lang.includes('en');
+    const isArabic = !isLTR;
     const areaUnit = t('translation.sqmUnit');
 
     const formatAreaRangeLabel = useCallback((min, max) => {
@@ -279,6 +283,184 @@ const GreenhouseDashboard = () => {
         };
     }, [filteredFarms, greenHouseTypes, coverTypes, emirates, regions, centers, isLTR]);
 
+    const addPdfFont = (doc) => {
+        if (!isArabic) return;
+        doc.addFileToVFS('Amiri-Regular.ttf', amiriFontBase64);
+        doc.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+        doc.setFont('Amiri');
+    };
+
+    const buildPdfTable = (doc, title, headers, rows, startY) => {
+        if (!rows.length) return startY;
+
+        const tableHeaders = isArabic ? [...headers].reverse() : headers;
+        const tableRows = rows.map((row) => (isArabic ? [...row].reverse() : row));
+
+        doc.setFontSize(12);
+        doc.text(title, isArabic ? 282 : 14, startY, { align: isArabic ? 'right' : 'left' });
+
+        autoTable(doc, {
+            startY: startY + 4,
+            head: [tableHeaders],
+            body: tableRows,
+            theme: 'grid',
+            margin: { left: 14, right: 14 },
+            styles: {
+                font: isArabic ? 'Amiri' : 'helvetica',
+                fontSize: 9,
+                halign: isArabic ? 'right' : 'left',
+                cellPadding: 2.5,
+            },
+            headStyles: {
+                fillColor: [5, 150, 105],
+                textColor: [255, 255, 255],
+                font: isArabic ? 'Amiri' : 'helvetica',
+                halign: isArabic ? 'right' : 'left',
+            },
+        });
+
+        return (doc.lastAutoTable?.finalY || startY + 10) + 10;
+    };
+
+    const exportToPdf = () => {
+        setIsExporting(true);
+
+        try {
+            const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+            addPdfFont(doc);
+
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const title = t('analytics.greenhouseDashboard.title') || 'Greenhouse Dashboard';
+            const generatedOn = `${t('analytics.greenhouseDashboard.generatedOn')} ${new Date().toLocaleString()}`;
+
+            doc.setFontSize(18);
+            doc.text(title, isArabic ? pageWidth - 14 : 14, 16, { align: isArabic ? 'right' : 'left' });
+            doc.setFontSize(10);
+            doc.text(generatedOn, isArabic ? pageWidth - 14 : 14, 23, { align: isArabic ? 'right' : 'left' });
+
+            let currentY = 30;
+
+            currentY = buildPdfTable(
+                doc,
+                t('analytics.greenhouseDashboard.appliedFilters'),
+                [t('analytics.greenhouseDashboard.metric'), t('analytics.greenhouseDashboard.value')],
+                [
+                    [t('analytics.greenhouseDashboard.region'), region ? (isLTR ? region.name : region.nameInArrabic) : t('filters.all')],
+                    [t('analytics.greenhouseDashboard.emirate'), emirate ? (isLTR ? emirate.name : emirate.nameInArrabic) : t('filters.all')],
+                    [t('analytics.greenhouseDashboard.center'), center ? (isLTR ? center.name : center.nameInArrabic) : t('filters.all')],
+                    [t('analytics.greenhouseDashboard.location'), location ? (isLTR ? location.name : location.nameInArrabic) : t('filters.all')],
+                    [t('analytics.greenhouseDashboard.greenhouseType'), selectedGreenhouseType ? (isLTR ? selectedGreenhouseType.name : selectedGreenhouseType.nameInArrabic) : t('filters.all')],
+                    [t('analytics.greenhouseDashboard.coverType'), selectedCoverType ? (isLTR ? selectedCoverType.name : selectedCoverType.nameInArrabic) : t('filters.all')],
+                ],
+                currentY
+            );
+
+            currentY = buildPdfTable(
+                doc,
+                t('analytics.greenhouseDashboard.sheetSummary'),
+                [t('analytics.greenhouseDashboard.metric'), t('analytics.greenhouseDashboard.value')],
+                [
+                    [t('translation.farmsWithGreenhouses'), analytics.totalFarms],
+                    [t('translation.totalGreenhouses'), analytics.totalGreenhouses],
+                    [t('analytics.greenhouseDashboard.totalGreenhouseAreaHa'), analytics.totalGreenhouseArea],
+                    [t('analytics.greenhouseDashboard.avgGreenhousesPerFarm'), analytics.avgGreenhousesPerFarm],
+                    [t('translation.avgAreaPerGreenhouse'), analytics.avgAreaPerGreenhouse],
+                ],
+                currentY
+            );
+
+            currentY = buildPdfTable(
+                doc,
+                t('analytics.greenhouseDashboard.sheetGreenhouseTypes'),
+                [
+                    t('analytics.greenhouseDashboard.colType'),
+                    t('analytics.greenhouseDashboard.colCount'),
+                    t('analytics.greenhouseDashboard.colPercentage'),
+                ],
+                analytics.greenhouseTypesData.map((item) => [item.name, item.count, `${item.value}%`]),
+                currentY
+            );
+
+            if (analytics.coverTypesData.length) {
+                currentY = buildPdfTable(
+                    doc,
+                    t('analytics.greenhouseDashboard.sheetCoverTypes'),
+                    [
+                        t('analytics.greenhouseDashboard.colCoverType'),
+                        t('analytics.greenhouseDashboard.colCount'),
+                        t('analytics.greenhouseDashboard.colPercentage'),
+                    ],
+                    analytics.coverTypesData.map((item) => [item.name, item.count, `${item.value}%`]),
+                    currentY
+                );
+            }
+
+            currentY = buildPdfTable(
+                doc,
+                t('analytics.greenhouseDashboard.sheetByEmirate'),
+                [
+                    t('analytics.greenhouseDashboard.emirate'),
+                    t('analytics.greenhouseDashboard.colTotalAreaSqm'),
+                    t('analytics.greenhouseDashboard.colNumberOfGreenhouses'),
+                    t('analytics.greenhouseDashboard.colAverageAreaPerGreenhouseSqm'),
+                ],
+                analytics.emirateAreaData.map((item) => [item.name, item.value, item.count, item.avgArea]),
+                currentY
+            );
+
+            currentY = buildPdfTable(
+                doc,
+                t('analytics.greenhouseDashboard.sheetGreenhousesPerFarm'),
+                [
+                    t('analytics.greenhouseDashboard.colNumberOfGreenhouses'),
+                    t('analytics.greenhouseDashboard.colNumberOfFarms'),
+                ],
+                analytics.greenhousesPerFarmData.map((item) => [item.count, item.farms]),
+                currentY
+            );
+
+            if (analytics.topFarms.length) {
+                currentY = buildPdfTable(
+                    doc,
+                    t('analytics.greenhouseDashboard.sheetTopFarms'),
+                    [
+                        t('analytics.greenhouseDashboard.farmNo'),
+                        t('analytics.greenhouseDashboard.emirate'),
+                        t('analytics.greenhouseDashboard.region'),
+                        t('analytics.greenhouseDashboard.center'),
+                        t('analytics.greenhouseDashboard.greenhouses'),
+                        t('analytics.greenhouseDashboard.colTotalAreaSqm'),
+                    ],
+                    analytics.topFarms.map((farm) => [
+                        farm.farmNo,
+                        farm.emirate,
+                        farm.region,
+                        farm.center,
+                        farm.greenhouses,
+                        farm.area,
+                    ]),
+                    currentY
+                );
+            }
+
+            buildPdfTable(
+                doc,
+                t('translation.farmSizeDistribution'),
+                ['Area Range', t('analytics.greenhouseDashboard.colNumberOfFarms')],
+                analytics.sizeDistribution.map((item) => [item.size, item.farms]),
+                currentY
+            );
+
+            const timestamp = new Date().toISOString().split('T')[0];
+            doc.save(`Greenhouse_Analytics_${timestamp}.pdf`);
+        } catch (error) {
+            console.error('PDF export failed:', error);
+            toast.error(t('farmers.toast.pdfGenerationFailed') || t('analytics.greenhouseDashboard.exportFailed'));
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
     // Clear all filters
     const clearAllFilters = () => {
         setRegion(null);
@@ -468,14 +650,24 @@ const GreenhouseDashboard = () => {
                                 <p className="text-sm text-gray-500 mt-0.5">{t('translation.greenhouseAnalytics')}</p>
                             </div>
                         </div>
-                        <button
-                            onClick={exportToExcel}
-                            disabled={isExporting}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <Download className="w-4 h-4" />
-                                            {isExporting ? t('analytics.greenhouseDashboard.exporting') : t('analytics.greenhouseDashboard.exportReport')}
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={exportToPdf}
+                                disabled={isExporting}
+                                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Download className="w-4 h-4" />
+                                {isExporting ? t('analytics.greenhouseDashboard.exporting') : (t('common.downloadOptions.pdf') || 'PDF')}
+                            </button>
+                            <button
+                                onClick={exportToExcel}
+                                disabled={isExporting}
+                                className="flex items-center gap-2 px-5 py-2.5 bg-white text-emerald-700 rounded-xl border border-emerald-200 hover:bg-emerald-50 transition-all shadow-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                <Download className="w-4 h-4" />
+                                {isExporting ? t('analytics.greenhouseDashboard.exporting') : (t('common.downloadOptions.excel') || 'Excel')}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Filters */}
