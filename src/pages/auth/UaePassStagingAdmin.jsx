@@ -252,12 +252,14 @@ export const UaePassStagingAdmin = () => {
           <button
             onClick={startLogin}
             disabled={loading}
-            className="flex w-full max-w-full items-center justify-center gap-2 rounded-full border border-1 border-black bg-white px-5 py-3 text-center text-base font-semibold text-black shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:shadow-lg active:scale-95 active:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-emerald-400 sm:w-auto sm:max-w-[380px] sm:gap-3 sm:px-10 sm:py-4 sm:text-lg md:text-xl"
+            className="flex w-full max-w-full items-center justify-center gap-2 rounded-full border border-1 border-black bg-white px-4 py-3 text-center text-sm font-semibold text-black shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:shadow-lg active:scale-95 active:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-emerald-400 sm:w-auto sm:max-w-[420px] sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:text-lg"
             aria-label={`${t('auth.loginWithUaePass')} (${t('auth.uaePassStaging')})`}
           >
             <UaePassLogo className="h-6 w-6 shrink-0" variant="onDark" />
-            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
-            <span className="whitespace-normal leading-tight">{`${t('auth.loginWithUaePass')} (${t('auth.uaePassStaging')})`}</span>
+            <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
+            </span>
+            <span className="whitespace-nowrap leading-none">{`${t('auth.loginWithUaePass')} (${t('auth.uaePassStaging')})`}</span>
           </button>
         </div>
 
