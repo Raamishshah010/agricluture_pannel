@@ -738,14 +738,22 @@
       "enterEmail": "أدخل البريد الإلكتروني",
       "enterPhone": "أدخل رقم الهاتف",
       "password": "كلمة المرور",
-      "emptyCTA": "أضف أول مزارع للبدء"
+      "emptyCTA": "أضف أول مزارع للبدء",
+      "pendingApproval": "بانتظار الاعتماد",
+      "approvalStatus": "حالة الاعتماد"
     },
     "farmerApprovals": {
       "title": "اعتماد المزارعين",
       "subtitle": "راجع المزارعين المسجلين من التطبيق وقم بالموافقة أو الرفض.",
       "searchPlaceholder": "ابحث بالاسم أو البريد أو الهاتف أو رقم الإمارة",
       "pendingBadge": "بانتظار الاعتماد",
+      "rejectedBadge": "مرفوض",
+      "approvedStatus": "معتمد",
+      "rejectedStatus": "مرفوض",
       "emptyState": "لا يوجد مزارعون بانتظار الاعتماد.",
+      "emptyRejectedState": "لا يوجد مزارعون مرفوضون.",
+      "pendingTab": "قيد الانتظار",
+      "rejectedTab": "المرفوضون",
       "approveConfirm": "هل تريد اعتماد هذا المزارع؟",
       "rejectConfirm": "هل تريد رفض هذا المزارع؟",
       "approveSuccess": "تم اعتماد المزارع بنجاح",

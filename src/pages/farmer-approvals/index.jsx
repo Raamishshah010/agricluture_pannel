@@ -8,6 +8,7 @@ import Loader from "../../components/Loader";
 export default function FarmerApprovals() {
   const t = useTranslation();
   const [list, setList] = useState([]);
+  const [activeTab, setActiveTab] = useState("pending");
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [actionLoading, setActionLoading] = useState({});
@@ -15,7 +16,8 @@ export default function FarmerApprovals() {
   const fetchPendingApprovals = async () => {
     try {
       setLoading(true);
-      const res = await service.getPendingApprovals();
+      const status = activeTab === "rejected" ? "rejected" : "pending_approval";
+      const res = await service.getPendingApprovals(100, status);
       setList(res?.data?.items || []);
     } catch (error) {
       toast.error(error.response?.data?.message || t("farmers.farmerApprovals.loadFail"));
@@ -26,12 +28,18 @@ export default function FarmerApprovals() {
 
   useEffect(() => {
     fetchPendingApprovals();
-  }, []);
+  }, [activeTab]);
 
   const filteredList = useMemo(() => {
+    const baseList = list.filter((item) => {
+      if (activeTab === "rejected") {
+        return item.approvalStatus === "rejected";
+      }
+      return (item.approvalStatus || "pending_approval") === "pending_approval";
+    });
     const q = query.trim().toLowerCase();
-    if (!q) return list;
-    return list.filter((item) => {
+    if (!q) return baseList;
+    return baseList.filter((item) => {
       const haystack = [
         item.name,
         item.email,
@@ -43,7 +51,7 @@ export default function FarmerApprovals() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [list, query]);
+  }, [list, query, activeTab]);
 
   const formatDate = (dateString) => {
     if (!dateString) return t("common.nA");
@@ -112,6 +120,28 @@ export default function FarmerApprovals() {
               </div>
             </div>
           </div>
+          <div className="mt-6 flex flex-wrap gap-2">
+            <button
+              onClick={() => setActiveTab("pending")}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                activeTab === "pending"
+                  ? "bg-emerald-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {t("farmers.farmerApprovals.pendingTab")}
+            </button>
+            <button
+              onClick={() => setActiveTab("rejected")}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${
+                activeTab === "rejected"
+                  ? "bg-red-600 text-white"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {t("farmers.farmerApprovals.rejectedTab")}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -141,7 +171,11 @@ export default function FarmerApprovals() {
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                 <Clock3 className="w-10 h-10 text-gray-400" />
               </div>
-              <p className="text-gray-500 font-medium">{t("farmers.farmerApprovals.emptyState")}</p>
+              <p className="text-gray-500 font-medium">
+                {activeTab === "rejected"
+                  ? t("farmers.farmerApprovals.emptyRejectedState")
+                  : t("farmers.farmerApprovals.emptyState")}
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -185,28 +219,38 @@ export default function FarmerApprovals() {
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
                         <td className="px-4 py-3">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-xs font-semibold text-amber-700 border border-amber-200 whitespace-nowrap">
-                            {t("farmers.farmerApprovals.pendingBadge")}
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border whitespace-nowrap ${
+                            activeTab === "rejected"
+                              ? "bg-red-50 text-red-700 border-red-200"
+                              : "bg-amber-50 text-amber-700 border-amber-200"
+                          }`}>
+                            {activeTab === "rejected"
+                              ? t("farmers.farmerApprovals.rejectedBadge")
+                              : t("farmers.farmerApprovals.pendingBadge")}
                           </span>
                         </td>
                         <td className="px-4 py-3">
                           <div className="flex justify-center gap-2">
-                            <button
-                              onClick={() => handleDecision(item, "approve")}
-                              disabled={isBusy}
-                              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                            >
-                              <CheckCircle2 className="w-4 h-4" />
-                              {t("common.components.farmCoding.approve")}
-                            </button>
-                            <button
-                              onClick={() => handleDecision(item, "reject")}
-                              disabled={isBusy}
-                              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                            >
-                              <XCircle className="w-4 h-4" />
-                              {t("common.components.farmCoding.reject")}
-                            </button>
+                            {activeTab === "pending" && (
+                              <>
+                                <button
+                                  onClick={() => handleDecision(item, "approve")}
+                                  disabled={isBusy}
+                                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  {t("common.components.farmCoding.approve")}
+                                </button>
+                                <button
+                                  onClick={() => handleDecision(item, "reject")}
+                                  disabled={isBusy}
+                                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                  {t("common.components.farmCoding.reject")}
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>

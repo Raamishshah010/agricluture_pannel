@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import service from "../../services/farmerService";
 import { toast } from "react-toastify";
 import Farmers from "./farmers";
@@ -37,6 +37,8 @@ export default function Index(props) {
   );
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const lastFarmersRequestKeyRef = useRef("");
+  const requestSequenceRef = useRef(0);
 
   useEffect(() => {
     sessionStorage.setItem("farmerActiveTab", activeTab);
@@ -66,33 +68,29 @@ export default function Index(props) {
   }, [randomNumber]);
 
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        setLoading(true);
-        const res = await service.getFarmers(1, 50);
-        setList(res.data);
-        setCount(res.pagination.totalPages);
-      } catch (err) {
-        toast.error(err.response?.data?.message || err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetch();
-  }, []);
-
-  useEffect(() => {
     if (!query.trim()) {
+      const requestKey = "1|50|";
+      if (lastFarmersRequestKeyRef.current === requestKey) {
+        return;
+      }
+      lastFarmersRequestKeyRef.current = requestKey;
+
       const fetch = async () => {
+        const requestId = ++requestSequenceRef.current;
         try {
           setLoading(true);
-          const res = await service.getFarmers(1, 50);
+          const res = await service.getFarmers(1, 50, "");
+          if (requestId !== requestSequenceRef.current) return;
           setList(res.data);
           setCount(res.pagination.totalPages);
         } catch (err) {
-          toast.error(err.response?.data?.message || err.message);
+          if (requestId === requestSequenceRef.current) {
+            toast.error(err.response?.data?.message || err.message);
+          }
         } finally {
-          setLoading(false);
+          if (requestId === requestSequenceRef.current) {
+            setLoading(false);
+          }
         }
       };
       fetch();
@@ -101,15 +99,25 @@ export default function Index(props) {
 
     const delayDebounce = setTimeout(() => {
       const fetchData = async () => {
+        const normalizedQuery = query.trim();
+        const requestKey = `1|50|${normalizedQuery}`;
+        if (lastFarmersRequestKeyRef.current === requestKey) {
+          return;
+        }
+        lastFarmersRequestKeyRef.current = requestKey;
+        const requestId = ++requestSequenceRef.current;
         try {
           setLoading(true);
-          const res = await service.getFarmers(1, 50, query);
+          const res = await service.getFarmers(1, 50, normalizedQuery);
+          if (requestId !== requestSequenceRef.current) return;
           setList(res.data);
           setLoading(false);
           setCount(res.pagination.totalPages);
         } catch (err) {
-          setLoading(false);
-          toast.error(err.message);
+          if (requestId === requestSequenceRef.current) {
+            setLoading(false);
+            toast.error(err.message);
+          }
         }
       };
 
@@ -127,16 +135,27 @@ export default function Index(props) {
   }, [props.number, randomNumber]);
 
   const loadMore = async (currentPage) => {
+    const requestKey = `${currentPage}|50|${query.trim()}`;
+    if (lastFarmersRequestKeyRef.current === requestKey) {
+      return;
+    }
+    lastFarmersRequestKeyRef.current = requestKey;
+    const requestId = ++requestSequenceRef.current;
     try {
       setLoading(true);
-      const res = await service.getFarmers(currentPage, 50);
+      const res = await service.getFarmers(currentPage, 50, query.trim());
+      if (requestId !== requestSequenceRef.current) return;
       setList(res.data);
       setCount(res.pagination.totalPages);
       setPage(currentPage);
     } catch (err) {
-      toast.error(err.response?.data?.message || err.message);
+      if (requestId === requestSequenceRef.current) {
+        toast.error(err.response?.data?.message || err.message);
+      }
     } finally {
-      setLoading(false);
+      if (requestId === requestSequenceRef.current) {
+        setLoading(false);
+      }
     }
   };
 

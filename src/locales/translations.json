@@ -749,14 +749,22 @@
       "enterEmail": "Enter email",
       "enterPhone": "Enter phone number",
       "password": "Password",
-      "emptyCTA": "Add your first farmer to get started"
+      "emptyCTA": "Add your first farmer to get started",
+      "pendingApproval": "Pending Approval",
+      "approvalStatus": "Approval Status"
     },
     "farmerApprovals": {
       "title": "Farmer Approvals",
       "subtitle": "Review farmers registered from the mobile app and approve or reject them.",
       "searchPlaceholder": "Search by name, email, phone, or Emirates ID",
       "pendingBadge": "Pending approval",
+      "rejectedBadge": "Rejected",
+      "approvedStatus": "Approved",
+      "rejectedStatus": "Rejected",
       "emptyState": "No farmers are waiting for approval.",
+      "emptyRejectedState": "No rejected farmers found.",
+      "pendingTab": "Pending",
+      "rejectedTab": "Rejected",
       "approveConfirm": "Approve this farmer?",
       "rejectConfirm": "Reject this farmer?",
       "approveSuccess": "Farmer approved successfully",

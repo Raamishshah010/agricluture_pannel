@@ -169,6 +169,9 @@ export default function Farmers({ list, handleFarms, setList }) {
                                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-32">
                                     {t('farmers.farmers.createdAt')}
                                 </th>
+                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40">
+                                    {t('farmers.farmers.approvalStatus')}
+                                </th>
                                 <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-72">
                                     {t('farmers.farmers.actions')}
                                 </th>
@@ -220,6 +223,21 @@ export default function Farmers({ list, handleFarms, setList }) {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                             </svg>
                                             {formatDate(farmer.createdAt)}
+                                        </span>
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap border ${
+                                            (farmer.approvalStatus || 'pending_approval') === 'approved'
+                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                                                : (farmer.approvalStatus || 'pending_approval') === 'rejected'
+                                                ? 'bg-red-50 text-red-700 border-red-200'
+                                                : 'bg-amber-50 text-amber-700 border-amber-200'
+                                        }`}>
+                                            {(farmer.approvalStatus || 'pending_approval') === 'approved'
+                                                ? t('farmers.farmerApprovals.approvedStatus')
+                                                : (farmer.approvalStatus || 'pending_approval') === 'rejected'
+                                                ? t('farmers.farmerApprovals.rejectedStatus')
+                                                : t('farmers.farmers.pendingApproval')}
                                         </span>
                                     </td>
                                     <td className="px-4 py-3">

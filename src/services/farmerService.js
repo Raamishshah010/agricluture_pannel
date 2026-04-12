@@ -5,6 +5,10 @@ const apiClient = axios.create({
     baseURL: API_BASE_URL,
 });
 
+const inflightRequests = new Map();
+
+const getInflightKey = (method, url) => `${method}:${url}`;
+
 apiClient.interceptors.request.use((config) => {
     const token = sessionStorage.getItem('adminToken');
     if (token) {
@@ -22,9 +26,23 @@ export const farmerService = {
         const response = await apiClient.get('/api/farmer/coders');
         return response.data;
     },
-    getFarmers: async (page, limit, query='') => {
-        const response = await apiClient.get(`/api/farmer/farmers?page=${page}&limit=${limit}&search=${query}`);
-        return response.data;
+    getFarmers: async (page, limit, query = '') => {
+        const normalizedQuery = String(query || '').trim();
+        const url = `/api/farmer/farmers?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}&search=${encodeURIComponent(normalizedQuery)}`;
+        const inflightKey = getInflightKey('GET', url);
+
+        if (inflightRequests.has(inflightKey)) {
+            return inflightRequests.get(inflightKey);
+        }
+
+        const request = apiClient.get(url)
+            .then((response) => response.data)
+            .finally(() => {
+                inflightRequests.delete(inflightKey);
+            });
+
+        inflightRequests.set(inflightKey, request);
+        return request;
     },
     getFarmerFarms: async (id) => {
         const response = await apiClient.get('/api/farm/owner/' + id);
@@ -34,8 +52,8 @@ export const farmerService = {
         const response = await apiClient.get('/api/farmer/search?query=' + query);
         return response.data;
     },
-    getPendingApprovals: async (limit = 100) => {
-        const response = await apiClient.get(`/api/farmer/pending-approvals?limit=${limit}`);
+    getPendingApprovals: async (limit = 100, status = 'pending_approval') => {
+        const response = await apiClient.get(`/api/farmer/pending-approvals?limit=${limit}&status=${encodeURIComponent(status)}`);
         return response.data;
     },
     updateApprovalStatus: async (id, payload) => {
