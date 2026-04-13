@@ -8,6 +8,7 @@ import { Conform } from "./pages/auth/ConformEmail";
 import { ResetPassword } from "./pages/auth/ResetPassword";
 import { UaePassLogin } from "./pages/auth/UaePassLogin";
 import UaePassStagingAdmin from "./pages/auth/UaePassStagingAdmin";
+import TestingUaePass from "./pages/auth/TestingUaePass";
 import useStore from './store/store.js'
 import service from './services/adminService.js'
 import farmService from './services/farmService.js'
@@ -94,6 +95,7 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/ue-pass" element={<Navigate to="/" replace />} />
         <Route path="/ue-pass-staging-admin" element={<UaePassStagingAdmin />} />
+        <Route path="/testing-uaepass" element={<TestingUaePass />} />
 
         <Route
           path="/dashboard/*"

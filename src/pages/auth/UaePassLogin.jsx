@@ -10,6 +10,7 @@ import { getUaePassOutcome } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
+const TESTING_FLOW_KEY = "uae-pass-testing-flow";
 
 const ENVIRONMENT_OPTIONS = [
   { value: "staging", labelKey: "auth.uaePassStaging" },
@@ -114,6 +115,19 @@ export const UaePassLogin = () => {
 
     try {
       const parsed = decodePayload(payload);
+
+      // If a testing flow started, forward payload to testing page and stop normal processing.
+      try {
+        const isTestingFlow = window.sessionStorage.getItem(TESTING_FLOW_KEY);
+        if (isTestingFlow === 'true') {
+          window.sessionStorage.removeItem(TESTING_FLOW_KEY);
+          const forwardUrl = `${window.location.origin}/testing-uaepass?payload=${encodeURIComponent(payload)}`;
+          window.location.replace(forwardUrl);
+          return;
+        }
+      } catch (e) {
+        console.warn('Failed to forward to testing UAE Pass page', e);
+      }
 
       // If a staging-admin flow started, forward the payload to the staging admin page
       try {

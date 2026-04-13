@@ -15,6 +15,8 @@ export default function Farmers({ list, handleFarms, setList }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [actionLoading, setActionLoading] = useState({});
+    const [statusFilter, setStatusFilter] = useState('all');
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
@@ -126,6 +128,91 @@ export default function Farmers({ list, handleFarms, setList }) {
         });
     };
 
+    const getNormalizedApprovalStatus = (farmer) => {
+        const rawApproval = String(farmer?.approvalStatus || '').toLowerCase().trim();
+        if (rawApproval === 'approved') return 'approved';
+        if (rawApproval === 'rejected') return 'rejected';
+        if (['pending_approval', 'under_review', 'needs_revision', 'pending'].includes(rawApproval)) {
+            return 'pending_approval';
+        }
+
+        const rawStatus = String(farmer?.status || '').toLowerCase().trim();
+        if (rawStatus === 'active') return 'approved';
+        if (['inactive', 'suspended', 'rejected'].includes(rawStatus)) return 'rejected';
+        if (['pending_approval', 'under_review', 'needs_revision'].includes(rawStatus)) {
+            return 'pending_approval';
+        }
+
+        return 'pending_approval';
+    };
+
+    const getApprovalBadgeClasses = (status) => {
+        if (status === 'approved') {
+            return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+        }
+        if (status === 'rejected') {
+            return 'bg-red-50 text-red-700 border-red-200';
+        }
+        return 'bg-amber-50 text-amber-700 border-amber-200';
+    };
+
+    const getApprovalLabel = (status) => {
+        if (status === 'approved') return t('farmers.farmerApprovals.approvedStatus');
+        if (status === 'rejected') return t('farmers.farmerApprovals.rejectedStatus');
+        return t('farmers.farmers.pendingApproval');
+    };
+
+    const filteredList = list.filter((farmer) => {
+        if (statusFilter === 'all') return true;
+        return getNormalizedApprovalStatus(farmer) === statusFilter;
+    });
+
+    const handleApprovalDecision = async (farmer, action) => {
+        const confirmKey = action === 'approve'
+            ? 'farmers.farmerApprovals.approveConfirm'
+            : 'farmers.farmerApprovals.rejectConfirm';
+
+        if (!window.confirm(t(confirmKey))) {
+            return;
+        }
+
+        try {
+            setActionLoading((prev) => ({ ...prev, [farmer.id]: action }));
+            const res = await service.updateApprovalStatus(farmer.id, { action });
+            const updatedFarmer = res?.data?.farmer || {};
+
+            setList((prev) => sortFarmersByCreatedAtDesc(prev.map((entry) => {
+                if (entry.id !== farmer.id) return entry;
+                return {
+                    ...entry,
+                    ...updatedFarmer,
+                    status: res?.data?.status || updatedFarmer?.status || entry.status,
+                    approvalStatus: res?.data?.approvalStatus || updatedFarmer?.approvalStatus || entry.approvalStatus,
+                    statusDetails: res?.data?.statusDetails || updatedFarmer?.statusDetails || entry.statusDetails,
+                };
+            })));
+
+            toast.success(
+                action === 'approve'
+                    ? t('farmers.farmerApprovals.approveSuccess')
+                    : t('farmers.farmerApprovals.rejectSuccess')
+            );
+        } catch (error) {
+            toast.error(
+                error.response?.data?.message ||
+                (action === 'approve'
+                    ? t('farmers.farmerApprovals.approveFail')
+                    : t('farmers.farmerApprovals.rejectFail'))
+            );
+        } finally {
+            setActionLoading((prev) => {
+                const next = { ...prev };
+                delete next[farmer.id];
+                return next;
+            });
+        }
+    };
+
     return (
         <div className="bg-gradient-to-br from-gray-50 to-gray-100">
             {/* Header Section */}
@@ -152,13 +239,54 @@ export default function Farmers({ list, handleFarms, setList }) {
                     </div>
                     <div>
                         <p className="text-sm text-gray-500 font-medium">{t('farmers.stats.totalFarmers')}</p>
-                        <p className="text-3xl font-bold text-gray-900">{list.length}</p>
+                        <p className="text-3xl font-bold text-gray-900">{filteredList.length}</p>
+                        {statusFilter !== 'all' && (
+                            <p className="text-xs text-gray-400 mt-1">{list.length} total</p>
+                        )}
                     </div>
                 </div>
             </div>
 
             {/* Table Section */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="px-4 py-4 border-b border-gray-100 bg-gray-50 flex flex-wrap items-center gap-2">
+                    <button
+                        onClick={() => setStatusFilter('all')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${statusFilter === 'all'
+                            ? 'bg-gray-800 text-white'
+                            : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
+                            }`}
+                    >
+                        All
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('pending_approval')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${statusFilter === 'pending_approval'
+                            ? 'bg-amber-600 text-white'
+                            : 'bg-white text-amber-700 border border-amber-200 hover:bg-amber-50'
+                            }`}
+                    >
+                        {t('farmers.farmers.pendingApproval')}
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('approved')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${statusFilter === 'approved'
+                            ? 'bg-emerald-600 text-white'
+                            : 'bg-white text-emerald-700 border border-emerald-200 hover:bg-emerald-50'
+                            }`}
+                    >
+                        {t('farmers.farmerApprovals.approvedStatus')}
+                    </button>
+                    <button
+                        onClick={() => setStatusFilter('rejected')}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${statusFilter === 'rejected'
+                            ? 'bg-red-600 text-white'
+                            : 'bg-white text-red-700 border border-red-200 hover:bg-red-50'
+                            }`}
+                    >
+                        {t('farmers.farmerApprovals.rejectedStatus')}
+                    </button>
+                </div>
                 <div className="overflow-x-auto">
                     <table className="w-full table-auto">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
@@ -187,7 +315,12 @@ export default function Farmers({ list, handleFarms, setList }) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {list.map((farmer) => (
+                            {filteredList.map((farmer) => {
+                                const approvalStatus = getNormalizedApprovalStatus(farmer);
+                                const isPendingApproval = approvalStatus === 'pending_approval';
+                                const isBusy = !!actionLoading[farmer.id];
+
+                                return (
                                 <tr key={farmer.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-4 py-3">
                                         <div className="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-sm">
@@ -243,22 +376,32 @@ export default function Farmers({ list, handleFarms, setList }) {
                                         </span>
                                     </td>
                                     <td className="px-4 py-3">
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap border ${
-                                            (farmer.approvalStatus || 'pending_approval') === 'approved'
-                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                                                : (farmer.approvalStatus || 'pending_approval') === 'rejected'
-                                                ? 'bg-red-50 text-red-700 border-red-200'
-                                                : 'bg-amber-50 text-amber-700 border-amber-200'
-                                        }`}>
-                                            {(farmer.approvalStatus || 'pending_approval') === 'approved'
-                                                ? t('farmers.farmerApprovals.approvedStatus')
-                                                : (farmer.approvalStatus || 'pending_approval') === 'rejected'
-                                                ? t('farmers.farmerApprovals.rejectedStatus')
-                                                : t('farmers.farmers.pendingApproval')}
+                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap border ${getApprovalBadgeClasses(approvalStatus)}`}>
+                                            {getApprovalLabel(approvalStatus)}
                                         </span>
                                     </td>
                                     <td className="px-4 py-3">
                                         <div className="flex justify-center gap-1.5">
+                                            {isPendingApproval && (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleApprovalDecision(farmer, 'approve')}
+                                                        disabled={isBusy}
+                                                        className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-medium text-xs shadow-sm hover:shadow-md whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+                                                        title={t('common.components.farmCoding.approve')}
+                                                    >
+                                                        {t('common.components.farmCoding.approve')}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleApprovalDecision(farmer, 'reject')}
+                                                        disabled={isBusy}
+                                                        className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium text-xs shadow-sm hover:shadow-md whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+                                                        title={t('common.components.farmCoding.reject')}
+                                                    >
+                                                        {t('common.components.farmCoding.reject')}
+                                                    </button>
+                                                </>
+                                            )}
                                             <button
                                                 onClick={() => handleFarms(farmer)}
                                                 className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-medium text-xs shadow-sm hover:shadow-md flex items-center gap-1.5 whitespace-nowrap"
@@ -284,12 +427,12 @@ export default function Farmers({ list, handleFarms, setList }) {
                                         </div>
                                     </td>
                                 </tr>
-                            ))}
+                            )})}
                         </tbody>
                     </table>
                 </div>
 
-                {list.length === 0 && (
+                {filteredList.length === 0 && (
                     <div className="text-center py-16">
                         <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                             <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

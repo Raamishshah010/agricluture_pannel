@@ -35,6 +35,7 @@ export default function Index(props) {
   });
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState("");
+  const [submittedQuery, setSubmittedQuery] = useState("");
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(1);
   const [randomNumber, setRandomNumber] = useState(
@@ -73,7 +74,9 @@ export default function Index(props) {
   }, [randomNumber]);
 
   useEffect(() => {
-    if (!query.trim()) {
+    const normalizedSearch = submittedQuery.trim();
+
+    if (!normalizedSearch) {
       const requestKey = "1|50|";
       if (lastFarmersRequestKeyRef.current === requestKey) {
         return;
@@ -88,6 +91,7 @@ export default function Index(props) {
           if (requestId !== requestSequenceRef.current) return;
           setList(sortFarmersByCreatedAtDesc(res.data));
           setCount(res.pagination.totalPages);
+          setPage(1);
         } catch (err) {
           if (requestId === requestSequenceRef.current) {
             toast.error(err.response?.data?.message || err.message);
@@ -102,35 +106,33 @@ export default function Index(props) {
       return;
     }
 
-    const delayDebounce = setTimeout(() => {
-      const fetchData = async () => {
-        const normalizedQuery = query.trim();
-        const requestKey = `1|50|${normalizedQuery}`;
-        if (lastFarmersRequestKeyRef.current === requestKey) {
-          return;
+    const fetchData = async () => {
+      const requestKey = `1|50|${normalizedSearch}`;
+      if (lastFarmersRequestKeyRef.current === requestKey) {
+        return;
+      }
+      lastFarmersRequestKeyRef.current = requestKey;
+      const requestId = ++requestSequenceRef.current;
+      try {
+        setLoading(true);
+        const res = await service.getFarmers(1, 50, normalizedSearch);
+        if (requestId !== requestSequenceRef.current) return;
+        setList(sortFarmersByCreatedAtDesc(res.data));
+        setCount(res.pagination.totalPages);
+        setPage(1);
+      } catch (err) {
+        if (requestId === requestSequenceRef.current) {
+          toast.error(err.response?.data?.message || err.message);
         }
-        lastFarmersRequestKeyRef.current = requestKey;
-        const requestId = ++requestSequenceRef.current;
-        try {
-          setLoading(true);
-          const res = await service.getFarmers(1, 50, normalizedQuery);
-          if (requestId !== requestSequenceRef.current) return;
-          setList(sortFarmersByCreatedAtDesc(res.data));
+      } finally {
+        if (requestId === requestSequenceRef.current) {
           setLoading(false);
-          setCount(res.pagination.totalPages);
-        } catch (err) {
-          if (requestId === requestSequenceRef.current) {
-            setLoading(false);
-            toast.error(err.message);
-          }
         }
-      };
+      }
+    };
 
-      fetchData();
-    }, 500);
-
-    return () => clearTimeout(delayDebounce);
-  }, [query]);
+    fetchData();
+  }, [submittedQuery]);
 
   useEffect(() => {
     if (props.number !== randomNumber) {
@@ -140,7 +142,7 @@ export default function Index(props) {
   }, [props.number, randomNumber]);
 
   const loadMore = async (currentPage) => {
-    const requestKey = `${currentPage}|50|${query.trim()}`;
+    const requestKey = `${currentPage}|50|${submittedQuery.trim()}`;
     if (lastFarmersRequestKeyRef.current === requestKey) {
       return;
     }
@@ -148,7 +150,7 @@ export default function Index(props) {
     const requestId = ++requestSequenceRef.current;
     try {
       setLoading(true);
-      const res = await service.getFarmers(currentPage, 50, query.trim());
+      const res = await service.getFarmers(currentPage, 50, submittedQuery.trim());
       if (requestId !== requestSequenceRef.current) return;
       setList(sortFarmersByCreatedAtDesc(res.data));
       setCount(res.pagination.totalPages);
@@ -201,9 +203,10 @@ export default function Index(props) {
       let allData = [];
       let currentPage = 1;
       let totalPages = 1;
+      const normalizedSearch = submittedQuery.trim();
 
       // Fetch first page to get total pages
-      const firstResponse = await service.getFarmers(currentPage, 50, query);
+      const firstResponse = await service.getFarmers(currentPage, 50, normalizedSearch);
       allData = [...firstResponse.data];
       totalPages = firstResponse.pagination.totalPages;
 
@@ -211,7 +214,7 @@ export default function Index(props) {
       if (totalPages > 1) {
         const promises = [];
         for (let i = 2; i <= totalPages; i++) {
-          promises.push(service.getFarmers(i, 50, query));
+          promises.push(service.getFarmers(i, 50, normalizedSearch));
         }
 
         const results = await Promise.all(promises);
@@ -339,10 +342,10 @@ const downloadPDF = async () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, t('farmers.sheetName'));
 
     // Add metadata
-    const metadataRow = query.trim()
+    const metadataRow = submittedQuery.trim()
       ? [[
           `${t('farmers.download.totalRecords')} ${allFarmers.length}`,
-          `${t('farmers.download.filterApplied')} ${query}`,
+          `${t('farmers.download.filterApplied')} ${submittedQuery}`,
         ]]
       : [[`${t('farmers.download.totalRecords')} ${allFarmers.length}`]];
 
@@ -350,7 +353,7 @@ const downloadPDF = async () => {
 
     XLSX.writeFile(
       workbook,
-      `farmers-list-all-pages${query ? "-filtered" : ""}.xlsx`,
+      `farmers-list-all-pages${submittedQuery ? "-filtered" : ""}.xlsx`,
     );
     setIsDownloadOpen(false);
     toast.success(t("farmers.downloadSuccess"));
@@ -396,8 +399,8 @@ const downloadPDF = async () => {
 
     // Add metadata at the bottom
     csvContent += `\n\n${t('farmers.download.totalRecords')} ${allFarmers.length}`;
-    if (query.trim()) {
-      csvContent += `\n${t('farmers.download.filterApplied')} ${query}`;
+    if (submittedQuery.trim()) {
+      csvContent += `\n${t('farmers.download.filterApplied')} ${submittedQuery}`;
     }
 
     // Add BOM for proper UTF-8 encoding (supports Arabic)
@@ -407,7 +410,7 @@ const downloadPDF = async () => {
     });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `farmers-list-all-pages${query ? "-filtered" : ""}.csv`;
+    link.download = `farmers-list-all-pages${submittedQuery ? "-filtered" : ""}.csv`;
     link.click();
     setIsDownloadOpen(false);
     toast.success(t("farmers.downloadSuccess"));
@@ -509,21 +512,38 @@ const downloadPDF = async () => {
         </div>
       </div>
 
-      <input
-        type="text"
-        placeholder={t("farmers.searchByFarmName")}
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        className="border border-gray-300 rounded-lg p-2 w-full mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          setSubmittedQuery(query.trim());
+        }}
+        className="w-full mb-4 flex gap-2"
+      >
+        <input
+          type="text"
+          placeholder={t("farmers.searchByFarmName")}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          type="submit"
+          className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white"
+        >
+          {t("common.components.search")}
+        </button>
+      </form>
 
       {/* Show filter badge if search is active */}
-      {query.trim() && (
+      {submittedQuery.trim() && (
         <div className="mb-4 flex items-center gap-2">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-            {t("farmers.filterActive")}: "{query}"
+            {t("farmers.filterActive")}: "{submittedQuery}"
             <button
-              onClick={() => setQuery("")}
+              onClick={() => {
+                setQuery("");
+                setSubmittedQuery("");
+              }}
               className="ml-2 text-blue-600 hover:text-blue-800"
             >
               ×

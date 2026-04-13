@@ -714,7 +714,7 @@
   "farmers": {
     "title": "Farmers",
     "subtitle": "Manage farmers",
-    "searchByFarmName": "Search by Name, Emirate ID",
+    "searchByFarmName": "Search by Name, Emirates ID, Email, Phone",
     "farms": {
       "back": "Back",
       "farms": "Farms",
