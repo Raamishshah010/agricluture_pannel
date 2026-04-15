@@ -12,16 +12,18 @@ import service from "../../services/farmerService";
 import { toast } from "react-toastify";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import useTranslation from "../../hooks/useTranslation";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import useStore from "../../store/store";
 import { amiriFontBase64 } from "../../assets/AmiriFont";
 import Loader from "../../components/Loader";
+import farmService from "../../services/farmService";
 
 export default function Coders() {
   const t = useTranslation();
+  const navigate = useNavigate();
   const [list, setList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +40,7 @@ export default function Coders() {
     image: "",
     password: "",
   });
-  const { farms, farmers } = useStore((st) => st);
+  const { farms } = useStore((st) => st);
 
   useEffect(() => {
     const fetch = async () => {
@@ -94,6 +96,23 @@ export default function Coders() {
   const closeDetailsModal = () => {
     setIsDetailsModalOpen(false);
     setSelectedCoder(null);
+  };
+
+  const handleViewFarm = async (farm) => {
+    if (!farm?.id) return;
+
+    try {
+      setLoading(true);
+      const res = await farmService.getfarmById(farm.id);
+      sessionStorage.setItem('selectedFarm', JSON.stringify(res.data));
+      sessionStorage.setItem('activeTab', 'farm-details');
+      navigate('/dashboard/manageFarms');
+      closeDetailsModal();
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -914,40 +933,50 @@ const downloadPDF = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     {t("coders.relatedFarms")}
                   </h3>
-                  {farmers.length > 0 ? (
+                  {selectedCoder.farms?.length > 0 ? (
                     <div className="space-y-3">
-                      {farmers
-                        .filter(farmer => farmer.farms && farmer.farms.includes(selectedCoder.id))
-                        .map(farmer => (
-                          <div key={farmer.id} className="bg-white rounded-lg p-4 border border-gray-200">
-                            <div className="flex justify-between items-start">
+                      {selectedCoder.farms.map((farmId) => {
+                        const farm = farms.find((item) => item.id === farmId);
+                        return (
+                          <div key={farmId} className="bg-white rounded-lg p-4 border border-gray-200">
+                            <div className="flex justify-between items-start gap-4">
                               <div>
-                                <h4 className="font-medium text-gray-900">{farmer.name}</h4>
+                                <h4 className="font-medium text-gray-900">
+                                  {farm?.farmName || farm?.name || farmId}
+                                </h4>
                                 <p className="text-sm text-gray-600 mt-1">
-                                  {t("coders.farmLocation")}: {farmer.location || t('common.nA')}
+                                  {t("coders.farmLocation")}: {farm?.location?.name || farm?.location || t('common.nA')}
                                 </p>
                                 <p className="text-sm text-gray-600">
-                                  {t("coders.farmSize")}: {farmer.size || t('common.nA')}
+                                  {t("coders.farmSize")}: {farm?.size || t('common.nA')}
                                 </p>
                               </div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex flex-col items-end gap-2">
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-100 text-xs font-medium text-emerald-800">
-                                  {t("coders.active")}
+                                  {farm?.status || t("coders.active")}
                                 </span>
+                                <span className="text-xs text-gray-500 break-all">
+                                  {farmId}
+                                </span>
+                                {farm?.id && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleViewFarm(farm)}
+                                    className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
+                                  >
+                                    <Eye size={14} />
+                                    {t("common.components.viewDetails")}
+                                  </button>
+                                )}
                               </div>
                             </div>
                           </div>
-                        ))
-                      }
-                      {farmers.filter(farmer => farmer.farms && farmer.farms.includes(selectedCoder.id)).length === 0 && (
-                        <p className="text-gray-500 text-center py-4">
-                          {t("coders.noFarmsAssigned")}
-                        </p>
-                      )}
+                        );
+                      })}
                     </div>
                   ) : (
                     <p className="text-gray-500 text-center py-4">
-                      {t("coders.noFarmsAvailable")}
+                      {t("coders.noFarmsAssigned")}
                     </p>
                   )}
                 </div>
