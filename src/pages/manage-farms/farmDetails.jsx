@@ -36,10 +36,11 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     };
 
     const InfoCard = ({ icon: Icon, title, children, gradient = "from-green-50 to-emerald-50" }) => (
-        <div className={`bg-gradient-to-br ${gradient} rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition-shadow duration-300`}>
-            <div className={`flex items-center ${isLTR ? "justify-start" : "justify-start"} gap-3 mb-5 pb-3 border-b-2 border-green-200`}>
+        <div className="relative overflow-hidden rounded-3xl border border-white/70 bg-white/85 p-6 shadow-[0_18px_50px_-18px_rgba(15,23,42,0.28)] backdrop-blur-xl transition-transform duration-300 hover:-translate-y-0.5 hover:shadow-[0_24px_60px_-20px_rgba(16,185,129,0.25)]">
+            <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${gradient}`} />
+            <div className={`flex items-center ${isLTR ? "justify-start" : "justify-start"} gap-3 mb-5 pb-4 border-b border-slate-200`}>
                 {Icon && <Icon className="w-6 h-6 text-green-600" />}
-                <h3 className="text-xl font-bold text-gray-800">{title}</h3>
+                <h3 className="text-xl font-bold tracking-tight text-slate-800">{title}</h3>
             </div>
             <div className="space-y-3">
                 {children}
@@ -48,22 +49,22 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     );
 
     const InfoRow = ({ label, value, valueClass = "" }) => (
-        <div className={`flex justify-between items-start py-2 hover:bg-white/50 px-2 rounded transition-colors ${isLTR ? "flex-row" : "flex-row"}`}>
-            <span className="text-sm text-gray-600 font-semibold">{isLTR ? `${label}:` : `${label}:`}</span>
-            <span className={`text-sm text-gray-900 text-right max-w-xs font-medium ${valueClass}`}>
+        <div className={`flex items-start justify-between gap-4 rounded-2xl px-3 py-2.5 transition-colors hover:bg-slate-50 ${isLTR ? "flex-row" : "flex-row"}`}>
+            <span className="text-sm font-semibold text-slate-500">{isLTR ? `${label}:` : `${label}:`}</span>
+            <span className={`max-w-xs text-right text-sm font-medium text-slate-900 ${valueClass}`}>
                 {value || t('common.nA')}
             </span>
         </div>
     );
 
     const StatCard = ({ label, value, icon: Icon, color = "green" }) => (
-        <div className={`bg-gradient-to-br from-${color}-50 to-${color}-100 rounded-lg p-4 border-l-4 border-${color}-500 shadow-md`}>
-            <div className={`flex items-center justify-between ${lang.includes('en') ? 'flex-row' : 'flex-row-reverse'}`}>
+        <div className="rounded-2xl border border-white/70 bg-white/80 p-4 shadow-[0_14px_35px_-18px_rgba(15,23,42,0.25)] backdrop-blur-xl">
+            <div className={`flex items-center justify-between gap-3 ${lang.includes('en') ? 'flex-row' : 'flex-row-reverse'}`}>
                 <div>
-                    <p className="text-xs text-gray-600 font-medium">{label}</p>
-                    <p className={`text-2xl font-bold text-${color}-700 mt-1`}>{value}</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
+                    <p className={`mt-2 text-2xl font-bold text-${color}-700`}>{value}</p>
                 </div>
-                {Icon && <Icon className={`w-8 h-8 text-${color}-400 opacity-50`} />}
+                {Icon && <Icon className={`w-8 h-8 text-${color}-400 opacity-60`} />}
             </div>
         </div>
     );
@@ -112,6 +113,18 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
     const isLTR = lang.includes('en');
     const coder = farmers.find(f => f.farms?.includes(farm.id));
+    const assignedCoderName = coder?.name || t('common.nA');
+    const locationName = isLTR ? farm.location?.name : farm.location?.nameInArrabic;
+    const regionName = isLTR ? farm.region?.name : farm.region?.nameInArrabic;
+    const emirateName = isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic;
+    const serviceCenterName = isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic;
+
+    const quickFacts = [
+        { label: t('farmCodingDetails.agricultureId'), value: farm.agricultureId || t('common.nA') },
+        { label: t('farmCodingDetails.farmNo'), value: farm.farmNo || t('common.nA') },
+        { label: t('farmCodingDetails.farmSerial'), value: farm.farmSerial || t('common.nA') },
+        { label: t('farmCodingDetails.size'), value: `${Math.round(farm.size)} ha` },
+    ];
 
     // Download as PDF
     const downloadPDF = () => {
@@ -645,152 +658,141 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 p-0 md:p-6">
-            <div className="flex justify-between items-center mb-4">
-                <button
-                    onClick={handleBack}
-                    className="flex items-center cursor-pointer gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 rounded-lg shadow-md transition-colors duration-200 border border-gray-200"
-                >
-                    <ArrowLeft className="w-4 h-4" />
-                    <span className="font-medium">{t('farmCodingDetails.back')}</span>
-                </button>
-
-                {/* Download Dropdown */}
-                <div className="relative">
+        <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-50 via-emerald-50/60 to-cyan-50 px-0 py-0 md:px-6 md:py-6">
+            <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-emerald-200/40 blur-3xl" />
+            <div className="pointer-events-none absolute right-0 top-0 h-96 w-96 rounded-full bg-cyan-200/30 blur-3xl" />
+            <div className="relative z-10 mx-auto max-w-7xl">
+                <div className="mb-4 flex items-center justify-between gap-3 rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.25)] backdrop-blur-xl">
                     <button
-                        onClick={() => setIsDownloadOpen(!isDownloadOpen)}
-                        className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
+                        onClick={handleBack}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-slate-700 shadow-sm transition-colors duration-200 hover:bg-slate-50"
                     >
-                        <Download size={20} />
-                        <span className="font-medium">{t('common.download')}</span>
-                        <ChevronDown
-                            size={16}
-                            className={`transition-transform duration-200 ${isDownloadOpen ? "rotate-180" : ""}`}
-                        />
+                        <ArrowLeft className="w-4 h-4" />
+                        <span className="font-medium">{t('farmCodingDetails.back')}</span>
                     </button>
 
-                    {isDownloadOpen && (
-                        <>
-                            <div
-                                className="fixed inset-0 z-10"
-                                onClick={() => setIsDownloadOpen(false)}
-                            />
-                            <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl z-50 border border-gray-100 overflow-hidden">
-                                <button
-                                    onClick={downloadPDF}
-                                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
-                                >
-                                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                                        <svg
-                                            className="w-5 h-5 text-emerald-600"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <div className="font-medium text-gray-900">{t('common.components.farmCoding.downloadOptions.pdf')}</div>
-                                        <div className="text-xs text-gray-500">{t('common.components.farmCoding.downloadOptions.pdfHint')}</div>
-                                    </div>
-                                </button>
-                                <button
-                                    onClick={downloadExcel}
-                                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
-                                >
-                                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                                        <svg
-                                            className="w-5 h-5 text-emerald-600"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <div className="font-medium text-gray-900">{t('common.components.farmCoding.downloadOptions.excel')}</div>
-                                        <div className="text-xs text-gray-500">{t('common.components.farmCoding.downloadOptions.excelHint')}</div>
-                                    </div>
-                                </button>
-                                <button
-                                    onClick={downloadCSV}
-                                    className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group rounded-b-xl"
-                                >
-                                    <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                                        <svg
-                                            className="w-5 h-5 text-emerald-600"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                            />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <div className="font-medium text-gray-900">{t('common.components.farmCoding.downloadOptions.csv')}</div>
-                                        <div className="text-xs text-gray-500">{t('common.components.farmCoding.downloadOptions.csvHint')}</div>
-                                    </div>
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto">
-                {/* Header Section */}
-                <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-2xl shadow-2xl p-8 mb-6 text-white">
-                    <div className="flex items-center justify-between flex-wrap gap-4">
-                        <div className="flex-1">
-                            <button title={t('manageFarms.farms.edit')} className="flex cursor-pointer items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-sm font-semibold" onClick={() => handleEdit(farm)}>
+                    <div className="relative flex items-center gap-3">
+                        {handleEdit && (
+                            <button title={t('manageFarms.farms.edit')} className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-emerald-700 shadow-sm transition-colors duration-200 hover:bg-emerald-100" onClick={() => handleEdit(farm)}>
                                 <SquarePenIcon size={14} />
                                 <span>{t('manageFarms.farms.edit')}</span>
                             </button>
-                            <h1 className="text-4xl font-bold mb-2" dir="rtl">{farm.farmName}</h1>
-                            <div className="flex flex-wrap gap-4 text-sm opacity-90">
-                                <span>🆔 {farm.agricultureId}</span>
-                                <span>📞 {farm.phoneNumber}</span>
-                                <span>🏛️ Farm #{farm.farmNo}</span>
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            {farm.activeStatus ? (
-                                <span className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-sm font-semibold">
-                                    <CheckCircle className="w-5 h-5" />
-                                    {t('farmCodingDetails.active')}
-                                </span>
-                            ) : (
-                                <span className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur rounded-full text-sm font-semibold">
-                                    <XCircle className="w-5 h-5" />
-                                    {t('farmCodingDetails.inactive')}
-                                </span>
+                        )}
+
+                        {/* Download Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsDownloadOpen(!isDownloadOpen)}
+                                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-white shadow-lg shadow-emerald-200 transition-all duration-200 hover:from-emerald-700 hover:to-teal-700 hover:shadow-xl hover:shadow-emerald-300"
+                            >
+                                <Download size={20} />
+                                <span className="font-medium">{t('common.download')}</span>
+                                <ChevronDown
+                                    size={16}
+                                    className={`transition-transform duration-200 ${isDownloadOpen ? "rotate-180" : ""}`}
+                                />
+                            </button>
+
+                            {isDownloadOpen && (
+                                <>
+                                    <div
+                                        className="fixed inset-0 z-10"
+                                        onClick={() => setIsDownloadOpen(false)}
+                                    />
+                                    <div className="absolute right-0 z-50 mt-2 w-52 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)]">
+                                        <button
+                                            onClick={downloadPDF}
+                                            className="group flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-emerald-50"
+                                        >
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 transition-colors group-hover:bg-emerald-200">
+                                                <svg className="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div className="font-medium text-slate-900">{t('common.components.farmCoding.downloadOptions.pdf')}</div>
+                                                <div className="text-xs text-slate-500">{t('common.components.farmCoding.downloadOptions.pdfHint')}</div>
+                                            </div>
+                                        </button>
+                                        <button
+                                            onClick={downloadExcel}
+                                            className="group flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-emerald-50"
+                                        >
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 transition-colors group-hover:bg-emerald-200">
+                                                <svg className="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div className="font-medium text-slate-900">{t('common.components.farmCoding.downloadOptions.excel')}</div>
+                                                <div className="text-xs text-slate-500">{t('common.components.farmCoding.downloadOptions.excelHint')}</div>
+                                            </div>
+                                        </button>
+                                        <button
+                                            onClick={downloadCSV}
+                                            className="group flex w-full items-center gap-3 rounded-b-2xl px-4 py-3 text-left transition-colors hover:bg-emerald-50"
+                                        >
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 transition-colors group-hover:bg-emerald-200">
+                                                <svg className="h-5 w-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div className="font-medium text-slate-900">{t('common.components.farmCoding.downloadOptions.csv')}</div>
+                                                <div className="text-xs text-slate-500">{t('common.components.farmCoding.downloadOptions.csvHint')}</div>
+                                            </div>
+                                        </button>
+                                    </div>
+                                </>
                             )}
-                            <span className="px-4 py-2 bg-white/20 backdrop-blur rounded-full text-sm font-semibold capitalize text-center">
-                                {farm.status}
-                            </span>
                         </div>
                     </div>
                 </div>
 
+                <section className="mb-6 overflow-hidden rounded-[2rem] border border-white/70 bg-gradient-to-br from-emerald-600 via-green-600 to-teal-600 p-8 text-white shadow-[0_24px_80px_-24px_rgba(16,185,129,0.45)]">
+                    <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-center">
+                        <div>
+                            <div className="mb-4 flex flex-wrap items-center gap-3">
+                                <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur">
+                                    {farm.activeStatus ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                                    {farm.activeStatus ? t('farmCodingDetails.active') : t('farmCodingDetails.inactive')}
+                                </span>
+                                <span className="rounded-full bg-white/15 px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] backdrop-blur">
+                                    {farm.status}
+                                </span>
+                            </div>
+                            <h1 className="max-w-3xl text-4xl font-black tracking-tight md:text-5xl" dir="rtl">{farm.farmName}</h1>
+                            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/85 md:text-base">
+                                {farm.notes || t('common.nA')}
+                            </p>
+                            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                {quickFacts.map((item) => (
+                                    <div key={item.label} className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
+                                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/70">{item.label}</p>
+                                        <p className="mt-1 text-sm font-semibold text-white">{item.value}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="grid gap-4">
+                            <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur">
+                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">{t('farmCodingDetails.coderInformation')}</p>
+                                <p className="mt-2 text-2xl font-bold">{assignedCoderName}</p>
+                                <p className="mt-1 text-sm text-white/80">
+                                    {coder ? `${t('farmCodingDetails.email')}: ${coder.email}` : t('common.nA')}
+                                </p>
+                            </div>
+                            <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur">
+                                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">{t('farmCodingDetails.locationDetails')}</p>
+                                <p className="mt-2 text-lg font-semibold">{locationName || t('common.nA')}</p>
+                                <p className="mt-1 text-sm text-white/80">{[regionName, emirateName, serviceCenterName].filter(Boolean).join(' • ') || t('common.nA')}</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 {/* Quick Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
                     <StatCard label={t('farmCodingDetails.totalArea')} value={`${Math.round(farm.totalArea)} ha`} icon={Map} color="blue" />
                     <StatCard label={t('farmCodingDetails.productionWells')} value={farm.numberOfProductionWells} icon={Droplet} color="cyan" />
                     <StatCard label={t('farmCodingDetails.workers')} value={farm.noOfWorkers || 0} icon={Users} color="purple" />
@@ -804,7 +806,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                         <InfoRow label={t('farmCodingDetails.emiratesID')} value={farm.emiratesID} />
                         <InfoRow label={t('farmCodingDetails.email')} value={farm.owner?.email} />
                         <InfoRow
-                            label={isLTR ? "Email Verified" : "تم التحقق من البريد الإلكتروني"}
+                            label={t('farmCodingDetails.emailVerified')}
                             value={farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')}
                             valueClass={farm.owner?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                         />
@@ -815,7 +817,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                         <InfoRow label={t('farmCodingDetails.name')} value={farm.holder?.name} />
                         <InfoRow label={t('farmCodingDetails.email')} value={farm.holder?.email} />
                         <InfoRow
-                            label={isLTR ? "Email Verified" : "تم التحقق من البريد الإلكتروني"}
+                            label={t('farmCodingDetails.emailVerified')}
                             value={farm.holder?.isEmailVerified ? t('common.yes') : t('common.no')}
                             valueClass={farm.holder?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                         />
@@ -827,7 +829,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                 <InfoRow label={t('farmCodingDetails.name')} value={coder?.name} />
                                 <InfoRow label={t('farmCodingDetails.email')} value={coder?.email} />
                                 <InfoRow
-                                    label={isLTR ? "Email Verified" : "تم التحقق من البريد الإلكتروني"}
+                                    label={t('farmCodingDetails.emailVerified')}
                                     value={coder?.isEmailVerified ? t('common.yes') : t('common.no')}
                                     valueClass={coder?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                                 />
