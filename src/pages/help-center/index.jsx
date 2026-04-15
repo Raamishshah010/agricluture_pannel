@@ -7,8 +7,8 @@ const faqs = [
     answer: 'Open Manage Farms from the dashboard, then select the create action and fill in the farm details.'
   },
   {
-    question: 'How do I approve a farmer request?',
-    answer: 'Go to Farmer Approvals in the sidebar, review the request, and approve or reject it from the detail view.'
+    question: 'How do I approve an account request?',
+    answer: 'Go to Account Approvals in the sidebar, review the request, and approve or reject it from the detail view.'
   },
   {
     question: 'Where can I update master data?',

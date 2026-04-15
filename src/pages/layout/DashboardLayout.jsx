@@ -48,6 +48,89 @@ const GreenhouseDashboard = lazy(() => import('../GreenhouseDashboard'));
 const FarmAnalytics = lazy(() => import('../farmsAnalytics'));
 const HelpCenter = lazy(() => import('../help-center'));
 
+const renderDashboardPage = (selectedPage, farmsNumber) => {
+  switch (selectedPage) {
+    case 'overview':
+      return <Overview />;
+    case 'emirates':
+      return <Emirates />;
+    case 'sizes':
+      return <Sizes />;
+    case 'crops':
+      return <CropsDashboard />;
+    case 'crops-management':
+      return <Crops />;
+    case 'manageFarmers':
+      return <Farmers number={farmsNumber} />;
+    case 'article categories':
+      return <ArticleCategories />;
+    case 'article sub categories':
+      return <SubCategories />;
+    case 'articles':
+      return <Articles />;
+    case 'emirates management':
+      return <EmiratesManagment />;
+    case 'centers management':
+      return <Centers />;
+    case 'Fruit Types':
+      return <FruitTypes />;
+    case 'Vegetable Types':
+      return <VegetableTypes />;
+    case 'Cover Types':
+      return <CoverTypes />;
+    case 'Fodder Types':
+      return <FodderTypes />;
+    case 'varieties':
+      return <Varities />;
+    case 'livestocks':
+      return <LiveStocks />;
+    case 'codingRequests':
+      return <FarmCodingRequest />;
+    case 'addAdmin':
+      return <AdminAdd />;
+    case 'manageAdmins':
+      return <AdminManage />;
+    case 'manageCoders':
+      return <Coders />;
+    case 'manageFarms':
+      return <ManageFarms number={farmsNumber} />;
+    case 'account approvals':
+      return <FarmerApprovals />;
+    case 'possessions':
+      return <Possessions />;
+    case 'farming-system':
+      return <FarmingSystem />;
+    case 'regions':
+      return <Regions />;
+    case 'crop-types':
+      return <CropTypes />;
+    case 'cultivation-methods':
+      return <CultivationMethods />;
+    case 'locations':
+      return <Locations />;
+    case 'irrigation-system':
+      return <IrrigationSystem />;
+    case 'external-irrigation-system':
+      return <ExternalIrrigationSystem />;
+    case 'green-house-types':
+      return <GreenHouseTypes />;
+    case 'water-sources':
+      return <WaterSources />;
+    case 'courage-types':
+      return <CourageTypes />;
+    case 'seasons':
+      return <Seasons />;
+    case 'greenhouseDashboard':
+      return <GreenhouseDashboard />;
+    case 'farmAnalytics':
+      return <FarmAnalytics />;
+    case 'help':
+      return <HelpCenter />;
+    default:
+      return <Overview />;
+  }
+};
+
 const DashboardLayout = () => {
   const t = useTranslation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -160,7 +243,7 @@ const DashboardLayout = () => {
     { id: 'manageFarms', icon: BarChart3, label: t('common.components.dashboard.manageFarms') },
     { id: 'manageCoders', icon: Users, label: t('common.components.dashboard.manageCoders') },
     { id: 'manageFarmers', icon: Users, label: t('common.components.dashboard.manageFarmers') },
-    { id: 'farmer approvals', icon: UserCheck, label: t('common.components.dashboard.farmerApprovals') },
+    { id: 'account approvals', icon: UserCheck, label: t('common.components.dashboard.accountApprovals') },
   ];
 
   const otherItems = [
@@ -205,97 +288,6 @@ const DashboardLayout = () => {
     { id: 'help', icon: HelpCircle, label: t('common.components.dashboard.helpCenter') }
   ];
 
-  const MainContent = () => {
-    const renderComponent = () => {
-      switch (selectedPage) {
-        case 'overview':
-          return <Overview />;
-        case 'emirates':
-          return <Emirates />;
-        case 'sizes':
-          return <Sizes />;
-        case 'crops':
-          return <CropsDashboard />;
-        case 'crops-management':
-          return <Crops />;
-        case 'manageFarmers':
-          return <Farmers number={farmsNumber} />;
-        case 'article categories':
-          return <ArticleCategories />;
-        case 'article sub categories':
-          return <SubCategories />;
-        case 'articles':
-          return <Articles />;
-        case 'emirates management':
-          return <EmiratesManagment />;
-        case 'centers management':
-          return <Centers />;
-        case 'Fruit Types':
-          return <FruitTypes />;
-        case 'Vegetable Types':
-          return <VegetableTypes />;
-        case 'Cover Types':
-          return <CoverTypes />;
-        case 'Fodder Types':
-          return <FodderTypes />;
-        case 'varieties':
-          return <Varities />;
-        case 'livestocks':
-          return <LiveStocks />;
-        case 'codingRequests':
-          return <FarmCodingRequest />;
-        case 'addAdmin':
-          return <AdminAdd />;
-        case 'manageAdmins':
-          return <AdminManage />;
-        case 'manageCoders':
-          return <Coders />;
-        case 'manageFarms':
-          return <ManageFarms number={farmsNumber} />;
-        case 'farmer approvals':
-          return <FarmerApprovals />;
-        case 'possessions':
-          return <Possessions />;
-        case 'farming-system':
-          return <FarmingSystem />;
-        case 'regions':
-          return <Regions />;
-        case 'crop-types':
-          return <CropTypes />;
-        case 'cultivation-methods':
-          return <CultivationMethods />;
-        case 'locations':
-          return <Locations />;
-        case 'irrigation-system':
-          return <IrrigationSystem />;
-        case 'external-irrigation-system':
-          return <ExternalIrrigationSystem />;
-        case 'green-house-types':
-          return <GreenHouseTypes />;
-        case 'water-sources':
-          return <WaterSources />;
-        case 'courage-types':
-          return <CourageTypes />;
-        case 'seasons':
-          return <Seasons />;
-        case 'greenhouseDashboard':
-          return <GreenhouseDashboard />;
-        case 'farmAnalytics':
-          return <FarmAnalytics />;
-        case 'help':
-          return <HelpCenter />;
-        default:
-          return <Overview />;
-      }
-    };
-
-    return (
-      <div className="flex-1 bg-gray-50 overflow-auto">
-        {renderComponent()}
-      </div>
-    );
-  };
-
   // slug helper for URL paths
   const slug = (id) => encodeURIComponent(String(id).trim().replace(/\s+/g, '-').toLowerCase());
 
@@ -331,6 +323,9 @@ const DashboardLayout = () => {
     const found = slugMap[key] || slugMap[last] || null;
     if (found) {
       setSelectedPage(found);
+    } else if (last === 'farmer-approvals' || last === 'farmer approvals') {
+      setSelectedPage('account approvals');
+      navigate('/dashboard/account-approvals', { replace: true });
     } else if (parts[0] === 'dashboard' && parts.length === 1) {
       setSelectedPage('overview');
       navigate('/dashboard/overview', { replace: true });
@@ -580,7 +575,9 @@ const DashboardLayout = () => {
           </div>
         </header>
         <Suspense fallback={<div className="flex-1 flex items-center justify-center bg-gray-50"><Loader message={t('common.loading')} /></div>}>
-          <MainContent />
+          <div className="flex-1 bg-gray-50 overflow-auto">
+            {renderDashboardPage(selectedPage, farmsNumber)}
+          </div>
         </Suspense>
       </div>
     </div>

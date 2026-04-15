@@ -18,6 +18,8 @@ export default function Farmers({ list, handleFarms, setList }) {
     const [actionLoading, setActionLoading] = useState({});
     const [statusFilter, setStatusFilter] = useState('all');
     const [editingItem, setEditingItem] = useState(null);
+    const [approvalDialogItem, setApprovalDialogItem] = useState(null);
+    const [approvalRole, setApprovalRole] = useState('farmer');
     const [formData, setFormData] = useState({
         name: '',
         emirateId: '',
@@ -168,17 +170,16 @@ export default function Farmers({ list, handleFarms, setList }) {
     });
 
     const handleApprovalDecision = async (farmer, action) => {
-        const confirmKey = action === 'approve'
-            ? 'farmers.farmerApprovals.approveConfirm'
-            : 'farmers.farmerApprovals.rejectConfirm';
-
-        if (!window.confirm(t(confirmKey))) {
+        if (action === 'reject' && !window.confirm(t('farmers.farmerApprovals.rejectConfirm'))) {
             return;
         }
 
         try {
             setActionLoading((prev) => ({ ...prev, [farmer.id]: action }));
-            const res = await service.updateApprovalStatus(farmer.id, { action });
+            const payload = action === 'approve'
+                ? { action, role: approvalRole }
+                : { action };
+            const res = await service.updateApprovalStatus(farmer.id, payload);
             const updatedFarmer = res?.data?.farmer || {};
 
             setList((prev) => sortFarmersByCreatedAtDesc(prev.map((entry) => {
@@ -197,6 +198,10 @@ export default function Farmers({ list, handleFarms, setList }) {
                     ? t('farmers.farmerApprovals.approveSuccess')
                     : t('farmers.farmerApprovals.rejectSuccess')
             );
+            if (action === 'approve') {
+                setApprovalDialogItem(null);
+                setApprovalRole('farmer');
+            }
         } catch (error) {
             toast.error(
                 error.response?.data?.message ||
@@ -211,6 +216,16 @@ export default function Farmers({ list, handleFarms, setList }) {
                 return next;
             });
         }
+    };
+
+    const openApprovalDialog = (farmer) => {
+        setApprovalRole('farmer');
+        setApprovalDialogItem(farmer);
+    };
+
+    const closeApprovalDialog = () => {
+        setApprovalDialogItem(null);
+        setApprovalRole('farmer');
     };
 
     return (
@@ -385,7 +400,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                                             {isPendingApproval && (
                                                 <>
                                                     <button
-                                                        onClick={() => handleApprovalDecision(farmer, 'approve')}
+                                                        onClick={() => openApprovalDialog(farmer)}
                                                         disabled={isBusy}
                                                         className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-medium text-xs shadow-sm hover:shadow-md whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
                                                         title={t('common.components.farmCoding.approve')}
@@ -646,6 +661,72 @@ export default function Farmers({ list, handleFarms, setList }) {
                                             {editingItem ? t('farmers.farmers.update') : t('farmers.farmers.add')}
                                         </>
                                     )}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {approvalDialogItem && (
+                <div className="fixed inset-0 bg-black/55 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all animate-slideUp overflow-hidden border border-gray-200">
+                        <div className="px-6 py-5 border-b border-gray-200 bg-gradient-to-r from-emerald-50 to-white">
+                            <h2 className="text-xl font-bold text-gray-900">{t('farmers.farmerApprovals.approveRoleTitle')}</h2>
+                            <p className="mt-1 text-sm text-gray-500">{t('farmers.farmerApprovals.approveRoleDescription')}</p>
+                        </div>
+                        <div className="px-6 py-5 space-y-4">
+                            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                                <div className="text-sm font-semibold text-gray-800">{approvalDialogItem.name}</div>
+                                <div className="text-xs text-gray-500 mt-1">{approvalDialogItem.email}</div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    {t('farmers.farmerApprovals.approveRoleLabel')}
+                                </label>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <button
+                                        type="button"
+                                        onClick={() => setApprovalRole('farmer')}
+                                        className={`rounded-xl border px-4 py-3 text-left transition-colors ${approvalRole === 'farmer'
+                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
+                                            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <div className="text-sm font-semibold">{t('farmers.farmerApprovals.approveAsFarmer')}</div>
+                                        <div className="text-xs mt-1 text-gray-500">{t('farmers.farmerApprovals.approveAsFarmerDescription')}</div>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setApprovalRole('coder')}
+                                        className={`rounded-xl border px-4 py-3 text-left transition-colors ${approvalRole === 'coder'
+                                            ? 'border-violet-500 bg-violet-50 text-violet-800'
+                                            : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                    >
+                                        <div className="text-sm font-semibold">{t('farmers.farmerApprovals.approveAsCoder')}</div>
+                                        <div className="text-xs mt-1 text-gray-500">{t('farmers.farmerApprovals.approveAsCoderDescription')}</div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-2">
+                                <button
+                                    type="button"
+                                    onClick={closeApprovalDialog}
+                                    className="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-700 text-sm font-semibold hover:bg-gray-200 transition-colors"
+                                    disabled={!!actionLoading[approvalDialogItem.id]}
+                                >
+                                    {t('farmers.farmers.cancel')}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => handleApprovalDecision(approvalDialogItem, 'approve')}
+                                    disabled={!!actionLoading[approvalDialogItem.id]}
+                                    className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                    {t('common.components.farmCoding.approve')}
                                 </button>
                             </div>
                         </div>

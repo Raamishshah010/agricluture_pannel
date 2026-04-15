@@ -53,8 +53,21 @@ export const farmerService = {
         return response.data;
     },
     getPendingApprovals: async (limit = 100, status = 'pending_approval') => {
-        const response = await apiClient.get(`/api/farmer/pending-approvals?limit=${limit}&status=${encodeURIComponent(status)}`);
-        return response.data;
+        const url = `/api/farmer/pending-approvals?limit=${encodeURIComponent(limit)}&status=${encodeURIComponent(status)}`;
+        const inflightKey = getInflightKey('GET', url);
+
+        if (inflightRequests.has(inflightKey)) {
+            return inflightRequests.get(inflightKey);
+        }
+
+        const request = apiClient.get(url)
+            .then((response) => response.data)
+            .finally(() => {
+                inflightRequests.delete(inflightKey);
+            });
+
+        inflightRequests.set(inflightKey, request);
+        return request;
     },
     updateApprovalStatus: async (id, payload) => {
         const response = await apiClient.patch(`/api/farmer/${id}/approval`, payload);

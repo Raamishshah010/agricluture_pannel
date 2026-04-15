@@ -47,7 +47,8 @@ export default function Coders() {
       try {
         setLoading(true);
         const res = await service.getCoders();
-        setList(res.data.coders);
+        const sortedCoders = res.data.coders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setList(sortedCoders);
       } catch (err) {
         toast.error(err.response?.data?.message || t("coders.toast.fetchFail"));
       } finally {
