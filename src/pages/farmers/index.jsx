@@ -34,6 +34,7 @@ export default function Index(props) {
     return storedFarm ? JSON.parse(storedFarm) : null;
   });
   const [loading, setLoading] = useState(false);
+  const [farmsLoading, setFarmsLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
   const [count, setCount] = useState(0);
@@ -167,15 +168,34 @@ export default function Index(props) {
   };
 
   const handleFarms = async (item) => {
-    setActiveTab("farms");
+    const farmerId = item?.id || item?._id || item?.farmerId || item?.userId || null;
+
+    if (!farmerId) {
+      toast.error('Failed to load farms for this farmer');
+      return;
+    }
+
+    setFarms([]);
+    setFarmsLoading(true);
     setSelectedFarmer(item);
+    setActiveTab("farms");
+
     try {
-      const res = await service.getFarmerFarms(item.id);
-      setActiveTab("farms");
-      setSelectedFarmer(item);
-      setFarms(res.data);
+      const res = await service.getFarmerFarms(farmerId);
+      const farmsList = Array.isArray(res)
+        ? res
+        : Array.isArray(res?.data)
+          ? res.data
+          : Array.isArray(res?.items)
+            ? res.items
+            : [];
+
+      setFarms(farmsList);
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);
+      setActiveTab("farmers");
+    } finally {
+      setFarmsLoading(false);
     }
   };
 
@@ -571,7 +591,8 @@ const downloadPDF = async () => {
   ) : activeTab.includes("farms") ? (
     <Farms
       list={farms}
-      farmerName={selectedFarmer.name}
+      loading={farmsLoading}
+      farmerName={selectedFarmer?.name || ''}
       handleBack={() => setActiveTab("farmers")}
       handleDetail={(item) => {
         setSelectedFarm(item);

@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import useTranslation from '../../hooks/useTranslation';
 
-export default function Farmers({ list, farmerName = '', handleBack, handleDetail }) {
+export default function Farmers({ list, farmerName = '', handleBack, handleDetail, loading = false }) {
     const t = useTranslation();
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
@@ -56,6 +56,20 @@ export default function Farmers({ list, farmerName = '', handleBack, handleDetai
                                         </td>
                                     </tr>
                                 ))}
+                                {!loading && list.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-10 text-center text-sm text-gray-500">
+                                            {t('farmers.farmers.noDataFound')}
+                                        </td>
+                                    </tr>
+                                )}
+                                {loading && (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-10 text-center text-sm text-gray-500">
+                                            {t('common.loading')}
+                                        </td>
+                                    </tr>
+                                )}
                             </tbody>
                         </table>
                     </div>
