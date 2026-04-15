@@ -417,7 +417,7 @@ const downloadPDF = async () => {
   };
 
   return activeTab.includes("farmers") ? (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-[1400px] mx-auto px-4 sm:px-6 pb-6">
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">

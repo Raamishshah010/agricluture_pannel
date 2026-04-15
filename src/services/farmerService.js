@@ -19,8 +19,21 @@ apiClient.interceptors.request.use((config) => {
 
 export const farmerService = {
     getAllFarmers: async () => {
-        const response = await apiClient.get('/api/farmer');
-        return response.data;
+        const url = '/api/farmer';
+        const inflightKey = getInflightKey('GET', url);
+
+        if (inflightRequests.has(inflightKey)) {
+            return inflightRequests.get(inflightKey);
+        }
+
+        const request = apiClient.get(url)
+            .then((response) => response.data)
+            .finally(() => {
+                inflightRequests.delete(inflightKey);
+            });
+
+        inflightRequests.set(inflightKey, request);
+        return request;
     },
     getCoders: async () => {
         const response = await apiClient.get('/api/farmer/coders');

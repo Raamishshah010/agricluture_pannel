@@ -5,6 +5,10 @@ const apiClient = axios.create({
   baseURL: API_BASE_URL,
 });
 
+const inflightRequests = new Map();
+
+const getInflightKey = (method, url) => `${method}:${url}`;
+
 apiClient.interceptors.request.use((config) => {
   const token = sessionStorage.getItem('adminToken');
   if (token) {
@@ -19,8 +23,21 @@ export const adminService = {
     return response.data;
   },
   getMasterData: async () => {
-    const response = await apiClient.get('/api/admin/master-data');
-    return response.data;
+    const url = '/api/admin/master-data';
+    const inflightKey = getInflightKey('GET', url);
+
+    if (inflightRequests.has(inflightKey)) {
+      return inflightRequests.get(inflightKey);
+    }
+
+    const request = apiClient.get(url)
+      .then((response) => response.data)
+      .finally(() => {
+        inflightRequests.delete(inflightKey);
+      });
+
+    inflightRequests.set(inflightKey, request);
+    return request;
   },
   // cached getAdmins (30s TTL) to avoid repeated network calls when components mount/unmount
   _cachedAdmins: null,
@@ -53,8 +70,21 @@ export const adminService = {
     return response.data;
   },
   getCurrentAdmin: async () => {
-    const response = await apiClient.get('/api/admin/me');
-    return response.data;
+    const url = '/api/admin/me';
+    const inflightKey = getInflightKey('GET', url);
+
+    if (inflightRequests.has(inflightKey)) {
+      return inflightRequests.get(inflightKey);
+    }
+
+    const request = apiClient.get(url)
+      .then((response) => response.data)
+      .finally(() => {
+        inflightRequests.delete(inflightKey);
+      });
+
+    inflightRequests.set(inflightKey, request);
+    return request;
   },
 };
 

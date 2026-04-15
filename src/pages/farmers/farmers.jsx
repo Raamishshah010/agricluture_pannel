@@ -229,11 +229,13 @@ export default function Farmers({ list, handleFarms, setList }) {
     };
 
     return (
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
             {/* Header Section */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div></div>
+                    <div className="text-sm text-gray-500 font-medium">
+                        {t('farmers.farmers.approvalStatus')}
+                    </div>
                     <button
                         onClick={openAddModal}
                         className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
@@ -303,28 +305,28 @@ export default function Farmers({ list, handleFarms, setList }) {
                     </button>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full table-auto">
+                    <table className="w-full min-w-[1120px] table-auto">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                             <tr>
-                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-20">
+                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-20 whitespace-nowrap">
                                     {t('farmers.farmers.image')}
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                                     {t('farmers.farmers.name')}
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40">
+                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40 whitespace-nowrap">
                                     {t('farmers.farmers.phoneNumber')}
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40">
+                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40 whitespace-nowrap">
                                     {t('farmers.farmers.emirateId')}
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-32">
+                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-32 whitespace-nowrap">
                                     {t('farmers.farmers.createdAt')}
                                 </th>
-                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40">
+                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40 whitespace-nowrap">
                                     {t('farmers.farmers.approvalStatus')}
                                 </th>
-                                <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-72">
+                                <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-80 whitespace-nowrap">
                                     {t('farmers.farmers.actions')}
                                 </th>
                             </tr>
@@ -354,9 +356,9 @@ export default function Farmers({ list, handleFarms, setList }) {
                                             )}
                                         </div>
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <div className="font-semibold text-gray-900 text-sm">{farmer.name}</div>
-                                        <div className="text-xs text-gray-500">{farmer.email}</div>
+                                    <td className="px-4 py-3 align-top">
+                                        <div className="font-semibold text-gray-900 text-sm break-words max-w-[260px]">{farmer.name}</div>
+                                        <div className="text-xs text-gray-500 break-all max-w-[260px]">{farmer.email}</div>
                                         <div className="mt-2 flex flex-wrap gap-2">
                                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${farmer.isCoder
                                                 ? 'bg-violet-50 text-violet-700 border-violet-200'
@@ -395,50 +397,54 @@ export default function Farmers({ list, handleFarms, setList }) {
                                             {getApprovalLabel(approvalStatus)}
                                         </span>
                                     </td>
-                                    <td className="px-4 py-3">
-                                        <div className="flex justify-center gap-1.5">
-                                            {isPendingApproval && (
-                                                <>
-                                                    <button
-                                                        onClick={() => openApprovalDialog(farmer)}
-                                                        disabled={isBusy}
-                                                        className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-medium text-xs shadow-sm hover:shadow-md whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
-                                                        title={t('common.components.farmCoding.approve')}
-                                                    >
-                                                        {t('common.components.farmCoding.approve')}
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleApprovalDecision(farmer, 'reject')}
-                                                        disabled={isBusy}
-                                                        className="px-3 py-1.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 font-medium text-xs shadow-sm hover:shadow-md whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
-                                                        title={t('common.components.farmCoding.reject')}
-                                                    >
-                                                        {t('common.components.farmCoding.reject')}
-                                                    </button>
-                                                </>
-                                            )}
-                                            <button
-                                                onClick={() => handleFarms(farmer)}
-                                                className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-medium text-xs shadow-sm hover:shadow-md flex items-center gap-1.5 whitespace-nowrap"
-                                                title={t('farmers.farmers.viewFarms')}
-                                            >
-                                                <Eye size={14} />
-                                                {t('farmers.farmers.viewFarms')}
-                                            </button>
-                                            <button
-                                                onClick={() => openEditModal(farmer)}
-                                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:shadow-md"
-                                                title={t('farmers.farmers.edit')}
-                                            >
-                                                <Edit2 size={16} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(farmer.id)}
-                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:shadow-md"
-                                                title={t('farmers.farmers.delete')}
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                    <td className="px-4 py-3 align-middle">
+                                        <div className="flex flex-col items-center justify-center gap-2 min-w-[300px]">
+                                            <div className="flex flex-wrap items-center justify-center gap-2">
+                                                {isPendingApproval && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => openApprovalDialog(farmer)}
+                                                            disabled={isBusy}
+                                                            className="h-10 px-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-semibold text-sm shadow-sm hover:shadow-md whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+                                                            title={t('common.components.farmCoding.approve')}
+                                                        >
+                                                            {t('common.components.farmCoding.approve')}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleApprovalDecision(farmer, 'reject')}
+                                                            disabled={isBusy}
+                                                            className="h-10 px-4 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 font-semibold text-sm shadow-sm hover:shadow-md whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
+                                                            title={t('common.components.farmCoding.reject')}
+                                                        >
+                                                            {t('common.components.farmCoding.reject')}
+                                                        </button>
+                                                    </>
+                                                )}
+                                                <button
+                                                    onClick={() => handleFarms(farmer)}
+                                                    className="h-10 px-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-semibold text-sm shadow-sm hover:shadow-md flex items-center gap-2 whitespace-nowrap"
+                                                    title={t('farmers.farmers.viewFarms')}
+                                                >
+                                                    <Eye size={16} />
+                                                    {t('farmers.farmers.viewFarms')}
+                                                </button>
+                                            </div>
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button
+                                                    onClick={() => openEditModal(farmer)}
+                                                    className="h-9 w-9 flex items-center justify-center border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-all duration-200"
+                                                    title={t('farmers.farmers.edit')}
+                                                >
+                                                    <Edit2 size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(farmer.id)}
+                                                    className="h-9 w-9 flex items-center justify-center border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200"
+                                                    title={t('farmers.farmers.delete')}
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
