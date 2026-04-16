@@ -318,7 +318,7 @@ export const UaePassLogin = () => {
           <button
             onClick={() => handleLoginClick('staging')}
             disabled={loading}
-            className="flex w-full max-w-full items-center justify-center gap-2 rounded-full border border-1 border-black bg-white px-4 py-3 text-center text-sm font-semibold text-black shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:shadow-lg active:scale-95 active:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-emerald-400 sm:w-auto sm:max-w-[360px] sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:text-lg"
+            className="flex w-full max-w-full items-center justify-center gap-2 rounded-md border border-black bg-black px-4 py-3 text-center text-sm font-semibold text-white shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:bg-gray-900 hover:shadow-lg active:scale-95 active:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-gray-400 sm:w-auto sm:max-w-[360px] sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:text-lg"
           >
             <UaePassLogo className="h-6 w-6 shrink-0" variant="onDark" />
             <span className="flex h-5 w-5 shrink-0 items-center justify-center">

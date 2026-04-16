@@ -1,5 +1,5 @@
 import React from 'react';
-import uaePassLogo from '../assets/uae_pass_logo.png'; // adjust path
+import uaePassLogo from '../assets/uae_pass_logo_white.png'; // adjust path
 
 export default function UaePassLogo({ size = 40 }) {
   return (
