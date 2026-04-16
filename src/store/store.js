@@ -1,5 +1,16 @@
 import { create } from 'zustand';
 
+const LANGUAGE_STORAGE_KEY = 'uaelanguage';
+
+const getInitialLanguage = () => {
+    if (typeof window === 'undefined') {
+        return 'en';
+    }
+
+    const storedLanguage = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+    return storedLanguage === 'ar' ? 'ar' : 'en';
+};
+
 const useStore = create((set) => ({
     fruitTypes: [],
     vegetableTypes: [],
@@ -18,7 +29,7 @@ const useStore = create((set) => ({
     farms: [],
     farmers: [],
     livestocks: [],
-    language: 'en',
+    language: getInitialLanguage(),
     dashboardLoading: {
         masterData: Boolean(sessionStorage.getItem('adminToken')),
         farms: Boolean(sessionStorage.getItem('adminToken')),
@@ -30,9 +41,15 @@ const useStore = create((set) => ({
         set({ ...fruitTypes });
     },
     setLanguage: (lang) => {
+        const nextLanguage = lang === 'ar' ? 'ar' : 'en';
+
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
+        }
+
         set({
-            language: lang
-        })
+            language: nextLanguage
+        });
     },
     setDashboardLoading: (section, value) => {
         set((state) => ({
