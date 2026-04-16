@@ -1,16 +1,15 @@
 import React from 'react';
-import uaePassLogo from '../assets/uae_pass_logo_white.png'; // adjust path
+import uaePassLogo from './uae_pass_logo_white.png';
 
-export default function UaePassLogo({ size = 40 }) {
+export default function UaePassLogo({ size = 24, className = '', alt = 'UAE PASS', ...props }) {
+  const style = { width: size, height: size, objectFit: 'contain' };
   return (
     <img
       src={uaePassLogo}
-      alt="UAE PASS"
-      style={{
-        width: size,
-        height: size,
-        objectFit: 'contain'
-      }}
+      alt={alt}
+      className={className}
+      style={style}
+      {...props}
     />
   );
 }

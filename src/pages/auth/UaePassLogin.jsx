@@ -318,13 +318,17 @@ export const UaePassLogin = () => {
           <button
             onClick={() => handleLoginClick('staging')}
             disabled={loading}
-            className="flex w-full max-w-full items-center justify-center gap-2 rounded-md border border-black bg-black px-4 py-3 text-center text-sm font-semibold text-white shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:bg-gray-900 hover:shadow-lg active:scale-95 active:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-gray-400 sm:w-auto sm:max-w-[360px] sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:text-lg"
+            className="flex items-center justify-center gap-5 w-full max-w-[600px] rounded-full bg-black px-4 py-2.5 text-center text-lg md:text-xl lg:text-2xl font-semibold text-white shadow-[0_5px_10px_rgba(0,0,0,0.4)] transition-colors duration-200 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            <UaePassLogo className="h-6 w-6 shrink-0" variant="onDark" />
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center">
+            <span className="flex items-center justify-center rounded-full bg-white/6 p-2">
+              <UaePassLogo className="!h-[32px] !w-[32px]" size={32} />
+            </span>
+            <span className="flex items-center gap-3">
+              <span className="whitespace-nowrap leading-none">{t('auth.loginWithUaePass')}</span>
+            </span>
+            <span className="flex h-5 w-5 items-center justify-center">
               {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
             </span>
-            <span className="whitespace-nowrap leading-none">{t('auth.loginWithUaePass')}</span>
           </button>
           <div className="hidden text-sm text-slate-300">
             {t('auth.redirectUri')} <span className="text-slate-50">{API_BASE_URL}/api/ue-pass/callback</span>
