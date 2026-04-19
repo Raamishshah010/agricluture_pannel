@@ -7,6 +7,8 @@ import {
   Eye,
   Download,
   ChevronDown,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import service from "../../services/farmerService";
 import { toast } from "react-toastify";
@@ -32,6 +34,7 @@ export default function Coders() {
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [selectedCoder, setSelectedCoder] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [actionLoading, setActionLoading] = useState({});
   const [formData, setFormData] = useState({
     name: "",
     emirateId: "",
@@ -182,6 +185,85 @@ export default function Coders() {
     });
   };
 
+  const getNormalizedApprovalStatus = (coder) => {
+    const rawApproval = String(coder?.approvalStatus || "").toLowerCase().trim();
+    if (rawApproval === "approved") return "approved";
+    if (rawApproval === "rejected") return "rejected";
+    if (["pending_approval", "under_review", "needs_revision", "pending"].includes(rawApproval)) {
+      return "pending_approval";
+    }
+
+    const rawStatus = String(coder?.status || "").toLowerCase().trim();
+    if (rawStatus === "active") return "approved";
+    if (["inactive", "suspended", "rejected"].includes(rawStatus)) return "rejected";
+    if (["pending_approval", "under_review", "needs_revision"].includes(rawStatus)) {
+      return "pending_approval";
+    }
+
+    return "pending_approval";
+  };
+
+  const getApprovalBadgeClasses = (status) => {
+    if (status === "approved") {
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    }
+    if (status === "rejected") {
+      return "bg-red-50 text-red-700 border-red-200";
+    }
+    return "bg-amber-50 text-amber-700 border-amber-200";
+  };
+
+  const getApprovalLabel = (status) => {
+    if (status === "approved") return t("farmers.farmerApprovals.approvedStatus");
+    if (status === "rejected") return t("farmers.farmerApprovals.rejectedStatus");
+    return t("coders.pendingApproval");
+  };
+
+  const handleApprovalDecision = async (coder, action) => {
+    if (action === "reject" && !window.confirm(t("farmers.farmerApprovals.rejectConfirm"))) {
+      return;
+    }
+
+    try {
+      setActionLoading((prev) => ({ ...prev, [coder.id]: action }));
+      const payload = action === "approve" ? { action, role: "coder" } : { action };
+      const res = await service.updateApprovalStatus(coder.id, payload);
+      const updatedCoder = res?.data?.farmer || {};
+
+      setList((prev) =>
+        prev.map((entry) => {
+          if (entry.id !== coder.id) return entry;
+          return {
+            ...entry,
+            ...updatedCoder,
+            status: res?.data?.status || updatedCoder?.status || entry.status,
+            approvalStatus: res?.data?.approvalStatus || updatedCoder?.approvalStatus || entry.approvalStatus,
+            statusDetails: res?.data?.statusDetails || updatedCoder?.statusDetails || entry.statusDetails,
+          };
+        }),
+      );
+
+      toast.success(
+        action === "approve"
+          ? t("farmers.farmerApprovals.approveSuccess")
+          : t("farmers.farmerApprovals.rejectSuccess"),
+      );
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          (action === "approve"
+            ? t("farmers.farmerApprovals.approveFail")
+            : t("farmers.farmerApprovals.rejectFail")),
+      );
+    } finally {
+      setActionLoading((prev) => {
+        const next = { ...prev };
+        delete next[coder.id];
+        return next;
+      });
+    }
+  };
+
   //! Download as PDF
 
 const downloadPDF = () => {
@@ -200,6 +282,7 @@ const downloadPDF = () => {
         t('coders.emirateId'),
         t('coders.phoneNumber'),
         t('coders.email'),
+        t('coders.approvalStatus'),
         t('coders.createdAt')
     ];
 
@@ -208,6 +291,7 @@ const downloadPDF = () => {
         coder.emirateId,
         coder.phoneNumber,
         coder.email,
+        getApprovalLabel(getNormalizedApprovalStatus(coder)),
         formatDate(coder.createdAt)
     ]);
 
@@ -248,7 +332,8 @@ const downloadPDF = () => {
             1: { halign: isArabic ? 'right' : 'left' },
             2: { halign: isArabic ? 'right' : 'left' },
             3: { halign: isArabic ? 'right' : 'left' },
-            4: { halign: isArabic ? 'right' : 'left' }
+            4: { halign: isArabic ? 'right' : 'left' },
+            5: { halign: isArabic ? 'right' : 'left' }
         },
         // Ye hook check karega ke table ka flow kahan hai
         didDrawPage: (data) => {
@@ -268,6 +353,7 @@ const downloadPDF = () => {
         [t("coders.emirateId")]: coder.emirateId,
         [t("coders.phoneNumber")]: coder.phoneNumber,
         [t("coders.email")]: coder.email,
+        [t("coders.approvalStatus")]: getApprovalLabel(getNormalizedApprovalStatus(coder)),
         [t("coders.createdAt")]: formatDate(coder.createdAt),
       })),
     );
@@ -286,6 +372,7 @@ const downloadPDF = () => {
       t("coders.emirateId"),
       t("coders.phoneNumber"),
       t("coders.email"),
+      t("coders.approvalStatus"),
       t("coders.createdAt"),
     ];
 
@@ -294,6 +381,7 @@ const downloadPDF = () => {
       coder.emirateId,
       coder.phoneNumber,
       coder.email,
+      getApprovalLabel(getNormalizedApprovalStatus(coder)),
       formatDate(coder.createdAt),
     ]);
 
@@ -499,6 +587,9 @@ const downloadPDF = () => {
                     {t("coders.email")}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                    {t("coders.approvalStatus")}
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     {t("coders.createdAt")}
                   </th>
                   <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">
@@ -538,6 +629,13 @@ const downloadPDF = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border whitespace-nowrap ${getApprovalBadgeClasses(getNormalizedApprovalStatus(coder))}`}
+                      >
+                        {getApprovalLabel(getNormalizedApprovalStatus(coder))}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
                       <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-xs font-medium text-gray-700">
                         <svg
                           className="w-3.5 h-3.5"
@@ -556,7 +654,7 @@ const downloadPDF = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex justify-center gap-2">
+                      <div className="flex justify-center gap-2 flex-wrap">
                         <button
                           onClick={() => openCoderDetails(coder)}
                           className="p-2.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 hover:shadow-md"
@@ -578,6 +676,28 @@ const downloadPDF = () => {
                         >
                           <Trash2 size={18} />
                         </button>
+                        {getNormalizedApprovalStatus(coder) === "pending_approval" && (
+                          <>
+                            <button
+                              onClick={() => handleApprovalDecision(coder, "approve")}
+                              disabled={!!actionLoading[coder.id]}
+                              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                              title={t("common.components.farmCoding.approve")}
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
+                              {t("common.components.farmCoding.approve")}
+                            </button>
+                            <button
+                              onClick={() => handleApprovalDecision(coder, "reject")}
+                              disabled={!!actionLoading[coder.id]}
+                              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                              title={t("common.components.farmCoding.reject")}
+                            >
+                              <XCircle className="w-4 h-4" />
+                              {t("common.components.farmCoding.reject")}
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -925,6 +1045,14 @@ const downloadPDF = () => {
                     <div className="md:col-span-2">
                       <label className="text-sm font-medium text-gray-600">{t("coders.createdAt")}</label>
                       <p className="text-gray-900 font-medium">{formatDate(selectedCoder.createdAt)}</p>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-sm font-medium text-gray-600">{t("coders.approvalStatus")}</label>
+                      <p className="mt-1">
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border whitespace-nowrap ${getApprovalBadgeClasses(getNormalizedApprovalStatus(selectedCoder))}`}>
+                          {getApprovalLabel(getNormalizedApprovalStatus(selectedCoder))}
+                        </span>
+                      </p>
                     </div>
                   </div>
                 </div>
