@@ -12,7 +12,6 @@ import {
 } from "lucide-react";
 import service from "../../services/farmerService";
 import { toast } from "react-toastify";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import useTranslation from "../../hooks/useTranslation";
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
@@ -28,7 +27,6 @@ export default function Coders() {
   const navigate = useNavigate();
   const [list, setList] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -41,7 +39,6 @@ export default function Coders() {
     email: "",
     phoneNumber: "",
     image: "",
-    password: "",
   });
   const { farms } = useStore((st) => st);
 
@@ -69,7 +66,6 @@ export default function Coders() {
       emirateId: "",
       phoneNumber: "",
       image: "",
-      password: "",
     });
     setIsModalOpen(true);
   };
@@ -82,7 +78,6 @@ export default function Coders() {
       emirateId: coder.emirateId || "",
       phoneNumber: coder.phoneNumber || "",
       image: coder.image || "",
-      password: "",
     });
     setIsModalOpen(true);
   };
@@ -131,8 +126,7 @@ export default function Coders() {
     if (
       !formData.name ||
       !formData.email ||
-      !formData.phoneNumber ||
-      (!editingItem && !formData.password)
+      !formData.phoneNumber
     ) {
       toast.error(t("coders.fillRequiredFields"));
       return;
@@ -145,7 +139,6 @@ export default function Coders() {
       fd.append("email", formData.email);
       fd.append("emirateId", formData.emirateId);
       fd.append("phoneNumber", formData.phoneNumber);
-      fd.append("password", formData.password);
       if (!editingItem) {
         fd.append("autoApprove", "true");
       }
@@ -895,50 +888,6 @@ const downloadPDF = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {t("coders.passwordRequired")}
-                    {!editingItem && (
-                      <span className="text-red-500 ml-1">*</span>
-                    )}
-                  </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                        />
-                      </svg>
-                    </div>
-                    <input
-                      type={showPassword ? "text" : "password"}
-                      placeholder={t("coders.password")}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-12 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                    />
-                    <button
-                      type="button"
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-gray-500 hover:text-gray-700"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <AiOutlineEyeInvisible size={20} />
-                      ) : (
-                        <AiOutlineEye size={20} />
-                      )}
-                    </button>
-                  </div>
-                </div>
               </div>
 
               {/* Modal Footer */}
