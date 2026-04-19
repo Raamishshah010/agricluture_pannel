@@ -6,6 +6,7 @@ import Farms from "./farms";
 import FarmDetails from "./farmDetails";
 import Pagination from "../../components/pagination";
 import useTranslation from "../../hooks/useTranslation";
+import useStore from "../../store/store";
 import { Download, ChevronDown } from "lucide-react";
 import Loader from "../../components/Loader";
 import jsPDF from "jspdf";
@@ -15,6 +16,7 @@ import { amiriFontBase64 } from "../../assets/AmiriFont"; // Amiri font import k
 
 export default function Index(props) {
   const t = useTranslation();
+  const { language } = useStore((state) => state);
   const sortFarmersByCreatedAtDesc = (farmers = []) => [...farmers].sort((a, b) => {
     const aTime = new Date(a?.createdAt || 0).getTime();
     const bTime = new Date(b?.createdAt || 0).getTime();
@@ -37,7 +39,9 @@ export default function Index(props) {
   const [farmsLoading, setFarmsLoading] = useState(false);
   const [query, setQuery] = useState("");
   const [submittedQuery, setSubmittedQuery] = useState("");
-  const [count, setCount] = useState(0);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(1);
   const [randomNumber, setRandomNumber] = useState(
     () => sessionStorage.getItem("randomNumber") || 1,
@@ -76,50 +80,23 @@ export default function Index(props) {
 
   useEffect(() => {
     const normalizedSearch = submittedQuery.trim();
+    const normalizedStatus = statusFilter === "all" ? "" : statusFilter;
 
-    if (!normalizedSearch) {
-      const requestKey = "1|50|";
-      if (lastFarmersRequestKeyRef.current === requestKey) {
-        return;
-      }
-      lastFarmersRequestKeyRef.current = requestKey;
-
-      const fetch = async () => {
-        const requestId = ++requestSequenceRef.current;
-        try {
-          setLoading(true);
-          const res = await service.getFarmers(1, 50, "");
-          if (requestId !== requestSequenceRef.current) return;
-          setList(sortFarmersByCreatedAtDesc(res.data));
-          setCount(res.pagination.totalPages);
-          setPage(1);
-        } catch (err) {
-          if (requestId === requestSequenceRef.current) {
-            toast.error(err.response?.data?.message || err.message);
-          }
-        } finally {
-          if (requestId === requestSequenceRef.current) {
-            setLoading(false);
-          }
-        }
-      };
-      fetch();
+    const requestKey = `1|50|${normalizedSearch}|${normalizedStatus}`;
+    if (lastFarmersRequestKeyRef.current === requestKey) {
       return;
     }
+    lastFarmersRequestKeyRef.current = requestKey;
 
     const fetchData = async () => {
-      const requestKey = `1|50|${normalizedSearch}`;
-      if (lastFarmersRequestKeyRef.current === requestKey) {
-        return;
-      }
-      lastFarmersRequestKeyRef.current = requestKey;
       const requestId = ++requestSequenceRef.current;
       try {
         setLoading(true);
-        const res = await service.getFarmers(1, 50, normalizedSearch);
+        const res = await service.getFarmers(1, 50, normalizedSearch, normalizedStatus);
         if (requestId !== requestSequenceRef.current) return;
         setList(sortFarmersByCreatedAtDesc(res.data));
-        setCount(res.pagination.totalPages);
+        setTotalPages(res.pagination.totalPages);
+        setTotalCount(res.pagination.totalCount || res.pagination.count || res.data.length);
         setPage(1);
       } catch (err) {
         if (requestId === requestSequenceRef.current) {
@@ -133,7 +110,7 @@ export default function Index(props) {
     };
 
     fetchData();
-  }, [submittedQuery]);
+  }, [submittedQuery, statusFilter]);
 
   useEffect(() => {
     if (props.number !== randomNumber) {
@@ -143,7 +120,9 @@ export default function Index(props) {
   }, [props.number, randomNumber]);
 
   const loadMore = async (currentPage) => {
-    const requestKey = `${currentPage}|50|${submittedQuery.trim()}`;
+    const normalizedSearch = submittedQuery.trim();
+    const normalizedStatus = statusFilter === "all" ? "" : statusFilter;
+    const requestKey = `${currentPage}|50|${normalizedSearch}|${normalizedStatus}`;
     if (lastFarmersRequestKeyRef.current === requestKey) {
       return;
     }
@@ -151,10 +130,11 @@ export default function Index(props) {
     const requestId = ++requestSequenceRef.current;
     try {
       setLoading(true);
-      const res = await service.getFarmers(currentPage, 50, submittedQuery.trim());
+      const res = await service.getFarmers(currentPage, 50, normalizedSearch, normalizedStatus);
       if (requestId !== requestSequenceRef.current) return;
       setList(sortFarmersByCreatedAtDesc(res.data));
-      setCount(res.pagination.totalPages);
+      setTotalPages(res.pagination.totalPages);
+      setTotalCount(res.pagination.totalCount || res.pagination.count || res.data.length);
       setPage(currentPage);
     } catch (err) {
       if (requestId === requestSequenceRef.current) {
@@ -166,6 +146,16 @@ export default function Index(props) {
       }
     }
   };
+
+  const refreshFarmers = async () => {
+    lastFarmersRequestKeyRef.current = "";
+    await loadMore(page);
+  };
+
+  const showingRecordsText =
+    language === "ar"
+      ? `إظهار ${list.length} من أصل ${totalCount} سجل`
+      : `Showing ${list.length} of ${totalCount} records`;
 
   const handleFarms = async (item) => {
     const farmerId = item?.id || item?._id || item?.farmerId || item?.userId || null;
@@ -224,9 +214,10 @@ export default function Index(props) {
       let currentPage = 1;
       let totalPages = 1;
       const normalizedSearch = submittedQuery.trim();
+      const normalizedStatus = statusFilter === "all" ? "" : statusFilter;
 
       // Fetch first page to get total pages
-      const firstResponse = await service.getFarmers(currentPage, 50, normalizedSearch);
+      const firstResponse = await service.getFarmers(currentPage, 50, normalizedSearch, normalizedStatus);
       allData = [...firstResponse.data];
       totalPages = firstResponse.pagination.totalPages;
 
@@ -234,7 +225,7 @@ export default function Index(props) {
       if (totalPages > 1) {
         const promises = [];
         for (let i = 2; i <= totalPages; i++) {
-          promises.push(service.getFarmers(i, 50, normalizedSearch));
+          promises.push(service.getFarmers(i, 50, normalizedSearch, normalizedStatus));
         }
 
         const results = await Promise.all(promises);
@@ -444,6 +435,7 @@ const downloadPDF = async () => {
             {t("farmers.title")}
           </h1>
           <p className="text-gray-600 mt-1">{t("farmers.subtitle")}</p>
+          <p className="text-sm text-gray-500 mt-2">{showingRecordsText}</p>
         </div>
 
         {/* Download Dropdown */}
@@ -579,10 +571,18 @@ const downloadPDF = async () => {
         <Loader />
       ) : (
         <>
-          <Farmers list={list} setList={setList} handleFarms={handleFarms} />
+          <Farmers
+            list={list}
+            setList={setList}
+            handleFarms={handleFarms}
+            totalCount={totalCount}
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            onRefreshFarmers={refreshFarmers}
+          />
           <Pagination
             initialPage={page}
-            totalPages={count}
+            totalPages={totalPages}
             onPageChange={loadMore}
           />
         </>

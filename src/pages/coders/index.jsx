@@ -654,7 +654,7 @@ const downloadPDF = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex justify-center gap-2 flex-wrap">
+                      <div className="flex items-center justify-center gap-2 whitespace-nowrap flex-nowrap">
                         <button
                           onClick={() => openCoderDetails(coder)}
                           className="p-2.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 hover:shadow-md"
@@ -681,20 +681,18 @@ const downloadPDF = () => {
                             <button
                               onClick={() => handleApprovalDecision(coder, "approve")}
                               disabled={!!actionLoading[coder.id]}
-                              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                              className="p-2.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                               title={t("common.components.farmCoding.approve")}
                             >
-                              <CheckCircle2 className="w-4 h-4" />
-                              {t("common.components.farmCoding.approve")}
+                              <CheckCircle2 size={18} />
                             </button>
                             <button
                               onClick={() => handleApprovalDecision(coder, "reject")}
                               disabled={!!actionLoading[coder.id]}
-                              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                              className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
                               title={t("common.components.farmCoding.reject")}
                             >
-                              <XCircle className="w-4 h-4" />
-                              {t("common.components.farmCoding.reject")}
+                              <XCircle size={18} />
                             </button>
                           </>
                         )}

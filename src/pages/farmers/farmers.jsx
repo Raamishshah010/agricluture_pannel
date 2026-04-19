@@ -1,11 +1,19 @@
 import { useState } from "react";
 import service from '../../services/farmerService';
-import { Edit2, Plus, Trash2, X, Eye } from "lucide-react";
+import { Edit2, Plus, Trash2, X, Eye, CheckCircle2, XCircle } from "lucide-react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import useTranslation from '../../hooks/useTranslation';
 import { toast } from 'react-toastify';
 
-export default function Farmers({ list, handleFarms, setList }) {
+export default function Farmers({
+    list,
+    handleFarms,
+    setList,
+    totalCount = 0,
+    statusFilter = 'all',
+    setStatusFilter,
+    onRefreshFarmers,
+}) {
     const t = useTranslation();
     const sortFarmersByCreatedAtDesc = (farmers = []) => [...farmers].sort((a, b) => {
         const aTime = new Date(a?.createdAt || 0).getTime();
@@ -16,7 +24,6 @@ export default function Farmers({ list, handleFarms, setList }) {
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState({});
-    const [statusFilter, setStatusFilter] = useState('all');
     const [editingItem, setEditingItem] = useState(null);
     const [approvalDialogItem, setApprovalDialogItem] = useState(null);
     const [approvalRole, setApprovalRole] = useState('farmer');
@@ -108,6 +115,9 @@ export default function Farmers({ list, handleFarms, setList }) {
             }
 
             closeModal();
+            if (onRefreshFarmers) {
+                await onRefreshFarmers();
+            }
             setLoading(false);
         } catch (error) {
             setLoading(false);
@@ -118,7 +128,11 @@ export default function Farmers({ list, handleFarms, setList }) {
     const handleDelete = async (id) => {
         if (window.confirm(t('farmers.farmers.deleteConfirm'))) {
             await service.delete(id);
-            setList(prev => sortFarmersByCreatedAtDesc(prev.filter(coder => coder.id !== id)));
+            if (onRefreshFarmers) {
+                await onRefreshFarmers();
+            } else {
+                setList(prev => sortFarmersByCreatedAtDesc(prev.filter(coder => coder.id !== id)));
+            }
         }
     };
 
@@ -164,11 +178,6 @@ export default function Farmers({ list, handleFarms, setList }) {
         return t('farmers.farmers.pendingApproval');
     };
 
-    const filteredList = list.filter((farmer) => {
-        if (statusFilter === 'all') return true;
-        return getNormalizedApprovalStatus(farmer) === statusFilter;
-    });
-
     const handleApprovalDecision = async (farmer, action) => {
         if (action === 'reject' && !window.confirm(t('farmers.farmerApprovals.rejectConfirm'))) {
             return;
@@ -201,6 +210,9 @@ export default function Farmers({ list, handleFarms, setList }) {
             if (action === 'approve') {
                 setApprovalDialogItem(null);
                 setApprovalRole('farmer');
+            }
+            if (onRefreshFarmers) {
+                await onRefreshFarmers();
             }
         } catch (error) {
             toast.error(
@@ -256,10 +268,10 @@ export default function Farmers({ list, handleFarms, setList }) {
                     </div>
                     <div>
                         <p className="text-sm text-gray-500 font-medium">{t('farmers.stats.totalFarmers')}</p>
-                        <p className="text-3xl font-bold text-gray-900">{filteredList.length}</p>
-                        {statusFilter !== 'all' && (
-                            <p className="text-xs text-gray-400 mt-1">{list.length} total</p>
-                        )}
+                        <p className="text-3xl font-bold text-gray-900">{totalCount || list.length}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                            Showing {list.length} of {totalCount || list.length}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -268,7 +280,7 @@ export default function Farmers({ list, handleFarms, setList }) {
             <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
                 <div className="px-4 py-4 border-b border-gray-100 bg-gray-50 flex flex-wrap items-center gap-2">
                     <button
-                        onClick={() => setStatusFilter('all')}
+                        onClick={() => setStatusFilter?.('all')}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${statusFilter === 'all'
                             ? 'bg-gray-800 text-white'
                             : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-100'
@@ -277,7 +289,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                         All
                     </button>
                     <button
-                        onClick={() => setStatusFilter('pending_approval')}
+                        onClick={() => setStatusFilter?.('pending_approval')}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${statusFilter === 'pending_approval'
                             ? 'bg-amber-600 text-white'
                             : 'bg-white text-amber-700 border border-amber-200 hover:bg-amber-50'
@@ -286,7 +298,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                         {t('farmers.farmers.pendingApproval')}
                     </button>
                     <button
-                        onClick={() => setStatusFilter('approved')}
+                        onClick={() => setStatusFilter?.('approved')}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${statusFilter === 'approved'
                             ? 'bg-emerald-600 text-white'
                             : 'bg-white text-emerald-700 border border-emerald-200 hover:bg-emerald-50'
@@ -295,7 +307,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                         {t('farmers.farmerApprovals.approvedStatus')}
                     </button>
                     <button
-                        onClick={() => setStatusFilter('rejected')}
+                        onClick={() => setStatusFilter?.('rejected')}
                         className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${statusFilter === 'rejected'
                             ? 'bg-red-600 text-white'
                             : 'bg-white text-red-700 border border-red-200 hover:bg-red-50'
@@ -326,13 +338,13 @@ export default function Farmers({ list, handleFarms, setList }) {
                                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40 whitespace-nowrap">
                                     {t('farmers.farmers.approvalStatus')}
                                 </th>
-                                <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-80 whitespace-nowrap">
+                                <th className="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase tracking-wider w-[340px] whitespace-nowrap">
                                     {t('farmers.farmers.actions')}
                                 </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {filteredList.map((farmer) => {
+                            {list.map((farmer) => {
                                 const approvalStatus = getNormalizedApprovalStatus(farmer);
                                 const isPendingApproval = approvalStatus === 'pending_approval';
                                 const isBusy = !!actionLoading[farmer.id];
@@ -398,53 +410,53 @@ export default function Farmers({ list, handleFarms, setList }) {
                                         </span>
                                     </td>
                                     <td className="px-4 py-3 align-middle">
-                                        <div className="flex flex-col items-center justify-center gap-2 min-w-[300px]">
-                                            <div className="flex flex-wrap items-center justify-center gap-2">
-                                                {isPendingApproval && (
-                                                    <>
-                                                        <button
-                                                            onClick={() => openApprovalDialog(farmer)}
-                                                            disabled={isBusy}
-                                                            className="h-10 px-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-semibold text-sm shadow-sm hover:shadow-md whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
-                                                            title={t('common.components.farmCoding.approve')}
-                                                        >
-                                                            {t('common.components.farmCoding.approve')}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleApprovalDecision(farmer, 'reject')}
-                                                            disabled={isBusy}
-                                                            className="h-10 px-4 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 font-semibold text-sm shadow-sm hover:shadow-md whitespace-nowrap disabled:opacity-60 disabled:cursor-not-allowed"
-                                                            title={t('common.components.farmCoding.reject')}
-                                                        >
-                                                            {t('common.components.farmCoding.reject')}
-                                                        </button>
-                                                    </>
-                                                )}
-                                                <button
-                                                    onClick={() => handleFarms(farmer)}
-                                                    className="h-10 px-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 font-semibold text-sm shadow-sm hover:shadow-md flex items-center gap-2 whitespace-nowrap"
-                                                    title={t('farmers.farmers.viewFarms')}
-                                                >
-                                                    <Eye size={16} />
-                                                    {t('farmers.farmers.viewFarms')}
-                                                </button>
-                                            </div>
-                                            <div className="flex items-center justify-center gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(farmer)}
-                                                    className="h-9 w-9 flex items-center justify-center border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-all duration-200"
-                                                    title={t('farmers.farmers.edit')}
-                                                >
-                                                    <Edit2 size={16} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(farmer.id)}
-                                                    className="h-9 w-9 flex items-center justify-center border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200"
-                                                    title={t('farmers.farmers.delete')}
-                                                >
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
+                                        <div className="flex items-center justify-center gap-2 flex-nowrap whitespace-nowrap">
+                                            {isPendingApproval && (
+                                                <>
+                                                    <button
+                                                        onClick={() => openApprovalDialog(farmer)}
+                                                        disabled={isBusy}
+                                                        className="h-10 w-10 flex items-center justify-center rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                                                        title={t('common.components.farmCoding.approve')}
+                                                        aria-label={t('common.components.farmCoding.approve')}
+                                                    >
+                                                        <CheckCircle2 size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleApprovalDecision(farmer, 'reject')}
+                                                        disabled={isBusy}
+                                                        className="h-10 w-10 flex items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                                                        title={t('common.components.farmCoding.reject')}
+                                                        aria-label={t('common.components.farmCoding.reject')}
+                                                    >
+                                                        <XCircle size={18} />
+                                                    </button>
+                                                </>
+                                            )}
+                                            <button
+                                                onClick={() => handleFarms(farmer)}
+                                                className="h-10 w-10 flex items-center justify-center bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 shadow-sm hover:shadow-md"
+                                                title={t('farmers.farmers.viewFarms')}
+                                                aria-label={t('farmers.farmers.viewFarms')}
+                                            >
+                                                <Eye size={16} />
+                                            </button>
+                                            <button
+                                                onClick={() => openEditModal(farmer)}
+                                                className="h-10 w-10 flex items-center justify-center border border-blue-200 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg transition-all duration-200"
+                                                title={t('farmers.farmers.edit')}
+                                                aria-label={t('farmers.farmers.edit')}
+                                            >
+                                                <Edit2 size={16} />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(farmer.id)}
+                                                className="h-10 w-10 flex items-center justify-center border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200"
+                                                title={t('farmers.farmers.delete')}
+                                                aria-label={t('farmers.farmers.delete')}
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -453,7 +465,7 @@ export default function Farmers({ list, handleFarms, setList }) {
                     </table>
                 </div>
 
-                {filteredList.length === 0 && (
+                {list.length === 0 && (
                     <div className="text-center py-16">
                         <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                             <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

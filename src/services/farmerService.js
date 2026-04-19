@@ -39,9 +39,10 @@ export const farmerService = {
         const response = await apiClient.get('/api/farmer/coders');
         return response.data;
     },
-    getFarmers: async (page, limit, query = '') => {
+    getFarmers: async (page, limit, query = '', status = '') => {
         const normalizedQuery = String(query || '').trim();
-        const url = `/api/farmer/farmers?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}&search=${encodeURIComponent(normalizedQuery)}`;
+        const normalizedStatus = String(status || '').trim();
+        const url = `/api/farmer/farmers?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}&search=${encodeURIComponent(normalizedQuery)}&status=${encodeURIComponent(normalizedStatus)}`;
         const inflightKey = getInflightKey('GET', url);
 
         if (inflightRequests.has(inflightKey)) {
