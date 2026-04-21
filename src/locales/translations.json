@@ -9,14 +9,12 @@
     "mobileNumber": "Mobile Number",
     "emiratesId": "Emirates ID",
     "enterEmiratesId": "Enter Emirates ID",
-    "password": "Password",
     "emirates": "Emirates",
     "type": "Type",
     "enterAdminFirstName": "Enter the admin first name",
     "enterAdminLastName": "Enter the admin last name",
     "enterAdminEmail": "Enter the admin email address",
     "enterApplicantMobile": "Enter the applicant's mobile number",
-    "writeNewPassword": "Write the new password for the admin",
     "selectEmirates": "Select which emirates for the new admin",
     "selectType": "Select the type for the admin",
     "emirateNames": {
@@ -831,6 +829,7 @@
     "rememberMe": "Remember me",
     "forgotPassword": "Forgot Password?",
     "login": "Login",
+    "password": "Password",
     "errors": {
       "emailRequired": "Please enter your email",
       "emailInvalid": "Please enter a valid email address",

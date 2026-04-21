@@ -11,7 +11,7 @@ export default function AdminAdd() {
   const navigate = useNavigate();
   const editAdmin = location.state && location.state.editAdmin ? location.state.editAdmin : null;
 
-  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', mobile: '', emirateId: '', password: '', emirates: '', type: '' });
+  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', mobile: '', emirateId: '', emirates: '', type: '' });
   const [loading, setLoading] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -29,7 +29,6 @@ export default function AdminAdd() {
         email: editAdmin.email || '',
         mobile: editAdmin.mobile || '',
         emirateId: editAdmin.emirateId || editAdmin.emiratesId || editAdmin.uuid || '',
-        password: '',
         emirates: editAdmin.emirate || '',
         type: editAdmin.type || ''
       });
@@ -58,7 +57,7 @@ export default function AdminAdd() {
     setApiError(null);
     // any change should reset attemptedSave so validation helper isn't shown prematurely
     setAttemptedSave(false);
-  }, [formData.firstName, formData.lastName, formData.email, formData.mobile, formData.emirateId, formData.password, formData.emirates, formData.type]);
+  }, [formData.firstName, formData.lastName, formData.email, formData.mobile, formData.emirateId, formData.emirates, formData.type]);
 
   const isFormValid = () => {
     // When editing: require firstName and at least one changed field (or a new password)
@@ -73,9 +72,7 @@ export default function AdminAdd() {
       const emirateIdChanged = (formData.emirateId !== origData.emirateId);
       const emirateChanged = (formData.emirates !== origData.emirates);
       const typeChanged = (formData.type !== origData.type);
-      const passwordSet = Boolean(formData.password);
-
-      return nameChanged || emailChanged || mobileChanged || emirateIdChanged || emirateChanged || typeChanged || passwordSet;
+      return nameChanged || emailChanged || mobileChanged || emirateIdChanged || emirateChanged || typeChanged;
     }
     // When adding: require full data including password and last name.
     // Required for add: firstName, lastName, email, mobile, type
@@ -102,7 +99,6 @@ export default function AdminAdd() {
       emirate: formData.emirates,
       type: formData.type,
       mobile: formData.mobile,
-      password: formData.password
     };
     setLoading(true);
     let savedItem = null;
@@ -215,10 +211,7 @@ export default function AdminAdd() {
             className="w-full px-3 py-3 border border-gray-300 rounded-lg"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.password')}</label>
-          <input type="password" value={formData.password} onChange={e => handleInputChange('password', e.target.value)} className="w-full px-3 py-3 border border-gray-300 rounded-lg" />
-        </div>
+        
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.emirates')}</label>
           <select value={formData.emirates} onChange={e => handleInputChange('emirates', e.target.value)} className="w-full px-3 py-3 border border-gray-300 rounded-lg appearance-none bg-white">

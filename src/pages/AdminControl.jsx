@@ -13,7 +13,6 @@ const AdminManagementFlow = () => {
     lastName: '',
     email: '',
     mobile: '',
-    password: '',
     emirates: '',
     type: ''
   });
@@ -88,7 +87,6 @@ const AdminManagementFlow = () => {
       lastName: last.join(' '),
       email: admin.email,
       mobile: admin.mobile,
-      password: '',
       emirates: admin.emirate,
       type: admin.type
     });
@@ -163,8 +161,8 @@ const AdminManagementFlow = () => {
   };
 
   const isFormValid = () => {
-    return formData.firstName && formData.lastName && formData.email && 
-           formData.mobile && formData.password && formData.emirates && formData.type;
+    return formData.firstName && formData.lastName && formData.email &&
+           formData.mobile && formData.emirates && formData.type;
   };
 
   const handleAddAdmin = () => {
@@ -176,7 +174,7 @@ const AdminManagementFlow = () => {
         emirate: formData.emirates,
         type: formData.type,
         mobile: formData.mobile,
-        password: formData.password
+      };
       };
 
       (async () => {
@@ -215,7 +213,6 @@ const AdminManagementFlow = () => {
       lastName: '',
       email: '',
       mobile: '',
-      password: '',
       emirates: '',
       type: ''
     });
@@ -228,7 +225,6 @@ const AdminManagementFlow = () => {
       lastName: '',
       email: '',
       mobile: '',
-      password: '',
       emirates: '',
       type: ''
     });
@@ -242,7 +238,6 @@ const AdminManagementFlow = () => {
       lastName: 'Mossad',
       email: 'Ahmed_Mossad20@Mazraty.com',
       mobile: '+201112649782',
-      password: 'Mossad_987',
       emirates: 'Abu Dhabi',
       type: 'Admin'
     });
@@ -306,16 +301,7 @@ const AdminManagementFlow = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.password')}</label>
-            <input
-              type="password"
-              placeholder={t('admin.writeNewPassword')}
-              value={formData.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
-              className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
+          
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.emirates')}</label>
@@ -423,15 +409,7 @@ const AdminManagementFlow = () => {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.password')}</label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => handleInputChange('password', e.target.value)}
-              className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
+          
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.emirates')}</label>
@@ -583,7 +561,7 @@ const AdminManagementFlow = () => {
         </div>
       </div>
     );
-  }
+  
 
   return null;
 };

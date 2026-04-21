@@ -1,4 +1,4 @@
-import { Loader2, Globe } from "lucide-react";
+import { Globe } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import useTranslation from "../../hooks/useTranslation";
 import { API_BASE_URL } from "../../utils";
@@ -206,14 +206,13 @@ export const TestingUaePass = () => {
           <button
             onClick={handleLoginClick}
             disabled={loading}
-            className="flex w-full max-w-full items-center justify-center gap-2 rounded-md border border-black bg-black px-4 py-3 text-center text-sm font-semibold text-white shadow transition-all duration-200 ease-out transform-gpu hover:-translate-y-1 hover:bg-gray-900 hover:shadow-lg active:scale-95 active:shadow-md disabled:cursor-not-allowed disabled:opacity-60 disabled:translate-y-0 disabled:shadow-none focus:outline-none focus:ring-2 focus:ring-gray-400 sm:w-auto sm:max-w-[420px] sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:text-lg"
+            className="relative inline-flex min-h-[48px] min-w-[140px] w-full max-w-[520px] cursor-pointer items-center justify-center rounded-[12px] border border-black bg-black px-5 py-2.5 text-center text-base font-semibold leading-none text-white transition-all duration-150 hover:bg-neutral-900 hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 active:bg-neutral-800 active:shadow-[0_2px_8px_rgba(0,0,0,0.2)] md:min-h-[56px] md:max-w-[640px] md:px-8 md:py-3 md:text-lg lg:min-h-[60px] lg:text-xl disabled:cursor-not-allowed disabled:border-neutral-500 disabled:bg-neutral-600 disabled:text-neutral-200 disabled:shadow-none"
             aria-label={`${t("auth.loginWithUaePass")} (${t("auth.uaePassStaging")})`}
           >
-            <UaePassLogo className="h-6 w-6 shrink-0" variant="onDark" />
-            <span className="flex h-5 w-5 shrink-0 items-center justify-center">
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
+            <span className="inline-flex items-center justify-center gap-3 md:gap-4">
+              <UaePassLogo className="h-6 w-6 shrink-0 md:h-7 md:w-7" size={24} />
+              <span className="whitespace-nowrap leading-none">{`${t("auth.loginWithUaePass")} (${t("auth.uaePassStaging")})`}</span>
             </span>
-            <span className="whitespace-nowrap leading-none">{`${t("auth.loginWithUaePass")} (${t("auth.uaePassStaging")})`}</span>
           </button>
 
           {(summaryRows.length > 0 || parsedPayload) && (

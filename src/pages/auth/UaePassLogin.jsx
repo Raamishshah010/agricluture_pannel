@@ -1,4 +1,4 @@
-import { Loader2, Globe } from "lucide-react";
+import { Globe } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useTranslation from '../../hooks/useTranslation';
@@ -318,16 +318,12 @@ export const UaePassLogin = () => {
           <button
             onClick={() => handleLoginClick('staging')}
             disabled={loading}
-            className="flex items-center justify-center gap-5 w-full max-w-[600px] rounded-full bg-black px-4 py-2.5 text-center text-lg md:text-xl lg:text-2xl font-semibold text-white shadow-[0_5px_10px_rgba(0,0,0,0.4)] transition-colors duration-200 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className="relative inline-flex min-h-[48px] min-w-[140px] w-full max-w-[520px] cursor-pointer items-center justify-center rounded-[12px] border border-black bg-black px-5 py-2.5 text-center text-base font-semibold leading-none text-white transition-all duration-150 hover:bg-neutral-900 hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 active:bg-neutral-800 active:shadow-[0_2px_8px_rgba(0,0,0,0.2)] md:min-h-[56px] md:max-w-[640px] md:px-8 md:py-3 md:text-lg lg:min-h-[60px] lg:text-xl disabled:cursor-not-allowed disabled:border-neutral-500 disabled:bg-neutral-600 disabled:text-neutral-200 disabled:shadow-none"
+            aria-label={t('auth.loginWithUaePass')}
           >
-            <span className="flex items-center justify-center rounded-full bg-white/6 p-2">
-              <UaePassLogo className="!h-[32px] !w-[32px]" size={32} />
-            </span>
-            <span className="flex items-center gap-3">
+            <span className="inline-flex items-center justify-center gap-3 md:gap-4">
+              <UaePassLogo className="h-6 w-6 shrink-0 md:h-7 md:w-7" size={24} />
               <span className="whitespace-nowrap leading-none">{t('auth.loginWithUaePass')}</span>
-            </span>
-            <span className="flex h-5 w-5 items-center justify-center">
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
             </span>
           </button>
           <div className="hidden text-sm text-slate-300">
