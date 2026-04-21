@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, Link2, Copy } from 'lucide-react';
 import useTranslation from '../hooks/useTranslation';
 import Loader from '../components/Loader';
 import adminService from '../services/adminService';
@@ -14,6 +14,10 @@ export default function AdminManage() {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteError, setInviteError] = useState('');
+  const [inviteData, setInviteData] = useState(null);
+  const [copyMessage, setCopyMessage] = useState('');
 
   const getAdminEmiratesId = (admin) =>
     admin?.emirateId ||
@@ -196,6 +200,37 @@ export default function AdminManage() {
     URL.revokeObjectURL(url);
   };
 
+  const generateInviteLink = async () => {
+    setInviteLoading(true);
+    setInviteError('');
+    setCopyMessage('');
+    try {
+      const response = await adminService.createAdminInviteLink({ expiresInDays: 7 });
+      if (!response?.success) {
+        throw new Error(response?.message || t('admin.inviteLinkError'));
+      }
+
+      setInviteData(response);
+    } catch (error) {
+      setInviteData(null);
+      setInviteError(error?.response?.data?.message || error.message || t('admin.inviteLinkError'));
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const copyInviteLink = async () => {
+    if (!inviteData?.inviteUrl) return;
+
+    try {
+      await navigator.clipboard.writeText(inviteData.inviteUrl);
+      setCopyMessage(t('admin.inviteLinkCopied'));
+    } catch (error) {
+      setCopyMessage('');
+      setInviteError(t('admin.inviteLinkCopyFailed'));
+    }
+  };
+
   /* =============================
      Render
   ============================== */
@@ -215,6 +250,15 @@ export default function AdminManage() {
               {selectedIds.length} {t('common.selected')}
             </div>
           )}
+
+          <button
+            onClick={generateInviteLink}
+            disabled={inviteLoading}
+            className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <Link2 className="h-4 w-4" />
+            {inviteLoading ? t('admin.generatingInviteLink') : t('admin.generateInviteLink')}
+          </button>
 
           <button
             onClick={exportSelectedCSV}
@@ -239,6 +283,41 @@ export default function AdminManage() {
           </button>
         </div>
       </div>
+
+      {inviteError && (
+        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {inviteError}
+        </div>
+      )}
+
+      {inviteData?.inviteUrl && (
+        <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-emerald-900">{t('admin.inviteLinkReady')}</p>
+              <p className="text-xs text-emerald-800">{t('admin.inviteLinkDescription')}</p>
+              <p className="text-sm text-emerald-900">
+                {t('admin.verificationCode')}: <span className="font-semibold">{inviteData.inviteCode}</span>
+              </p>
+              <p className="break-all text-sm text-emerald-900">{inviteData.inviteUrl}</p>
+              {inviteData.expiresAt && (
+                <p className="text-xs text-emerald-700">
+                  {t('admin.inviteExpiresAt')}: {new Date(inviteData.expiresAt).toLocaleString()}
+                </p>
+              )}
+            </div>
+
+            <button
+              onClick={copyInviteLink}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            >
+              <Copy className="h-4 w-4" />
+              {t('admin.copyInviteLink')}
+            </button>
+          </div>
+          {copyMessage && <p className="mt-3 text-sm text-emerald-800">{copyMessage}</p>}
+        </div>
+      )}
 
       {/* Table Header */}
       <div className="px-6 py-4 border-b border-gray-200">

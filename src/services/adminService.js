@@ -61,6 +61,10 @@ export const adminService = {
     const response = await apiClient.post('/api/admin/admins', payload);
     return response.data;
   },
+  createAdminInviteLink: async (payload = {}) => {
+    const response = await apiClient.post('/api/admin/invite-link', payload);
+    return response.data;
+  },
   updateAdmin: async (id, payload) => {
     const response = await apiClient.put(`/api/admin/admins/${id}`, payload);
     return response.data;

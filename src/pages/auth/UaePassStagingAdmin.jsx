@@ -10,6 +10,9 @@ import { getUaePassOutcome } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
+const INVITE_TOKEN_KEY = "admin-invite-token";
+const INVITE_CODE_KEY = "admin-invite-code";
+const AUTO_START_KEY = "admin-invite-auto-started";
 
 const formatValue = (value) => {
   if (value === null || value === undefined) {
@@ -85,6 +88,8 @@ export const UaePassStagingAdmin = () => {
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState("");
   const [stateMismatch, setStateMismatch] = useState(false);
+  const [inviteToken, setInviteToken] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -96,6 +101,26 @@ export const UaePassStagingAdmin = () => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const payload = params.get("payload");
+    const queryInviteToken = params.get("inviteToken");
+    const queryInviteCode = params.get("inviteCode");
+    const storedInviteToken = window.sessionStorage.getItem(INVITE_TOKEN_KEY) || "";
+    const storedInviteCode = window.sessionStorage.getItem(INVITE_CODE_KEY) || "";
+    if (queryInviteToken) {
+      window.sessionStorage.setItem(INVITE_TOKEN_KEY, queryInviteToken);
+      setInviteToken(queryInviteToken);
+      if (queryInviteCode) {
+        window.sessionStorage.setItem(INVITE_CODE_KEY, queryInviteCode);
+        setInviteCode(queryInviteCode);
+      }
+    } else if (storedInviteToken) {
+      setInviteToken(storedInviteToken);
+      if (storedInviteCode) {
+        setInviteCode(storedInviteCode);
+      }
+    } else if (!payload) {
+      setError(t('auth.inviteCodeRequired'));
+      setStatusMessage('');
+    }
     console.log('UAE-PASS-STAGING:raw-location', window.location.href);
     if (!payload) return;
 
@@ -127,6 +152,13 @@ export const UaePassStagingAdmin = () => {
         const receivedUser = parsed.user || parsed.userResponse || null;
         setUserData(receivedUser);
 
+        const activeInviteToken = window.sessionStorage.getItem(INVITE_TOKEN_KEY) || inviteToken;
+        if (!activeInviteToken) {
+          setError(t('auth.inviteCodeRequired'));
+          setStatusMessage('');
+          return;
+        }
+
         // If admin token present, behave like normal admin login
         const adminToken = parsed.adminToken || parsed.token || null;
         if (adminToken) {
@@ -144,7 +176,10 @@ export const UaePassStagingAdmin = () => {
         const resp = await fetch(`${API_BASE_URL}/api/admin/create-from-uaepass`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(receivedUser)
+          body: JSON.stringify({
+            ...receivedUser,
+            inviteToken: activeInviteToken,
+          })
         });
         let body;
         try {
@@ -182,8 +217,16 @@ export const UaePassStagingAdmin = () => {
     })();
   }, []);
 
-  const startLogin = async () => {
+  async function startLogin() {
     setError("");
+    const activeInviteToken = typeof window !== "undefined"
+      ? (window.sessionStorage.getItem(INVITE_TOKEN_KEY) || inviteToken)
+      : inviteToken;
+    if (!activeInviteToken) {
+      setStatusMessage('');
+      setError(t('auth.inviteCodeRequired'));
+      return;
+    }
     setStatusMessage(t('auth.preparingLogin'));
     const stateValue = generateStateValue();
     if (typeof window !== "undefined") {
@@ -200,7 +243,23 @@ export const UaePassStagingAdmin = () => {
       setStatusMessage('');
       setLoading(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!inviteToken) return;
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payload")) return;
+
+    const storedAutoStart = window.sessionStorage.getItem(AUTO_START_KEY);
+    if (storedAutoStart === inviteToken) {
+      return;
+    }
+
+    window.sessionStorage.setItem(AUTO_START_KEY, inviteToken);
+    void startLogin();
+  }, [inviteToken]);
 
   const resetFlow = () => {
     setUserData(null);
@@ -208,9 +267,13 @@ export const UaePassStagingAdmin = () => {
     setStatusMessage(t('auth.readyToStart'));
     setStateMismatch(false);
     setLoading(false);
+    setInviteCode('');
     if (typeof window !== "undefined") {
       window.sessionStorage.removeItem(STATE_KEY);
       window.sessionStorage.removeItem(ENVIRONMENT_KEY);
+      window.sessionStorage.removeItem(INVITE_TOKEN_KEY);
+      window.sessionStorage.removeItem(INVITE_CODE_KEY);
+      window.sessionStorage.removeItem(AUTO_START_KEY);
       setAdminToken(null);
       const cleanUrl = `${window.location.origin}${window.location.pathname}`;
       window.history.replaceState({}, "", cleanUrl);
@@ -251,7 +314,7 @@ export const UaePassStagingAdmin = () => {
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-center">
           <button
             onClick={startLogin}
-            disabled={loading}
+            disabled={loading || !inviteToken}
             className="relative inline-flex min-h-[48px] min-w-[140px] w-full max-w-[520px] cursor-pointer items-center justify-center rounded-[12px] border border-black bg-black px-5 py-2.5 text-center text-base font-semibold leading-none text-white transition-all duration-150 hover:bg-neutral-900 hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 active:bg-neutral-800 active:shadow-[0_2px_8px_rgba(0,0,0,0.2)] md:min-h-[56px] md:max-w-[640px] md:px-8 md:py-3 md:text-lg lg:min-h-[60px] lg:text-xl disabled:cursor-not-allowed disabled:border-neutral-500 disabled:bg-neutral-600 disabled:text-neutral-200 disabled:shadow-none"
             aria-label={`${t('auth.loginWithUaePass')} (${t('auth.uaePassStaging')})`}
           >
@@ -263,6 +326,13 @@ export const UaePassStagingAdmin = () => {
         </div>
 
         {error && <p className="text-sm font-medium text-red-600">{error}</p>}
+
+        {inviteToken && (
+          <div className="w-full rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+            <p className="font-semibold">{t('auth.inviteCodeReady')}</p>
+            <p className="mt-1 break-all">{t('auth.inviteCodeLabel')}: {inviteCode || inviteToken}</p>
+          </div>
+        )}
 
         {summaryRows.length > 0 && (
           <section className="space-y-3 hidden">
