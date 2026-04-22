@@ -59,7 +59,9 @@
     "save": "حفظ",
     "deleteConfirm": "هل أنت متأكد من أنك تريد حذف هذا المسؤول؟",
     "deleteSelectedConfirm": "هل أنت متأكد من أنك تريد حذف المسؤولين المحددين؟",
-    "deleteSelected": "حذف المحددين"
+    "deleteSelected": "حذف المحددين",
+    "password": "ترجمة مطلوبة",
+    "writeNewPassword": "ترجمة مطلوبة"
   },
   "sizes": {
     "title": "إجمالي مساحات المزارع المسجلة في الإمارات!",
@@ -91,7 +93,22 @@
       "farmId": "معرّف المزرعة",
       "sizeSqrt": "المساحة (م²)",
       "export": "تصدير",
-      "exporting": "جارٍ التصدير..."
+      "exporting": "جارٍ التصدير...",
+      "avgSize": "ترجمة مطلوبة",
+      "cumulativeFarms": "ترجمة مطلوبة",
+      "exportFailed": "ترجمة مطلوبة",
+      "farmsInRange": "ترجمة مطلوبة",
+      "filenamePrefix": "ترجمة مطلوبة",
+      "numberOfFarms": "ترجمة مطلوبة",
+      "percentage": "ترجمة مطلوبة",
+      "sheetAllFarms": "ترجمة مطلوبة",
+      "sheetCenterAnalysis": "ترجمة مطلوبة",
+      "sheetCumulative": "ترجمة مطلوبة",
+      "sheetEmirateAnalysis": "ترجمة مطلوبة",
+      "sheetSizeDistribution": "ترجمة مطلوبة",
+      "sheetSummary": "ترجمة مطلوبة",
+      "sizeRange": "ترجمة مطلوبة",
+      "totalSize": "ترجمة مطلوبة"
     },
     "map": {
       "sizeLabel": "المساحة",
@@ -168,7 +185,20 @@
     "selectGreenhouseType": "اختر نوع البيت المحمي",
     "selectCoverType": "اختر نوع الغطاء",
     "avgAreaPerGreenhouse": "متوسط المساحة لكل دفيئة",
-    "other": "أخرى"
+    "other": "أخرى",
+    "annual": "ترجمة مطلوبة",
+    "autumn": "ترجمة مطلوبة",
+    "fodder": "ترجمة مطلوبة",
+    "fruitTrees": "ترجمة مطلوبة",
+    "fruits": "ترجمة مطلوبة",
+    "grains": "ترجمة مطلوبة",
+    "greenhouse": "ترجمة مطلوبة",
+    "monthly": "ترجمة مطلوبة",
+    "quarterly": "ترجمة مطلوبة",
+    "spring": "ترجمة مطلوبة",
+    "summer": "ترجمة مطلوبة",
+    "vegetables": "ترجمة مطلوبة",
+    "winter": "ترجمة مطلوبة"
   },
   "status": {
     "label": "الحالة",
@@ -205,7 +235,8 @@
     "fodderType": "🌾 الأعلاف",
     "greenhouse": "🏠 البيوت المحمية",
     "farmingSystem": "🚜 نظام الزراعة",
-    "coverType": "💧 نوع الغطاء"
+    "coverType": "💧 نوع الغطاء",
+    "crop": "ترجمة مطلوبة"
   },
   "filters": {
     "fruit": "🍎 نوع الفاكهة",
@@ -217,7 +248,8 @@
     "geographic": "الموقع الجغرافي",
     "irrigation": "💧 نظام الري",
     "filters": "الفلاتر",
-    "clearAll": "مسح الكل"
+    "clearAll": "مسح الكل",
+    "all": "ترجمة مطلوبة"
   },
   "farms": {
     "addNewFarm": "إضافة مزرعة جديدة",
@@ -304,7 +336,8 @@
     "allEmirates": "جميع الإمارات",
     "popupAreaLabel": "المساحة:",
     "downloadReport": "تنزيل التقرير",
-    "searchCrops": "ابحث عن المحاصيل"
+    "searchCrops": "ابحث عن المحاصيل",
+    "title": "ترجمة مطلوبة"
   },
   "overview": {
     "selectEmirate": "اختر الإمارة",
@@ -332,7 +365,10 @@
     "totalUncultivatedArea": "إجمالي مساحة غير مزروعة بالمتر المربع",
     "nurseries": "مشاتل",
     "totalNurseries": "إجمالي المشاتل",
-    "noData": "لا توجد بيانات"
+    "noData": "لا توجد بيانات",
+    "center": "ترجمة مطلوبة",
+    "emirate": "ترجمة مطلوبة",
+    "location": "ترجمة مطلوبة"
   },
   "searchUsers": "ابحث عن المستخدمين...",
   "reports": {
@@ -548,7 +584,9 @@
     "map": {
       "agriculturalZone": "المنطقة الزراعية",
       "loading": "جاري تحميل الخريطة..."
-    }
+    },
+    "all": "ترجمة مطلوبة",
+    "unknown": "ترجمة مطلوبة"
   },
   "coders": {
     "title": "المرمزون",
@@ -879,7 +917,36 @@
     "userProfile": "ملف المستخدم",
     "retrievedAttributes": "السمات المسترجعة",
     "startOver": "ابدأ من جديد",
-    "readyToStart": "جاهز لبدء المصافحة"
+    "readyToStart": "جاهز لبدء المصافحة",
+    "confirm": {
+      "description": "ترجمة مطلوبة",
+      "didNotReceive": "ترجمة مطلوبة",
+      "resendLink": "ترجمة مطلوبة",
+      "title": "ترجمة مطلوبة"
+    },
+    "forgot": {
+      "description": "ترجمة مطلوبة",
+      "errors": {
+        "emailInvalid": "ترجمة مطلوبة",
+        "emailRequired": "ترجمة مطلوبة"
+      },
+      "placeholder": "ترجمة مطلوبة",
+      "sendButton": "ترجمة مطلوبة",
+      "title": "ترجمة مطلوبة"
+    },
+    "notAdmin": "ترجمة مطلوبة",
+    "reset": {
+      "confirmPasswordPlaceholder": "ترجمة مطلوبة",
+      "description": "ترجمة مطلوبة",
+      "errors": {
+        "confirmPasswordRequired": "ترجمة مطلوبة",
+        "newPasswordRequired": "ترجمة مطلوبة",
+        "passwordsMismatch": "ترجمة مطلوبة"
+      },
+      "newPasswordPlaceholder": "ترجمة مطلوبة",
+      "saveButton": "ترجمة مطلوبة",
+      "title": "ترجمة مطلوبة"
+    }
   },
   "reset": {
     "title": "إعادة تعيين كلمة المرور",
@@ -973,7 +1040,19 @@
         "sheetCoverTypes": "أنواع الغطاء",
         "sheetFarmingSystems": "أنظمة الزراعة",
         "exporting": "جارٍ التصدير...",
-        "exportFailed": "فشل التصدير. حاول مرة أخرى"
+        "exportFailed": "فشل التصدير. حاول مرة أخرى",
+        "colCount": "ترجمة مطلوبة",
+        "colCoverType": "ترجمة مطلوبة",
+        "colEmirate": "ترجمة مطلوبة",
+        "colFarmingSystem": "ترجمة مطلوبة",
+        "colFodderType": "ترجمة مطلوبة",
+        "colFruitType": "ترجمة مطلوبة",
+        "colGreenhouseType": "ترجمة مطلوبة",
+        "colNumberOfFarms": "ترجمة مطلوبة",
+        "colServiceCenter": "ترجمة مطلوبة",
+        "colTotalFarms": "ترجمة مطلوبة",
+        "colVegetableType": "ترجمة مطلوبة",
+        "filenamePrefix": "ترجمة مطلوبة"
       },
       "updatedSuccessfully": "تم التحديث بنجاح"
     },
@@ -1090,7 +1169,8 @@
       "greenhouses": "البيوت المحمية",
       "greenhouseAreaHa": "مساحة البيوت المحمية (هكتار)",
       "exportReport": "تصدير التقرير",
-      "exporting": "جارٍ التصدير..."
+      "exporting": "جارٍ التصدير...",
+      "exportFailed": "ترجمة مطلوبة"
     },
     "center": {
       "title": "إدارة المراكز",
@@ -1133,7 +1213,8 @@
         "editTitle": "تعديل الفئة",
         "namePlaceholder": "مثال: مهارات الزراعة",
         "nameArabicPlaceholder": "مثال: مهارات الزراعة"
-      }
+      },
+      "deleteConfirm": "ترجمة مطلوبة"
     },
     "title": "المقالات",
     "subtitle": "إدارة مقالاتك ومنشورات المدونة",
@@ -1179,7 +1260,8 @@
         "nameArabicLabel": "الاسم (بالعربية)",
         "parentCategoryLabel": "الفئة الرئيسية",
         "loadingCategories": "جارٍ تحميل الفئات...",
-        "parentCategoryPlaceholder": "اختر الفئة الرئيسية"
+        "parentCategoryPlaceholder": "اختر الفئة الرئيسية",
+        "nameArabicPlaceholder": "ترجمة مطلوبة"
       },
       "toast": {
         "selectImage": "يرجى اختيار صورة للفئة الفرعية الجديدة",
@@ -1871,5 +1953,10 @@
     "addSuccess": "تم الإضافة بنجاح",
     "deleteSuccess": "تم الحذف بنجاح",
     "subtitle": "العنوان الفرعي"
-  }
+  },
+  "map": {
+    "agriculturalZone": "ترجمة مطلوبة",
+    "loading": "ترجمة مطلوبة"
+  },
+  "vegetable": "ترجمة مطلوبة"
 }

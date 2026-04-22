@@ -58,9 +58,10 @@
     "deleteSelectedConfirm": "Are you sure you want to delete the selected admins?",
     "noAdmins": "No administrators added yet",
     "clickAddAdmin": "Click \"Add Admin\" to get started",
-    "notSaved": "Not saved"
-    ,
-    "fixErrors": "Please fill required fields:"
+    "notSaved": "Not saved",
+    "fixErrors": "Please fill required fields:",
+    "password": "Password",
+    "writeNewPassword": "Write new password"
   },
   "translation": {
     "emiratesAnalytics": "Emirates Analytics",
@@ -129,7 +130,20 @@
     "selectCoverType": "Select Cover Type",
     "avgAreaPerGreenhouse": "Avg Area Per Greenhouse",
     "title": "Farm Area Dashboard",
-    "other": "Other"
+    "other": "Other",
+    "annual": "Annual",
+    "autumn": "Autumn",
+    "fodder": "Fodder",
+    "fruitTrees": "Fruit Trees",
+    "fruits": "Fruits",
+    "grains": "Grains",
+    "greenhouse": "Greenhouse",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "spring": "Spring",
+    "summer": "Summer",
+    "vegetables": "Vegetables",
+    "winter": "Winter"
   },
   "status": {
     "label": "Status",
@@ -166,7 +180,8 @@
     "fodderType": "🌾 Fodder",
     "greenhouse": "🏠 Greenhouse",
     "farmingSystem": "🚜 Farming",
-    "coverType": "💧 Cover Type"
+    "coverType": "💧 Cover Type",
+    "crop": "Crop"
   },
   "filters": {
     "fruit": "🍎 Fruit Type",
@@ -178,7 +193,8 @@
     "geographic": "Geographic",
     "irrigation": "💧 Irrigation",
     "filters": "Filters",
-    "clearAll": "Clear All"
+    "clearAll": "Clear All",
+    "all": "All"
   },
   "farms": {
     "addNewFarm": "Add New Farm",
@@ -265,7 +281,8 @@
     "allEmirates": "All Emirates",
     "popupAreaLabel": "Area:",
     "downloadReport": "Download Report",
-    "searchCrops": "Search crops"
+    "searchCrops": "Search crops",
+    "title": "Farms"
   },
   "manageFarms": {
     "title": "Farms",
@@ -343,7 +360,10 @@
     "totalUncultivatedArea": "Total crop area per square meter",
     "nurseries": "Nurseries",
     "totalNurseries": "Total nurseries",
-    "noData": "No data"
+    "noData": "No data",
+    "center": "Center",
+    "emirate": "Emirate",
+    "location": "Location"
   },
   "searchUsers": "Search users...",
   "reports": {
@@ -527,9 +547,9 @@
         "changeStatus": "Change Status",
         "changeFarmStatus": "Change Farm Status",
         "selectStatus": "Select Status",
-      "approve": "Approve",
-      "reject": "Reject",
-      "suspended": "Suspended",
+        "approve": "Approve",
+        "reject": "Reject",
+        "suspended": "Suspended",
         "suspensionReason": "Suspension Reason",
         "provideSuspensionReason": "Please provide the reason for suspension...",
         "cancel": "Cancel",
@@ -559,7 +579,9 @@
     "errorLoading": "Error Loading",
     "errorOccurred": "Error Occurred",
     "createdAt": "Created At",
-    "actions": "Actions"
+    "actions": "Actions",
+    "all": "All",
+    "unknown": "Unknown"
   },
   "coders": {
     "title": "Coders",
@@ -853,21 +875,21 @@
     "passwordResetSuccessful": "Password Reset Successful",
     "passwordResetSuccessDesc": "Your password has been reset successfully. You can now log in with your new password.",
     "goToLogin": "Go to Login",
-      "uaePassDemo": "UAE Pass Demo",
-      "uaePassLogin": "UAE Pass Login",
-      "language": "Language",
-      "english": "English",
-      "arabic": "Arabic",
-      "uaePassEnvironment": "Environment",
-      "uaePassStaging": "Staging",
-      "uaePassProduction": "Production",
-      "loginWithUaePass": "Sign in with UAE PASS",
-      "creatingAdminAccount": "Creating admin account (staging)...",
-      "adminCreatedAndSignedIn": "Admin created and signed in",
-      "uaePassDescription": "Choose staging or production, then start UAE Pass login. The backend exchanges the authorization code, fetches the user profile, and returns a signed app session.",
-      "inviteCodeRequired": "A valid admin invitation link is required to complete this signup.",
-      "inviteCodeReady": "Invitation detected",
-      "inviteCodeLabel": "Invite token",
+    "uaePassDemo": "UAE Pass Demo",
+    "uaePassLogin": "UAE Pass Login",
+    "language": "Language",
+    "english": "English",
+    "arabic": "Arabic",
+    "uaePassEnvironment": "Environment",
+    "uaePassStaging": "Staging",
+    "uaePassProduction": "Production",
+    "loginWithUaePass": "Sign in with UAE PASS",
+    "creatingAdminAccount": "Creating admin account (staging)...",
+    "adminCreatedAndSignedIn": "Admin created and signed in",
+    "uaePassDescription": "Choose staging or production, then start UAE Pass login. The backend exchanges the authorization code, fetches the user profile, and returns a signed app session.",
+    "inviteCodeRequired": "A valid admin invitation link is required to complete this signup.",
+    "inviteCodeReady": "Invitation detected",
+    "inviteCodeLabel": "Invite token",
     "redirectUri": "Redirect URI:",
     "uaePassCancelledStatus": "User cancelled the login.",
     "uaePassCancelledDetail": "The user cancelled the login in UAE Pass.",
@@ -892,7 +914,35 @@
     "startOver": "Start over",
     "readyToStart": "Ready to start the handshake",
     "notAdmin": "You are not registered as an admin for this dashboard.",
-    "notAdminStatus": "Access to admin dashboard denied."
+    "notAdminStatus": "Access to admin dashboard denied.",
+    "confirm": {
+      "description": "Enter the confirmation code sent to you",
+      "didNotReceive": "Did not receive code?",
+      "resendLink": "Resend link",
+      "title": "Confirm"
+    },
+    "forgot": {
+      "description": "Enter your email to receive reset instructions",
+      "errors": {
+        "emailInvalid": "Invalid email address",
+        "emailRequired": "Email is required"
+      },
+      "placeholder": "Enter your email",
+      "sendButton": "Send reset link",
+      "title": "Forgot Password"
+    },
+    "reset": {
+      "confirmPasswordPlaceholder": "Confirm new password",
+      "description": "Set a new password for your account",
+      "errors": {
+        "confirmPasswordRequired": "Confirm password is required",
+        "newPasswordRequired": "New password is required",
+        "passwordsMismatch": "Passwords do not match"
+      },
+      "newPasswordPlaceholder": "New password",
+      "saveButton": "Save",
+      "title": "Reset Password"
+    }
   },
   "reset": {
     "title": "Reset Password",
@@ -1010,7 +1060,19 @@
         "sheetCoverTypes": "Cover Types",
         "sheetFarmingSystems": "Farming Systems",
         "exporting": "Exporting...",
-        "exportFailed": "Export failed. Please try again"
+        "exportFailed": "Export failed. Please try again",
+        "colCount": "Col Count",
+        "colCoverType": "Cover Type",
+        "colEmirate": "Emirate",
+        "colFarmingSystem": "Farming System",
+        "colFodderType": "Fodder Type",
+        "colFruitType": "Fruit Type",
+        "colGreenhouseType": "Greenhouse Type",
+        "colNumberOfFarms": "Number Of Farms",
+        "colServiceCenter": "Service Center",
+        "colTotalFarms": "Total Farms",
+        "colVegetableType": "Vegetable Type",
+        "filenamePrefix": "Export Filename Prefix"
       },
       "updatedSuccessfully": "Updated successfully"
     },
@@ -1127,7 +1189,8 @@
       "greenhouses": "Greenhouses",
       "greenhouseAreaHa": "Greenhouse Area (ha)",
       "exportReport": "Export Report",
-      "exporting": "Exporting..."
+      "exporting": "Exporting...",
+      "exportFailed": "Export failed"
     },
     "center": {
       "title": "Centers Management",
@@ -1170,7 +1233,8 @@
         "editTitle": "Edit Category",
         "namePlaceholder": "e.g. Agricultural Skills",
         "nameArabicPlaceholder": "e.g. Agricultural Skills (Arabic)"
-      }
+      },
+      "deleteConfirm": "Are you sure you want to delete this category?"
     },
     "title": "Articles",
     "subtitle": "Manage your articles and blog posts",
@@ -1216,7 +1280,8 @@
         "nameArabicLabel": "Name (Arabic)",
         "parentCategoryLabel": "Parent Category",
         "loadingCategories": "Loading categories...",
-        "parentCategoryPlaceholder": "Select parent category"
+        "parentCategoryPlaceholder": "Select parent category",
+        "nameArabicPlaceholder": "Name (Arabic)"
       },
       "toast": {
         "selectImage": "Please select an image for the new sub-category",
@@ -1324,7 +1389,8 @@
       "sheetAllFarms": "All Farms",
       "filenamePrefix": "farm_areas",
       "export": "Export",
-      "exporting": "Exporting..."
+      "exporting": "Exporting...",
+      "exportFailed": "Sizes export failed"
     },
     "map": {
       "sizeLabel": "Area",
@@ -1888,5 +1954,12 @@
         "actions": "Actions"
       }
     }
+  },
+  "": {
+    "": "."
+  },
+  "map": {
+    "agriculturalZone": "Agricultural Zone",
+    "loading": "Loading map..."
   }
 }
