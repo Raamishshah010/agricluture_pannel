@@ -5,7 +5,10 @@ import useTranslation from '../../hooks/useTranslation';
 import { API_BASE_URL } from "../../utils";
 import useStore from '../../store/store';
 import logo from '../../assets/logo.png';
-import UaePassLogo from '../../assets/UaePassLogo';
+import uaePassButtonDefault from '../../assets/uae-pass-button/uae-pass-button-active.svg';
+import uaePassButtonPressed from '../../assets/uae-pass-button/uae-pass-button-pressed.svg';
+import uaePassButtonFocus from '../../assets/uae-pass-button/uae-pass-button-focus.svg';
+import uaePassButtonDisabled from '../../assets/uae-pass-button/uae-pass-button-disabled.svg';
 import { getUaePassOutcome } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
@@ -316,14 +319,40 @@ export const UaePassLogin = () => {
 
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-center">
           <button
+            type="button"
             onClick={() => handleLoginClick('staging')}
             disabled={loading}
-            className="relative inline-flex h-[72px] w-full max-w-[420px] cursor-pointer items-center justify-center rounded-[16px] border border-black bg-black px-8 text-center text-[20px] font-semibold leading-none tracking-[-0.01em] text-white shadow-[0_8px_18px_rgba(0,0,0,0.28)] transition-all duration-150 hover:-translate-y-0.5 hover:bg-neutral-900 hover:shadow-[0_12px_24px_rgba(0,0,0,0.32)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 active:translate-y-0 active:bg-neutral-800 active:shadow-[0_4px_12px_rgba(0,0,0,0.22)] disabled:cursor-not-allowed disabled:border-neutral-500 disabled:bg-neutral-600 disabled:text-neutral-200 disabled:shadow-none"
+            className="group relative inline-flex w-full max-w-[264px] cursor-pointer items-center justify-center bg-transparent p-0 align-middle leading-none focus-visible:outline-none disabled:cursor-not-allowed"
             aria-label={t('auth.loginWithUaePass')}
+            aria-busy={loading}
           >
-            <span className="inline-flex items-center justify-center gap-4">
-              <UaePassLogo className="h-7 w-7 shrink-0 md:h-8 md:w-8" size={28} />
-              <span className="whitespace-nowrap leading-none">{t('auth.loginWithUaePass')}</span>
+            <span className="relative block w-full">
+              <img
+                src={uaePassButtonDefault}
+                alt=""
+                className="block h-auto w-full select-none"
+                draggable="false"
+              />
+              <img
+                src={uaePassButtonFocus}
+                alt=""
+                className="pointer-events-none absolute inset-0 h-full w-full select-none opacity-0 transition-opacity duration-150 group-focus-visible:opacity-100"
+                draggable="false"
+              />
+              <img
+                src={uaePassButtonPressed}
+                alt=""
+                className="pointer-events-none absolute inset-0 h-full w-full select-none opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                draggable="false"
+              />
+              {loading && (
+                <img
+                  src={uaePassButtonDisabled}
+                  alt=""
+                  className="pointer-events-none absolute inset-0 h-full w-full select-none"
+                  draggable="false"
+                />
+              )}
             </span>
           </button>
           <div className="hidden text-sm text-slate-300">
