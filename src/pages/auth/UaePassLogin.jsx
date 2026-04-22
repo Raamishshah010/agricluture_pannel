@@ -318,11 +318,11 @@ export const UaePassLogin = () => {
           <button
             onClick={() => handleLoginClick('staging')}
             disabled={loading}
-            className="relative inline-flex min-h-[48px] min-w-[140px] w-full max-w-[520px] cursor-pointer items-center justify-center rounded-[12px] border border-black bg-black px-5 py-2.5 text-center text-base font-semibold leading-none text-white transition-all duration-150 hover:bg-neutral-900 hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 active:bg-neutral-800 active:shadow-[0_2px_8px_rgba(0,0,0,0.2)] md:min-h-[56px] md:max-w-[640px] md:px-8 md:py-3 md:text-lg lg:min-h-[60px] lg:text-xl disabled:cursor-not-allowed disabled:border-neutral-500 disabled:bg-neutral-600 disabled:text-neutral-200 disabled:shadow-none"
+            className="relative inline-flex h-[72px] w-full max-w-[420px] cursor-pointer items-center justify-center rounded-[16px] border border-black bg-black px-8 text-center text-[20px] font-semibold leading-none tracking-[-0.01em] text-white shadow-[0_8px_18px_rgba(0,0,0,0.28)] transition-all duration-150 hover:-translate-y-0.5 hover:bg-neutral-900 hover:shadow-[0_12px_24px_rgba(0,0,0,0.32)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 active:translate-y-0 active:bg-neutral-800 active:shadow-[0_4px_12px_rgba(0,0,0,0.22)] disabled:cursor-not-allowed disabled:border-neutral-500 disabled:bg-neutral-600 disabled:text-neutral-200 disabled:shadow-none"
             aria-label={t('auth.loginWithUaePass')}
           >
-            <span className="inline-flex items-center justify-center gap-3 md:gap-4">
-              <UaePassLogo className="h-6 w-6 shrink-0 md:h-7 md:w-7" size={24} />
+            <span className="inline-flex items-center justify-center gap-4">
+              <UaePassLogo className="h-7 w-7 shrink-0 md:h-8 md:w-8" size={28} />
               <span className="whitespace-nowrap leading-none">{t('auth.loginWithUaePass')}</span>
             </span>
           </button>
