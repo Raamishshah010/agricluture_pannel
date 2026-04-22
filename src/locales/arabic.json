@@ -612,6 +612,7 @@
     }
   },
   "farmCodingDetails": {
+    "desalinationUnits": "وحدات تحلية المياه",
     "farmDetailsTitle": "تفاصيل المزرعة",
     "basicInformation": "المعلومات الأساسية",
     "field": "الحقل",
