@@ -9,6 +9,10 @@ import uaePassButtonDefault from '../../assets/uae-pass-button/uae-pass-button-a
 import uaePassButtonPressed from '../../assets/uae-pass-button/uae-pass-button-pressed.svg';
 import uaePassButtonFocus from '../../assets/uae-pass-button/uae-pass-button-focus.svg';
 import uaePassButtonDisabled from '../../assets/uae-pass-button/uae-pass-button-disabled.svg';
+import uaePassButtonDefaultAr from '../../assets/uae-pass-button/ar/uae-pass-button-active.svg';
+import uaePassButtonPressedAr from '../../assets/uae-pass-button/ar/uae-pass-button-pressed.svg';
+import uaePassButtonFocusAr from '../../assets/uae-pass-button/ar/uae-pass-button-focus.svg';
+import uaePassButtonDisabledAr from '../../assets/uae-pass-button/ar/uae-pass-button-disabled.svg';
 import { getUaePassOutcome } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
@@ -19,6 +23,21 @@ const ENVIRONMENT_OPTIONS = [
   { value: "staging", labelKey: "auth.uaePassStaging" },
   { value: "production", labelKey: "auth.uaePassProduction" },
 ];
+
+const UAE_PASS_BUTTON_ASSETS = {
+  en: {
+    default: uaePassButtonDefault,
+    pressed: uaePassButtonPressed,
+    focus: uaePassButtonFocus,
+    disabled: uaePassButtonDisabled,
+  },
+  ar: {
+    default: uaePassButtonDefaultAr,
+    pressed: uaePassButtonPressedAr,
+    focus: uaePassButtonFocusAr,
+    disabled: uaePassButtonDisabledAr,
+  },
+};
 
 const formatValue = (value) => {
   if (value === null || value === undefined) {
@@ -89,6 +108,7 @@ export const UaePassLogin = () => {
   const t = useTranslation();
   const navigate = useNavigate();
   const { language, setLanguage, setAdminToken } = useStore((state) => state);
+  const buttonAssets = UAE_PASS_BUTTON_ASSETS[language] || UAE_PASS_BUTTON_ASSETS.en;
   const [statusMessage, setStatusMessage] = useState(t('auth.readyToStart'));
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -328,26 +348,26 @@ export const UaePassLogin = () => {
           >
             <span className="relative block w-full">
               <img
-                src={uaePassButtonDefault}
+                src={buttonAssets.default}
                 alt=""
                 className="block h-auto w-full select-none"
                 draggable="false"
               />
               <img
-                src={uaePassButtonFocus}
+                src={buttonAssets.focus}
                 alt=""
                 className="pointer-events-none absolute inset-0 h-full w-full select-none opacity-0 transition-opacity duration-150 group-focus-visible:opacity-100"
                 draggable="false"
               />
               <img
-                src={uaePassButtonPressed}
+                src={buttonAssets.pressed}
                 alt=""
                 className="pointer-events-none absolute inset-0 h-full w-full select-none opacity-0 transition-opacity duration-75 group-active:opacity-100"
                 draggable="false"
               />
               {loading && (
                 <img
-                  src={uaePassButtonDisabled}
+                  src={buttonAssets.disabled}
                   alt=""
                   className="pointer-events-none absolute inset-0 h-full w-full select-none"
                   draggable="false"
