@@ -289,22 +289,20 @@ export const UaePassLogin = () => {
   }, [userData]);
 
   return (
-    <div className="min-h-screen w-full bg-white flex items-center justify-center p-4">
+    <div className="relative min-h-screen w-full bg-white flex items-center justify-center p-4">
+      <div className="absolute right-4 top-4 z-20 flex items-center gap-3 rounded-lg border border-gray-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur-sm">
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value)}
+          className="cursor-pointer border-none bg-transparent text-gray-800 font-semibold focus:outline-none"
+          aria-label={t('auth.language')}
+        >
+          <option value="en">{t('auth.english')}</option>
+          <option value="ar">{t('auth.arabic')}</option>
+        </select>
+        <Globe className="h-4 w-4 text-gray-700" />
+      </div>
       <div className="w-full max-w-3xl p-8 space-y-6 flex flex-col items-center">
-        <div className="w-full flex justify-end">
-          <div className="flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 w-fit shadow-sm space-x-3">
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="border-none bg-transparent text-gray-800 font-semibold focus:outline-none rounded-md cursor-pointer"
-              aria-label={t('auth.language')}
-            >
-              <option value="en">{t('auth.english')}</option>
-              <option value="ar">{t('auth.arabic')}</option>
-            </select>
-            <Globe className="w-4 h-4 text-gray-700" />
-          </div>
-        </div>
         <div className="space-y-2">
           <div className="flex justify-center mb-4">
             <img src={logo} alt="Mazraty Logo" className="h-48 w-auto object-contain" />
