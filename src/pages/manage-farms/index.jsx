@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import service from '../../services/farmService';
 import { toast } from 'react-toastify';
 import Farms from './farms';
@@ -9,7 +9,7 @@ import { NewFarmForm } from './newForm';
 import useStore from '../../store/store';
 import Dropdown from '../../components/dropdownWithSearch';
 import useTranslation from '../../hooks/useTranslation';
-import { Download, ChevronDown } from 'lucide-react';
+import { Download, ChevronDown, Upload } from 'lucide-react';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
@@ -33,6 +33,8 @@ export default function Index(props) {
     const [minSize, setMinSize] = useState('');
     const [maxSize, setMaxSize] = useState('');
     const [isDownloadOpen, setIsDownloadOpen] = useState(false);
+    const [isImporting, setIsImporting] = useState(false);
+    const importInputRef = useRef(null);
 
     useEffect(() => {
         sessionStorage.setItem('activeTab', activeTab);
@@ -114,6 +116,29 @@ export default function Index(props) {
             toast.error(err.response?.data?.message || err.message);
         }
     }, [farms, setFarms, t]);
+
+    const handleImportCsv = async (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        const fd = new FormData();
+        fd.append('file', file);
+
+        try {
+            setIsImporting(true);
+            const res = await service.importCsv(fd);
+            const imported = res?.data?.imported || 0;
+            const failed = res?.data?.failed || 0;
+            const latest = await service.getAllfarms();
+            setFarms(Array.isArray(latest?.data) ? latest.data : latest);
+            toast.success(`Imported ${imported} farms${failed ? `, ${failed} failed` : ''}`);
+        } catch (err) {
+            toast.error(err.response?.data?.message || err.message);
+        } finally {
+            setIsImporting(false);
+            if (event.target) event.target.value = '';
+        }
+    };
 
     const filteredFarms = useMemo(() => {
         const lowerQuery = query.trim().toLowerCase();
@@ -323,6 +348,28 @@ export default function Index(props) {
                     <h1 className="text-3xl font-bold text-gray-900">{t('manageFarms.title')}</h1>
                 </div>
                 <div className="flex gap-3">
+                    <input
+                        ref={importInputRef}
+                        type="file"
+                        accept=".csv,text/csv"
+                        className="hidden"
+                        onChange={handleImportCsv}
+                    />
+                    <a
+                        href="/samples/farms-import-sample.csv"
+                        download
+                        className="px-4 py-2.5 border border-emerald-200 text-emerald-700 rounded-xl hover:bg-emerald-50 transition-colors font-medium"
+                    >
+                        Sample CSV
+                    </a>
+                    <button
+                        onClick={() => importInputRef.current?.click()}
+                        disabled={isImporting}
+                        className="px-5 py-2.5 bg-white border border-emerald-300 text-emerald-700 rounded-xl hover:bg-emerald-50 transition-colors flex items-center gap-2 font-medium disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        <Upload size={18} />
+                        <span>{isImporting ? 'Importing...' : 'Import CSV'}</span>
+                    </button>
                     {/* Download Dropdown */}
                     <div className="relative">
                         <button

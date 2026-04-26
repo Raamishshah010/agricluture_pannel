@@ -50,6 +50,14 @@ export const farmerService = {
         const response = await apiClient.post('/api/farm/add', payload);
         return response.data;
     },
+    importCsv: async (payload) => {
+        const response = await apiClient.post('/api/farm/import-csv', payload, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    },
     updateFarm: async (payload, id) => {
         const response = await apiClient.put('/api/farm/update/' + id, payload);
         return response.data;

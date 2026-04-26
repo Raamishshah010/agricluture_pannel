@@ -7,7 +7,7 @@ import FarmDetails from "./farmDetails";
 import Pagination from "../../components/pagination";
 import useTranslation from "../../hooks/useTranslation";
 import useStore from "../../store/store";
-import { Download, ChevronDown } from "lucide-react";
+import { Download, ChevronDown, Upload } from "lucide-react";
 import Loader from "../../components/Loader";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -49,6 +49,8 @@ export default function Index(props) {
   );
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const importInputRef = useRef(null);
   const lastFarmersRequestKeyRef = useRef("");
   const requestSequenceRef = useRef(0);
 
@@ -151,6 +153,28 @@ export default function Index(props) {
   const refreshFarmers = async () => {
     lastFarmersRequestKeyRef.current = "";
     await loadMore(page);
+  };
+
+  const handleImportCsv = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const fd = new FormData();
+    fd.append("file", file);
+
+    try {
+      setIsImporting(true);
+      const res = await service.importCsv(fd);
+      const imported = res?.data?.imported || 0;
+      const failed = res?.data?.failed || 0;
+      toast.success(`Imported ${imported} farmers${failed ? `, ${failed} failed` : ""}`);
+      await refreshFarmers();
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    } finally {
+      setIsImporting(false);
+      if (event.target) event.target.value = "";
+    }
   };
 
   const showingRecordsText =
@@ -441,6 +465,30 @@ const downloadPDF = async () => {
           <p className="text-sm text-gray-500 mt-2">{showingRecordsText}</p>
         </div>
 
+        <div className="flex flex-wrap items-center gap-3">
+          <input
+            ref={importInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            className="hidden"
+            onChange={handleImportCsv}
+          />
+          <a
+            href="/samples/farmers-import-sample.csv"
+            download
+            className="px-4 py-3 border border-emerald-200 text-emerald-700 rounded-lg hover:bg-emerald-50 transition-colors font-medium"
+          >
+            Sample CSV
+          </a>
+          <button
+            onClick={() => importInputRef.current?.click()}
+            disabled={isImporting}
+            className="flex items-center gap-2 px-5 py-3 rounded-lg border border-emerald-300 text-emerald-700 bg-white hover:bg-emerald-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <Upload size={20} />
+            {isImporting ? "Importing..." : "Import CSV"}
+          </button>
+
         {/* Download Dropdown */}
         <div className="relative">
           <button
@@ -524,6 +572,7 @@ const downloadPDF = async () => {
               </div>
             </>
           )}
+        </div>
         </div>
       </div>
 

@@ -103,6 +103,14 @@ export const farmerService = {
         });
         return response.data;
     },
+    importCsv: async (payload) => {
+        const response = await apiClient.post('/api/farmer/import-csv', payload, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data;
+    },
     update: async (id, payload) => {
         const response = await apiClient.put('/api/farmer/' + id, payload, {
             headers: {
