@@ -3,9 +3,12 @@ import { Check, X, Plus, Edit2, Trash2 } from 'lucide-react';
 import useTranslation from '../hooks/useTranslation';
 import Loader from '../components/Loader';
 import adminService from '../services/adminService';
+import useStore from '../store/store';
+import { getLocalizedPersonName } from '../utils/localizedName';
 
 const AdminManagementFlow = () => {
   const t = useTranslation();
+  const { language } = useStore((state) => state);
   const [currentScreen, setCurrentScreen] = useState(1);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [formData, setFormData] = useState({
@@ -44,6 +47,7 @@ const AdminManagementFlow = () => {
 
     return labels[value] || value;
   };
+  const getAdminName = (admin) => getLocalizedPersonName(admin, language) || t('common.nA');
 
   // Auto-dismiss success popup after 2 seconds
   useEffect(() => {
@@ -141,7 +145,7 @@ const AdminManagementFlow = () => {
   };
 
   const exportSelectedCSV = () => {
-    const rows = (selectedIds.length ? admins.filter(a => selectedIds.includes(a.id)) : admins).map(a => [a.name, a.email, a.emirate, a.type, a.mobile]);
+    const rows = (selectedIds.length ? admins.filter(a => selectedIds.includes(a.id)) : admins).map(a => [getAdminName(a), a.email, a.emirate, a.type, a.mobile]);
     const header = [t('admin.adminName'), t('admin.email'), t('admin.emirate'), t('admin.adminType'), t('admin.mobileNumberHeader')];
     const csv = [header, ...rows].map(r => r.map(cell => `"${(cell||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -537,7 +541,7 @@ const AdminManagementFlow = () => {
                     <div>
                       <input type="checkbox" checked={selectedIds.includes(admin.id)} onChange={() => toggleSelect(admin.id)} />
                     </div>
-                    <div className="font-medium">{admin.name}</div>
+                    <div className="font-medium">{getAdminName(admin)}</div>
                     <div className="truncate">{admin.email}</div>
                     <div>{getEmirateLabel(admin.emirate)}</div>
                     <div>{getTypeLabel(admin.type)}</div>

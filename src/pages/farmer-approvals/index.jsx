@@ -4,9 +4,12 @@ import service from "../../services/farmerService";
 import { toast } from "react-toastify";
 import useTranslation from "../../hooks/useTranslation";
 import Loader from "../../components/Loader";
+import useStore from "../../store/store";
+import { getLocalizedPersonName } from "../../utils/localizedName";
 
 export default function FarmerApprovals() {
   const t = useTranslation();
+  const { language } = useStore((state) => state);
   const [list, setList] = useState([]);
   const [activeTab, setActiveTab] = useState("pending");
   const [loading, setLoading] = useState(false);
@@ -43,6 +46,7 @@ export default function FarmerApprovals() {
     if (!q) return baseList;
     return baseList.filter((item) => {
       const haystack = [
+        getLocalizedPersonName(item, language),
         item.name,
         item.email,
         item.phoneNumber,
@@ -53,7 +57,9 @@ export default function FarmerApprovals() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [list, query, activeTab]);
+  }, [list, query, activeTab, language]);
+
+  const getFarmerName = (farmer) => getLocalizedPersonName(farmer, language) || t("common.nA");
 
   const formatDate = (dateString) => {
     if (!dateString) return t("common.nA");
@@ -222,7 +228,7 @@ export default function FarmerApprovals() {
                     return (
                       <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-4 py-3">
-                          <div className="font-semibold text-gray-900 text-sm">{item.name}</div>
+                          <div className="font-semibold text-gray-900 text-sm">{getFarmerName(item)}</div>
                           <div className="text-xs text-gray-500">{item.email}</div>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">{item.phoneNumber || t("common.nA")}</td>
@@ -292,7 +298,7 @@ export default function FarmerApprovals() {
             <div className="px-6 py-5 space-y-4">
               <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
                 <div className="text-sm font-semibold text-gray-800">
-                  {approvalDialogItem.name}
+                  {getFarmerName(approvalDialogItem)}
                 </div>
                 <div className="text-xs text-gray-500 mt-1">{approvalDialogItem.email}</div>
               </div>

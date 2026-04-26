@@ -13,6 +13,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import { amiriFontBase64 } from "../../assets/AmiriFont"; // Amiri font import karein
+import { getLocalizedPersonName } from "../../utils/localizedName";
 
 export default function Index(props) {
   const t = useTranslation();
@@ -157,6 +158,8 @@ export default function Index(props) {
       ? `إظهار ${list.length} من أصل ${totalCount} سجل`
       : `Showing ${list.length} of ${totalCount} records`;
 
+  const getFarmerName = (farmer) => getLocalizedPersonName(farmer, language) || t('common.nA');
+
   const handleFarms = async (item) => {
     const farmerId = item?.id || item?._id || item?.farmerId || item?.userId || null;
 
@@ -274,7 +277,7 @@ const downloadPDF = async () => {
       // 2. DATA MAPPING (Reverse row for Arabic)
       let tableData = allFarmers.map(farmer => {
         const row = [
-          farmer.name || t('common.nA'),
+          getFarmerName(farmer),
           farmer.phoneNumber || t('common.nA'),
           farmer.emirateId || t('common.nA'),
           formatDate(farmer.createdAt)
@@ -342,7 +345,7 @@ const downloadPDF = async () => {
         [t("farmers.image")]: farmer.image
           ? t("farmers.imageAvailable")
           : t("farmers.noImage"),
-        [t("farmers.name")]: farmer.name || t('common.nA'),
+        [t("farmers.name")]: getFarmerName(farmer),
         [t("farmers.phoneNumber")]: farmer.phoneNumber || t('common.nA'),
         [t("farmers.emirateId")]: farmer.emirateId || t('common.nA'),
         [t("farmers.createdAt")]: formatDate(farmer.createdAt),
@@ -388,7 +391,7 @@ const downloadPDF = async () => {
 
     const csvData = allFarmers.map((farmer) => [
       farmer.image ? t("farmers.imageAvailable") : t("farmers.noImage"),
-      farmer.name || t("farmers.noData"),
+      getFarmerName(farmer),
       farmer.phoneNumber || t("farmers.noData"),
       farmer.emirateId || t("farmers.noData"),
       formatDate(farmer.createdAt),
@@ -592,7 +595,7 @@ const downloadPDF = async () => {
     <Farms
       list={farms}
       loading={farmsLoading}
-      farmerName={selectedFarmer?.name || ''}
+      farmerName={getFarmerName(selectedFarmer)}
       handleBack={() => setActiveTab("farmers")}
       handleDetail={(item) => {
         setSelectedFarm(item);

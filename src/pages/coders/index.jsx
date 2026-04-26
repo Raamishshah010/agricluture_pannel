@@ -21,6 +21,7 @@ import useStore from "../../store/store";
 import { amiriFontBase64 } from "../../assets/AmiriFont";
 import Loader from "../../components/Loader";
 import farmService from "../../services/farmService";
+import { getLocalizedPersonName } from "../../utils/localizedName";
 
 export default function Coders() {
   const t = useTranslation();
@@ -40,7 +41,8 @@ export default function Coders() {
     phoneNumber: "",
     image: "",
   });
-  const { farms } = useStore((st) => st);
+  const { farms, language } = useStore((st) => st);
+  const getCoderName = (coder) => getLocalizedPersonName(coder, language) || t("common.nA");
 
   useEffect(() => {
     const fetch = async () => {
@@ -280,7 +282,7 @@ const downloadPDF = () => {
     ];
 
     let tableData = list.map(coder => [
-        coder.name,
+        getCoderName(coder),
         coder.emirateId,
         coder.phoneNumber,
         coder.email,
@@ -342,7 +344,7 @@ const downloadPDF = () => {
   const downloadExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       list.map((coder) => ({
-        [t("coders.name")]: coder.name,
+        [t("coders.name")]: getCoderName(coder),
         [t("coders.emirateId")]: coder.emirateId,
         [t("coders.phoneNumber")]: coder.phoneNumber,
         [t("coders.email")]: coder.email,
@@ -370,7 +372,7 @@ const downloadPDF = () => {
     ];
 
     const csvData = list.map((coder) => [
-      coder.name,
+      getCoderName(coder),
       coder.emirateId,
       coder.phoneNumber,
       coder.email,
@@ -599,10 +601,10 @@ const downloadPDF = () => {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold shadow-md">
-                          {coder.name.charAt(0).toUpperCase()}
+                          {getCoderName(coder).charAt(0).toUpperCase()}
                         </div>
                         <div className="font-semibold text-gray-900">
-                          {coder.name}
+                          {getCoderName(coder)}
                         </div>
                       </div>
                     </td>
@@ -952,7 +954,7 @@ const downloadPDF = () => {
                     {t("coders.coderDetails")}
                   </h2>
                   <p className="text-sm text-gray-500">
-                    {selectedCoder.name}
+                    {getCoderName(selectedCoder)}
                   </p>
                 </div>
               </div>
@@ -975,7 +977,7 @@ const downloadPDF = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.name")}</label>
-                      <p className="text-gray-900 font-medium">{selectedCoder.name}</p>
+                      <p className="text-gray-900 font-medium">{getCoderName(selectedCoder)}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.emirateId")}</label>

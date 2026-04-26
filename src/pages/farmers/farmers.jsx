@@ -3,6 +3,8 @@ import service from '../../services/farmerService';
 import { Edit2, Plus, Trash2, X, Eye, CheckCircle2, XCircle } from "lucide-react";
 import useTranslation from '../../hooks/useTranslation';
 import { toast } from 'react-toastify';
+import useStore from '../../store/store';
+import { getLocalizedPersonName } from '../../utils/localizedName';
 
 export default function Farmers({
     list,
@@ -14,6 +16,8 @@ export default function Farmers({
     onRefreshFarmers,
 }) {
     const t = useTranslation();
+    const { language } = useStore((state) => state);
+    const getFarmerName = (farmer) => getLocalizedPersonName(farmer, language) || t('common.nA');
     const sortFarmersByCreatedAtDesc = (farmers = []) => [...farmers].sort((a, b) => {
         const aTime = new Date(a?.createdAt || 0).getTime();
         const bTime = new Date(b?.createdAt || 0).getTime();
@@ -349,20 +353,20 @@ export default function Farmers({
                                             {farmer.image ? (
                                                 <img
                                                     src={farmer.image}
-                                                    alt={farmer.name}
+                                                    alt={getFarmerName(farmer)}
                                                     className="w-full h-full object-cover"
                                                 />
                                             ) : (
                                                 <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
                                                     <span className="text-white font-bold text-base">
-                                                        {farmer.name.charAt(0).toUpperCase()}
+                                                        {getFarmerName(farmer).charAt(0).toUpperCase()}
                                                     </span>
                                                 </div>
                                             )}
                                         </div>
                                     </td>
                                     <td className="px-4 py-3 align-top">
-                                        <div className="font-semibold text-gray-900 text-sm break-words max-w-[260px]">{farmer.name}</div>
+                                        <div className="font-semibold text-gray-900 text-sm break-words max-w-[260px]">{getFarmerName(farmer)}</div>
                                         <div className="text-xs text-gray-500 break-all max-w-[260px]">{farmer.email}</div>
                                         <div className="mt-2 flex flex-wrap gap-2">
                                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${farmer.isCoder
@@ -655,7 +659,7 @@ export default function Farmers({
                         </div>
                         <div className="px-6 py-5 space-y-4">
                             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                                <div className="text-sm font-semibold text-gray-800">{approvalDialogItem.name}</div>
+                                <div className="text-sm font-semibold text-gray-800">{getFarmerName(approvalDialogItem)}</div>
                                 <div className="text-xs text-gray-500 mt-1">{approvalDialogItem.email}</div>
                             </div>
 

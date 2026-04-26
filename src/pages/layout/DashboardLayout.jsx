@@ -8,6 +8,7 @@ import useStore from '../../store/store';
 import { useNavigate } from "react-router-dom";
 import Loader from '../../components/Loader';
 import { API_BASE_URL } from '../../utils';
+import { getLocalizedPersonName } from '../../utils/localizedName';
 
 const Overview = lazy(() => import('../Overview'));
 const Emirates = lazy(() => import('../Emirates/index'));
@@ -143,6 +144,9 @@ const DashboardLayout = () => {
 
   const isRTL = language.includes('ar');
   const directionClass = isRTL ? 'rtl' : 'ltr';
+  const getAdminDisplayName = () => admin
+    ? (getLocalizedPersonName(admin, language) || admin.givenName || `${(admin.givenName || '').trim()} ${(admin.familyName || '').trim()}`.trim() || admin.email)
+    : null;
 
   const clearAuthStorage = () => {
     const authKeys = ['adminToken', 'admin', 'token', 'user', 'uae-pass-state', 'uae-pass-environment', 'stagingAdmin'];
@@ -476,8 +480,7 @@ const DashboardLayout = () => {
                   <div className="flex-1 min-w-0">
                     <p className={`text-xs sm:text-sm md:text-base font-medium text-gray-800 truncate ${isRTL ? 'text-right' : 'text-left'}`}>
                       {(() => {
-                        if (!admin) return t('common.components.dashboard.adminName');
-                        return admin.name || admin.givenName || `${(admin.givenName || '').trim()} ${(admin.familyName || '').trim()}`.trim() || admin.email || t('common.components.dashboard.adminName');
+                        return getAdminDisplayName() || t('common.components.dashboard.adminName');
                       })()}
                     </p>
                     <p className={`text-[10px] sm:text-xs text-gray-500 truncate hidden sm:block ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -531,7 +534,7 @@ const DashboardLayout = () => {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full gap-2 md:gap-0">
             <div className="flex flex-col">
                   {(() => {
-                    const adminName = admin ? (admin.name || admin.givenName || `${(admin.givenName || '').trim()} ${(admin.familyName || '').trim()}`.trim() || admin.email) : null;
+                    const adminName = getAdminDisplayName();
                     return (
                       <>
                         <h1 className={`text-lg md:text-2xl font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>

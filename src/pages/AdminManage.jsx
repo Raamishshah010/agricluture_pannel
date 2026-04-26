@@ -4,11 +4,14 @@ import useTranslation from '../hooks/useTranslation';
 import Loader from '../components/Loader';
 import adminService from '../services/adminService';
 import { useNavigate, useLocation } from 'react-router-dom';
+import useStore from '../store/store';
+import { getLocalizedPersonName } from '../utils/localizedName';
 
 export default function AdminManage() {
   const t = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const { language } = useStore((state) => state);
   const emiratesIdLabel = t('farms.emiratesId');
 
   const [admins, setAdmins] = useState([]);
@@ -25,6 +28,7 @@ export default function AdminManage() {
     admin?.emiratesID ||
     admin?.emiritsId ||
     '';
+  const getAdminName = (admin) => getLocalizedPersonName(admin, language) || t('common.nA');
 
   /* =============================
      Load Admins
@@ -163,7 +167,7 @@ export default function AdminManage() {
         ? admins.filter(a => selectedIds.includes(a.id))
         : admins
     ).map(a => [
-      a.name,
+      getAdminName(a),
       a.email,
       getAdminEmiratesId(a),
       a.emirate,
@@ -356,7 +360,7 @@ export default function AdminManage() {
                   onChange={() => toggleSelect(admin.id)}
                 />
               </div>
-              <div className="font-medium">{admin.name}</div>
+              <div className="font-medium">{getAdminName(admin)}</div>
               <div className="truncate">{admin.email}</div>
               <div className="truncate">{getAdminEmiratesId(admin) || '-'}</div>
               <div>{admin.emirate}</div>
