@@ -786,7 +786,21 @@
       "coder": "Coder",
       "emptyCTA": "Add your first farmer to get started",
       "pendingApproval": "Pending Approval",
-      "approvalStatus": "Approval Status"
+      "approvalStatus": "Approval Status",
+      "accountStatus": "Account Status",
+      "accountStatuses": {
+        "active": "Active",
+        "pending_approval": "Pending Approval",
+        "inactive": "Inactive",
+        "suspended": "Suspended"
+      },
+      "approvalStatuses": {
+        "approved": "Approved",
+        "pending_approval": "Pending Approval",
+        "under_review": "Under Review",
+        "needs_revision": "Needs Revision",
+        "rejected": "Rejected"
+      }
     },
     "farmerApprovals": {
       "title": "Account Approvals",
@@ -809,6 +823,16 @@
       "approveAsFarmer": "Farmer",
       "approveAsFarmerDescription": "Keep this account in the farmer list.",
       "approveAsCoderDescription": "Move this account into the coder flow.",
+      "mergeCandidates": "Existing matches",
+      "mergeLabel": "Existing account match",
+      "approveNewAccount": "Approve as a new account",
+      "approveNewAccountDescription": "Keep this request separate from the existing data.",
+      "farms": "farms",
+      "matchDetailsTitle": "Matching Existing Accounts",
+      "matchDetailsDescription": "Review the existing accounts found with the same Emirates ID before approving or merging.",
+      "pendingAccount": "Pending account",
+      "coderAccount": "Coder account",
+      "farmerAccount": "Farmer account",
       "approveSuccess": "Account approved successfully",
       "rejectSuccess": "Account rejected successfully",
       "approveFail": "Failed to approve account",

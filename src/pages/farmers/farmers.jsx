@@ -29,6 +29,8 @@ export default function Farmers({
     const [editingItem, setEditingItem] = useState(null);
     const [approvalDialogItem, setApprovalDialogItem] = useState(null);
     const [approvalRole, setApprovalRole] = useState('farmer');
+    const accountStatusOptions = ['active', 'pending_approval', 'inactive', 'suspended'];
+    const approvalStatusOptions = ['approved', 'pending_approval', 'under_review', 'needs_revision', 'rejected'];
     const [formData, setFormData] = useState({
         name: '',
         emirateId: '',
@@ -36,6 +38,8 @@ export default function Farmers({
         phoneNumber: '',
         image: '',
         isCoder: false,
+        status: 'pending_approval',
+        approvalStatus: 'pending_approval',
     });
 
     const openAddModal = () => {
@@ -47,6 +51,8 @@ export default function Farmers({
             phoneNumber: '',
             image: '',
             isCoder: false,
+            status: 'approved',
+            approvalStatus: 'approved',
         });
         setIsModalOpen(true);
     };
@@ -60,6 +66,8 @@ export default function Farmers({
             phoneNumber: coder.phoneNumber || '',
             image: coder.image || '',
             isCoder: !!coder.isCoder,
+            status: coder.status || 'pending_approval',
+            approvalStatus: coder.approvalStatus || 'pending_approval',
         });
         setIsModalOpen(true);
     };
@@ -95,6 +103,10 @@ export default function Farmers({
             fd.append('emirateId', formData.emirateId);
             fd.append('phoneNumber', formData.phoneNumber);
             fd.append('isCoder', String(!!formData.isCoder));
+            if (editingItem) {
+                fd.append('status', formData.status);
+                fd.append('approvalStatus', formData.approvalStatus);
+            }
             if (!editingItem) {
                 fd.append('autoApprove', 'true');
             }
@@ -173,6 +185,16 @@ export default function Farmers({
         if (status === 'approved') return t('farmers.farmerApprovals.approvedStatus');
         if (status === 'rejected') return t('farmers.farmerApprovals.rejectedStatus');
         return t('farmers.farmers.pendingApproval');
+    };
+
+    const getAccountStatusLabel = (status) => {
+        const normalized = String(status || '').toLowerCase().trim();
+        return t(`farmers.farmers.accountStatuses.${normalized}`) || normalized;
+    };
+
+    const getApprovalStatusOptionLabel = (status) => {
+        const normalized = String(status || '').toLowerCase().trim();
+        return t(`farmers.farmers.approvalStatuses.${normalized}`) || normalized;
     };
 
     const handleApprovalDecision = async (farmer, action) => {
@@ -615,6 +637,45 @@ export default function Farmers({
                                         </div>
                                     </label>
                                 </div>
+
+                                {editingItem && (
+                                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                {t('farmers.farmers.accountStatus')}
+                                            </label>
+                                            <select
+                                                name="status"
+                                                value={formData.status}
+                                                onChange={handleInputChange}
+                                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-white"
+                                            >
+                                                {accountStatusOptions.map((status) => (
+                                                    <option key={status} value={status}>
+                                                        {getAccountStatusLabel(status)}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                                {t('farmers.farmers.approvalStatus')}
+                                            </label>
+                                            <select
+                                                name="approvalStatus"
+                                                value={formData.approvalStatus}
+                                                onChange={handleInputChange}
+                                                className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-white"
+                                            >
+                                                {approvalStatusOptions.map((status) => (
+                                                    <option key={status} value={status}>
+                                                        {getApprovalStatusOptionLabel(status)}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             {/* Modal Footer */}

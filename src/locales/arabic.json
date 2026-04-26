@@ -791,7 +791,21 @@
       "coder": "مبرمج",
       "emptyCTA": "أضف أول مزارع للبدء",
       "pendingApproval": "بانتظار الاعتماد",
-      "approvalStatus": "حالة الاعتماد"
+      "approvalStatus": "حالة الاعتماد",
+      "accountStatus": "حالة الحساب",
+      "accountStatuses": {
+        "active": "نشط",
+        "pending_approval": "بانتظار الاعتماد",
+        "inactive": "غير نشط",
+        "suspended": "موقوف"
+      },
+      "approvalStatuses": {
+        "approved": "معتمد",
+        "pending_approval": "بانتظار الاعتماد",
+        "under_review": "قيد المراجعة",
+        "needs_revision": "بحاجة إلى مراجعة",
+        "rejected": "مرفوض"
+      }
     },
     "farmerApprovals": {
       "title": "اعتماد الحسابات",
@@ -814,6 +828,16 @@
       "approveAsFarmer": "مزارع",
       "approveAsFarmerDescription": "احتفظ بهذا الحساب ضمن قائمة المزارعين.",
       "approveAsCoderDescription": "انقل هذا الحساب إلى مسار المبرمجين.",
+      "mergeCandidates": "حسابات مطابقة",
+      "mergeLabel": "مطابقة حساب موجود",
+      "approveNewAccount": "اعتماد كحساب جديد",
+      "approveNewAccountDescription": "احتفظ بهذا الطلب منفصلا عن البيانات الموجودة.",
+      "farms": "مزارع",
+      "matchDetailsTitle": "الحسابات الموجودة المطابقة",
+      "matchDetailsDescription": "راجع الحسابات الموجودة التي لها نفس رقم الهوية الإماراتية قبل الاعتماد أو الدمج.",
+      "pendingAccount": "الحساب المعلق",
+      "coderAccount": "حساب مبرمج",
+      "farmerAccount": "حساب مزارع",
       "approveSuccess": "تم اعتماد الحساب بنجاح",
       "rejectSuccess": "تم رفض الحساب بنجاح",
       "approveFail": "فشل اعتماد الحساب",
