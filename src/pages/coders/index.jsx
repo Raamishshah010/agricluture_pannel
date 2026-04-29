@@ -35,14 +35,17 @@ export default function Coders() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState({});
   const [formData, setFormData] = useState({
-    name: "",
+    fullnameEN: "",
     emirateId: "",
+    accountNumber: "",
+    agriculturalId: "",
     email: "",
-    phoneNumber: "",
+    mobile: "",
     image: "",
   });
   const { farms, language } = useStore((st) => st);
   const getCoderName = (coder) => getLocalizedPersonName(coder, language) || t("common.nA");
+  const getCoderMobile = (coder) => coder?.mobile || coder?.phoneNumber || t("common.nA");
 
   useEffect(() => {
     const fetch = async () => {
@@ -63,10 +66,12 @@ export default function Coders() {
   const openAddModal = () => {
     setEditingItem(null);
     setFormData({
-      name: "",
+      fullnameEN: "",
       email: "",
       emirateId: "",
-      phoneNumber: "",
+      accountNumber: "",
+      agriculturalId: "",
+      mobile: "",
       image: "",
     });
     setIsModalOpen(true);
@@ -75,10 +80,12 @@ export default function Coders() {
   const openEditModal = (coder) => {
     setEditingItem(coder);
     setFormData({
-      name: coder.name,
+      fullnameEN: coder.fullnameEN || coder.name || "",
       email: coder.email,
       emirateId: coder.emirateId || "",
-      phoneNumber: coder.phoneNumber || "",
+      accountNumber: coder.accountNumber || "",
+      agriculturalId: coder.agriculturalId || coder.agricultureID || "",
+      mobile: coder.mobile || coder.phoneNumber || "",
       image: coder.image || "",
     });
     setIsModalOpen(true);
@@ -126,9 +133,9 @@ export default function Coders() {
 
   const handleSubmit = async () => {
     if (
-      !formData.name ||
+      !formData.fullnameEN ||
       !formData.email ||
-      !formData.phoneNumber
+      !formData.mobile
     ) {
       toast.error(t("coders.fillRequiredFields"));
       return;
@@ -137,10 +144,12 @@ export default function Coders() {
       setLoading(true);
 
       const fd = new FormData();
-      fd.append("name", formData.name);
+      fd.append("fullnameEN", formData.fullnameEN);
       fd.append("email", formData.email);
       fd.append("emirateId", formData.emirateId);
-      fd.append("phoneNumber", formData.phoneNumber);
+      fd.append("accountNumber", formData.accountNumber);
+      fd.append("agriculturalId", formData.agriculturalId);
+      fd.append("mobile", formData.mobile);
       if (!editingItem) {
         fd.append("autoApprove", "true");
       }
@@ -233,7 +242,6 @@ export default function Coders() {
             ...updatedCoder,
             status: res?.data?.status || updatedCoder?.status || entry.status,
             approvalStatus: res?.data?.approvalStatus || updatedCoder?.approvalStatus || entry.approvalStatus,
-            statusDetails: res?.data?.statusDetails || updatedCoder?.statusDetails || entry.statusDetails,
           };
         }),
       );
@@ -275,6 +283,8 @@ const downloadPDF = () => {
     let tableHeaders = [
         t('coders.name'),
         t('coders.emirateId'),
+        t('coders.accountNumber'),
+        t('coders.agriculturalId'),
         t('coders.phoneNumber'),
         t('coders.email'),
         t('coders.approvalStatus'),
@@ -284,7 +294,9 @@ const downloadPDF = () => {
     let tableData = list.map(coder => [
         getCoderName(coder),
         coder.emirateId,
-        coder.phoneNumber,
+        coder.accountNumber || t('common.nA'),
+        coder.agriculturalId || coder.agricultureID || t('common.nA'),
+        getCoderMobile(coder),
         coder.email,
         getApprovalLabel(getNormalizedApprovalStatus(coder)),
         formatDate(coder.createdAt)
@@ -331,7 +343,7 @@ const downloadPDF = () => {
             5: { halign: isArabic ? 'right' : 'left' }
         },
         // Ye hook check karega ke table ka flow kahan hai
-        didDrawPage: (data) => {
+        didDrawPage: () => {
             // Page numbers ya footer agar chahiye
         }
     });
@@ -346,7 +358,9 @@ const downloadPDF = () => {
       list.map((coder) => ({
         [t("coders.name")]: getCoderName(coder),
         [t("coders.emirateId")]: coder.emirateId,
-        [t("coders.phoneNumber")]: coder.phoneNumber,
+        [t("coders.accountNumber")]: coder.accountNumber || t('common.nA'),
+        [t("coders.agriculturalId")]: coder.agriculturalId || coder.agricultureID || t('common.nA'),
+        [t("coders.phoneNumber")]: getCoderMobile(coder),
         [t("coders.email")]: coder.email,
         [t("coders.approvalStatus")]: getApprovalLabel(getNormalizedApprovalStatus(coder)),
         [t("coders.createdAt")]: formatDate(coder.createdAt),
@@ -365,6 +379,8 @@ const downloadPDF = () => {
     const headers = [
       t("coders.name"),
       t("coders.emirateId"),
+      t("coders.accountNumber"),
+      t("coders.agriculturalId"),
       t("coders.phoneNumber"),
       t("coders.email"),
       t("coders.approvalStatus"),
@@ -374,7 +390,9 @@ const downloadPDF = () => {
     const csvData = list.map((coder) => [
       getCoderName(coder),
       coder.emirateId,
-      coder.phoneNumber,
+      coder.accountNumber || t("common.nA"),
+      coder.agriculturalId || coder.agricultureID || t("common.nA"),
+      getCoderMobile(coder),
       coder.email,
       getApprovalLabel(getNormalizedApprovalStatus(coder)),
       formatDate(coder.createdAt),
@@ -615,7 +633,7 @@ const downloadPDF = () => {
                     </td>
                     <td className="px-6 py-4">
                       <span className="text-sm text-gray-600">
-                        {coder.phoneNumber}
+                        {getCoderMobile(coder)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -786,8 +804,8 @@ const downloadPDF = () => {
                     </div>
                     <input
                       type="text"
-                      name="name"
-                      value={formData.name}
+                      name="fullnameEN"
+                      value={formData.fullnameEN}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                       placeholder={t("coders.enterName")}
@@ -858,6 +876,35 @@ const downloadPDF = () => {
                   </div>
                 </div>
 
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      {t("coders.accountNumber")}
+                    </label>
+                    <input
+                      type="text"
+                      name="accountNumber"
+                      value={formData.accountNumber}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                      placeholder={t("coders.enterAccountNumber")}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      {t("coders.agriculturalId")}
+                    </label>
+                    <input
+                      type="text"
+                      name="agriculturalId"
+                      value={formData.agriculturalId}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                      placeholder={t("coders.enterAgriculturalId")}
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     {t("coders.phoneRequired")}
@@ -881,8 +928,8 @@ const downloadPDF = () => {
                     </div>
                     <input
                       type="text"
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
+                      name="mobile"
+                      value={formData.mobile}
                       onChange={handleInputChange}
                       className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                       placeholder={t("coders.enterPhone")}
@@ -984,12 +1031,20 @@ const downloadPDF = () => {
                       <p className="text-gray-900 font-medium">{selectedCoder.emirateId || t('common.nA')}</p>
                     </div>
                     <div>
+                      <label className="text-sm font-medium text-gray-600">{t("coders.accountNumber")}</label>
+                      <p className="text-gray-900 font-medium">{selectedCoder.accountNumber || t('common.nA')}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">{t("coders.agriculturalId")}</label>
+                      <p className="text-gray-900 font-medium">{selectedCoder.agriculturalId || selectedCoder.agricultureID || t('common.nA')}</p>
+                    </div>
+                    <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.email")}</label>
                       <p className="text-gray-900 font-medium">{selectedCoder.email}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.phoneNumber")}</label>
-                      <p className="text-gray-900 font-medium">{selectedCoder.phoneNumber || t('common.nA')}</p>
+                      <p className="text-gray-900 font-medium">{getCoderMobile(selectedCoder)}</p>
                     </div>
                     <div className="md:col-span-2">
                       <label className="text-sm font-medium text-gray-600">{t("coders.createdAt")}</label>

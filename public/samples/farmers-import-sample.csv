@@ -1,3 +1,3 @@
-sub,uuid,firstnameEN,lastnameEN,fullnameEN,firstnameAR,lastnameAR,fullnameAR,email,mobile,idn,unifiedID,nationality,nationalityEN,gender,dateOfBirth,userType,emirateId,phoneNumber,name,isCoder,isSocialUser,autoApprove,isEmailVerified,farms,image
-uaepass-sub-1001,uaepass-uuid-1001,Ahmed,Al Mansoori,Ahmed Al Mansoori,Ahmed,Al Mansoori,Ahmed Al Mansoori,ahmed.mansoori@example.com,+971501112233,784198812345678,784198812345678,United Arab Emirates,United Arab Emirates,male,1988-04-12,CITIZEN,784198812345678,+971501112233,Ahmed Al Mansoori,false,true,true,true,,
-uaepass-sub-1002,uaepass-uuid-1002,Fatima,Al Ketbi,Fatima Al Ketbi,Fatima,Al Ketbi,Fatima Al Ketbi,fatima.ketbi@example.com,+971502223344,784199012345679,784199012345679,United Arab Emirates,United Arab Emirates,female,1990-09-22,CITIZEN,784199012345679,+971502223344,Fatima Al Ketbi,false,true,true,true,,
+fullnameEN,fullnameAR,email,mobile,emirateId,accountNumber,agricultureID
+Ahmed Al Mansoori,أحمد المنصوري,ahmed.mansoori@example.com,+971501112233,784198812345678,AC987654321,AGRI001
+Fatima Al Ketbi,فاطمة الكتبي,fatima.ketbi@example.com,+971502223344,784199012345679,AC123456789,AGRI002

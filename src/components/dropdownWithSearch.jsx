@@ -43,14 +43,18 @@ const Dropdown = ({ options, value, onChange, placeholder, classes = "w-48", dis
   );
 
   // Filter options based on search term
-  const filteredOptions = options.filter(option => {
-    const localizedName = option.nameInArabic || option.nameInArrabic || option.scientificName || option.name;
-    return (
-      isLTR ?
-        option.name.toLowerCase().includes(searchTerm.toLowerCase())
-        : localizedName ? localizedName.toLowerCase().includes(searchTerm.toLowerCase())
-          : option.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+  const normalizedSearchTerm = searchTerm.toLowerCase();
+  const filteredOptions = (Array.isArray(options) ? options : []).filter(option => {
+    if (!option) return false;
+
+    const primaryName = String(option.name || '').toLowerCase();
+    const localizedName = String(option.nameInArabic || option.nameInArrabic || option.scientificName || option.name || '').toLowerCase();
+
+    if (isLTR) {
+      return primaryName.includes(normalizedSearchTerm) || localizedName.includes(normalizedSearchTerm);
+    }
+
+    return localizedName.includes(normalizedSearchTerm) || primaryName.includes(normalizedSearchTerm);
   });
 
   // Get display name based on language

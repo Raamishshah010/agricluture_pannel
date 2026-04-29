@@ -49,10 +49,15 @@ export default function FarmerApprovals() {
     return baseList.filter((item) => {
       const haystack = [
         getLocalizedPersonName(item, language),
+        item.fullnameEN,
         item.name,
         item.email,
+        item.mobile,
         item.phoneNumber,
         item.emirateId,
+        item.accountNumber,
+        item.agriculturalId,
+        item.agricultureID,
       ]
         .filter(Boolean)
         .join(" ")
@@ -62,6 +67,7 @@ export default function FarmerApprovals() {
   }, [list, query, activeTab, language]);
 
   const getFarmerName = (farmer) => getLocalizedPersonName(farmer, language) || t("common.nA");
+  const getFarmerMobile = (farmer) => farmer?.mobile || farmer?.phoneNumber || t("common.nA");
 
   const formatDate = (dateString) => {
     if (!dateString) return t("common.nA");
@@ -249,7 +255,7 @@ export default function FarmerApprovals() {
                           <div className="font-semibold text-gray-900 text-sm">{getFarmerName(item)}</div>
                           <div className="text-xs text-gray-500">{item.email}</div>
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{item.phoneNumber || t("common.nA")}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{getFarmerMobile(item)}</td>
                         <td className="px-4 py-3">
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 text-xs font-semibold text-blue-700 border border-blue-200 whitespace-nowrap">
                             {item.emirateId || t("common.nA")}
@@ -397,7 +403,7 @@ export default function FarmerApprovals() {
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <div className="text-sm font-semibold">{candidate.name || t("common.nA")}</div>
+                            <div className="text-sm font-semibold">{candidate.fullnameEN || candidate.name || t("common.nA")}</div>
                             <div className="text-xs mt-1 text-gray-500">{candidate.email || t("common.nA")}</div>
                             <div className="text-xs mt-1 text-gray-500">{candidate.emirateId || t("common.nA")}</div>
                           </div>
@@ -471,11 +477,19 @@ export default function FarmerApprovals() {
                   </div>
                   <div>
                     <div className="text-xs text-gray-500">{t("farmers.farmers.phoneNumber")}</div>
-                    <div className="text-sm text-gray-700">{matchDetailsItem.phoneNumber || t("common.nA")}</div>
+                    <div className="text-sm text-gray-700">{getFarmerMobile(matchDetailsItem)}</div>
                   </div>
                   <div>
                     <div className="text-xs text-gray-500">{t("farmers.farmers.emirateId")}</div>
                     <div className="text-sm font-semibold text-blue-700">{matchDetailsItem.emirateId || t("common.nA")}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">{t("farmers.farmers.accountNumber")}</div>
+                    <div className="text-sm text-gray-700">{matchDetailsItem.accountNumber || t("common.nA")}</div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-500">{t("farmers.farmers.agriculturalId")}</div>
+                    <div className="text-sm text-gray-700">{matchDetailsItem.agriculturalId || matchDetailsItem.agricultureID || t("common.nA")}</div>
                   </div>
                 </div>
               </div>
@@ -485,7 +499,7 @@ export default function FarmerApprovals() {
                   <div key={candidate.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div>
-                        <div className="text-base font-bold text-gray-900">{candidate.name || t("common.nA")}</div>
+                        <div className="text-base font-bold text-gray-900">{candidate.fullnameEN || candidate.name || t("common.nA")}</div>
                         <div className="mt-1 text-xs text-gray-500 break-all">{candidate.id}</div>
                       </div>
                       <div className="flex flex-wrap gap-2">
@@ -505,11 +519,19 @@ export default function FarmerApprovals() {
                       </div>
                       <div>
                         <div className="text-xs text-gray-500">{t("farmers.farmers.phoneNumber")}</div>
-                        <div className="text-sm text-gray-700">{candidate.phoneNumber || t("common.nA")}</div>
+                        <div className="text-sm text-gray-700">{candidate.mobile || candidate.phoneNumber || t("common.nA")}</div>
                       </div>
                       <div>
                         <div className="text-xs text-gray-500">{t("farmers.farmers.emirateId")}</div>
                         <div className="text-sm font-semibold text-blue-700">{candidate.emirateId || t("common.nA")}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-500">{t("farmers.farmers.accountNumber")}</div>
+                        <div className="text-sm text-gray-700">{candidate.accountNumber || t("common.nA")}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-500">{t("farmers.farmers.agriculturalId")}</div>
+                        <div className="text-sm text-gray-700">{candidate.agriculturalId || candidate.agricultureID || t("common.nA")}</div>
                       </div>
                       <div>
                         <div className="text-xs text-gray-500">{t("farmers.farmers.accountStatus")}</div>

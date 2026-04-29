@@ -10,6 +10,7 @@ export default function AdminAdd() {
   const location = useLocation();
   const navigate = useNavigate();
   const editAdmin = location.state && location.state.editAdmin ? location.state.editAdmin : null;
+  const adminUuid = editAdmin?.uuid || editAdmin?.id || editAdmin?._id || '';
 
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', mobile: '', emirateId: '', emirates: '', type: '' });
   const [loading, setLoading] = useState(false);
@@ -183,6 +184,15 @@ export default function AdminAdd() {
 
       <h1 className="text-2xl font-semibold text-gray-900 mb-2">{editAdmin ? t('admin.editAdmin') : t('admin.addNewAdmin')}</h1>
       <p className="text-gray-600 mb-6">{t('admin.enterDetails')}</p>
+
+      <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-sm font-medium text-gray-700">{t('admin.uuid')}</span>
+          <span className="text-sm text-gray-900 break-all">
+            {editAdmin ? adminUuid || t('common.nA') : t('admin.uuidGeneratedAfterSave')}
+          </span>
+        </div>
+      </div>
 
       <div className="grid grid-cols-2 gap-6 mb-8">
         <div>

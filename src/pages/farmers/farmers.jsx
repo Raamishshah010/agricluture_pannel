@@ -18,6 +18,7 @@ export default function Farmers({
     const t = useTranslation();
     const { language } = useStore((state) => state);
     const getFarmerName = (farmer) => getLocalizedPersonName(farmer, language) || t('common.nA');
+    const getFarmerMobile = (farmer) => farmer?.mobile || farmer?.phoneNumber || t('common.nA');
     const sortFarmersByCreatedAtDesc = (farmers = []) => [...farmers].sort((a, b) => {
         const aTime = new Date(a?.createdAt || 0).getTime();
         const bTime = new Date(b?.createdAt || 0).getTime();
@@ -32,10 +33,12 @@ export default function Farmers({
     const accountStatusOptions = ['active', 'pending_approval', 'inactive', 'suspended'];
     const approvalStatusOptions = ['approved', 'pending_approval', 'under_review', 'needs_revision', 'rejected'];
     const [formData, setFormData] = useState({
-        name: '',
+        fullnameEN: '',
         emirateId: '',
+        accountNumber: '',
+        agriculturalId: '',
         email: '',
-        phoneNumber: '',
+        mobile: '',
         image: '',
         isCoder: false,
         status: 'pending_approval',
@@ -45,10 +48,12 @@ export default function Farmers({
     const openAddModal = () => {
         setEditingItem(null);
         setFormData({
-            name: '',
+            fullnameEN: '',
             email: '',
             emirateId: '',
-            phoneNumber: '',
+            accountNumber: '',
+            agriculturalId: '',
+            mobile: '',
             image: '',
             isCoder: false,
             status: 'approved',
@@ -60,10 +65,12 @@ export default function Farmers({
     const openEditModal = (coder) => {
         setEditingItem(coder);
         setFormData({
-            name: coder.name,
+            fullnameEN: coder.fullnameEN || coder.name || '',
             email: coder.email,
             emirateId: coder.emirateId || '',
-            phoneNumber: coder.phoneNumber || '',
+            accountNumber: coder.accountNumber || '',
+            agriculturalId: coder.agriculturalId || coder.agricultureID || '',
+            mobile: coder.mobile || coder.phoneNumber || '',
             image: coder.image || '',
             isCoder: !!coder.isCoder,
             status: coder.status || 'pending_approval',
@@ -87,9 +94,9 @@ export default function Farmers({
 
     const handleSubmit = async () => {
         if (
-            !formData.name ||
+            !formData.fullnameEN ||
             !formData.email ||
-            !formData.phoneNumber
+            !formData.mobile
         ) {
             toast.error(t('farmers.farmers.requiredFields'));
             return;
@@ -98,10 +105,12 @@ export default function Farmers({
             setLoading(true);
 
             const fd = new FormData();
-            fd.append('name', formData.name);
+            fd.append('fullnameEN', formData.fullnameEN);
             fd.append('email', formData.email);
             fd.append('emirateId', formData.emirateId);
-            fd.append('phoneNumber', formData.phoneNumber);
+            fd.append('accountNumber', formData.accountNumber);
+            fd.append('agriculturalId', formData.agriculturalId);
+            fd.append('mobile', formData.mobile);
             fd.append('isCoder', String(!!formData.isCoder));
             if (editingItem) {
                 fd.append('status', formData.status);
@@ -217,7 +226,6 @@ export default function Farmers({
                     ...updatedFarmer,
                     status: res?.data?.status || updatedFarmer?.status || entry.status,
                     approvalStatus: res?.data?.approvalStatus || updatedFarmer?.approvalStatus || entry.approvalStatus,
-                    statusDetails: res?.data?.statusDetails || updatedFarmer?.statusDetails || entry.statusDetails,
                 };
             })));
 
@@ -404,7 +412,7 @@ export default function Farmers({
                                             <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                             </svg>
-                                            <span className="text-sm text-gray-600">{farmer.phoneNumber}</span>
+                                            <span className="text-sm text-gray-600">{getFarmerMobile(farmer)}</span>
                                         </div>
                                     </td>
                                     <td className="px-4 py-3">
@@ -544,8 +552,8 @@ export default function Farmers({
                                         </div>
                                         <input
                                             type="text"
-                                            name="name"
-                                            value={formData.name}
+                                            name="fullnameEN"
+                                            value={formData.fullnameEN}
                                             onChange={handleInputChange}
                                             className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                             placeholder={t('farmers.farmers.enterName')}
@@ -596,6 +604,35 @@ export default function Farmers({
                                     </div>
                                 </div>
 
+                                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            {t('farmers.farmers.accountNumber')}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="accountNumber"
+                                            value={formData.accountNumber}
+                                            onChange={handleInputChange}
+                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                            placeholder={t('farmers.farmers.enterAccountNumber')}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            {t('farmers.farmers.agriculturalId')}
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="agriculturalId"
+                                            value={formData.agriculturalId}
+                                            onChange={handleInputChange}
+                                            className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                                            placeholder={t('farmers.farmers.enterAgriculturalId')}
+                                        />
+                                    </div>
+                                </div>
+
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                                         {t('farmers.farmers.phoneNumber')}
@@ -609,8 +646,8 @@ export default function Farmers({
                                         </div>
                                         <input
                                             type="text"
-                                            name="phoneNumber"
-                                            value={formData.phoneNumber}
+                                            name="mobile"
+                                            value={formData.mobile}
                                             onChange={handleInputChange}
                                             className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
                                             placeholder={t('farmers.farmers.enterPhone')}

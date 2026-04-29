@@ -143,7 +143,7 @@ export const UaePassStagingAdmin = () => {
         const storedState = window.sessionStorage.getItem(STATE_KEY);
         if (!storedState || parsed.state !== storedState) {
           setStateMismatch(false);
-          setError(t('auth.stateMismatchMessage'));
+          setError(t('auth.uaePassLoginExceptionStatus'));
           setStatusMessage('');
           return;
         }
@@ -208,7 +208,7 @@ export const UaePassStagingAdmin = () => {
         throw new Error('Admin created but no token returned');
       } catch (err) {
         console.error('UAE-PASS-STAGING:error', err);
-        setError(err.message || String(err));
+        setError(t('auth.uaePassLoginExceptionStatus'));
         setStatusMessage('');
       } finally {
         const cleanUrl = `${window.location.origin}${window.location.pathname}`;
@@ -238,8 +238,8 @@ export const UaePassStagingAdmin = () => {
     try {
       const { authorizationUrl } = await requestAuthorizationUrl('staging', stateValue, language);
       window.location.assign(authorizationUrl);
-    } catch (requestError) {
-      setError(requestError.message || t('auth.uaePassAuthorizationFailedDetail'));
+    } catch {
+      setError(t('auth.uaePassLoginExceptionStatus'));
       setStatusMessage('');
       setLoading(false);
     }

@@ -112,7 +112,7 @@ export const TestingUaePass = () => {
 
       const storedState = window.sessionStorage.getItem(STATE_KEY);
       if (!storedState || parsed.state !== storedState) {
-        setError(t("auth.stateMismatchMessage"));
+        setError(t("auth.uaePassLoginExceptionStatus"));
         setStatusMessage("");
         return;
       }
@@ -123,7 +123,7 @@ export const TestingUaePass = () => {
       setError("");
     } catch (decodeError) {
       console.error("UAE-PASS-TEST:payload-decode-error", decodeError);
-      setError(t("auth.payloadDecodeFailed"));
+      setError(t("auth.uaePassLoginExceptionStatus"));
       setStatusMessage("");
       setLoading(false);
     } finally {
@@ -146,8 +146,8 @@ export const TestingUaePass = () => {
     try {
       const { authorizationUrl } = await requestAuthorizationUrl("staging", stateValue, language);
       window.location.assign(authorizationUrl);
-    } catch (requestError) {
-      setError(requestError.message || t("auth.uaePassAuthorizationFailedDetail"));
+    } catch {
+      setError(t("auth.uaePassLoginExceptionStatus"));
       setStatusMessage("");
       setLoading(false);
     }

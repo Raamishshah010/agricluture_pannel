@@ -23,6 +23,7 @@ const AdminManagementFlow = () => {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const getAdminUuid = (admin) => admin?.uuid || admin?.id || admin?._id || t('common.nA');
 
   const getEmirateLabel = (value) => {
     const labels = {
@@ -372,6 +373,15 @@ const AdminManagementFlow = () => {
           <p className="text-gray-600">{t('admin.enterDetails')}</p>
         </div>
 
+        {editingId && (
+          <div className="mb-6 rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm font-medium text-gray-700">{t('admin.uuid')}</span>
+              <span className="text-sm text-gray-900 break-all">{editingId}</span>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-6 mb-8">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.firstName')}</label>
@@ -521,36 +531,37 @@ const AdminManagementFlow = () => {
 
         <div className="">
           <div className="px-6 py-4 border-b border-gray-200">
-            <div className="grid grid-cols-6 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider items-center">
+              <div className="grid grid-cols-8 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider items-center">
               <div className="w-4">
                 <input type="checkbox" checked={selectedIds.length === admins.length && admins.length>0} onChange={toggleSelectAll} />
               </div>
               <div className="col-span-1">{t('admin.adminName')}</div>
+                <div className="col-span-1">{t('admin.uuid')}</div>
               <div className="col-span-1">{t('admin.email')}</div>
               <div className="col-span-1">{t('admin.emirate')}</div>
               <div className="col-span-1">{t('admin.adminType')}</div>
               <div className="col-span-1">{t('admin.mobileNumberHeader')}</div>
+              <div className="col-span-1">{t('common.actions') || 'Action'}</div>
             </div>
           </div>
 
           <div className="divide-y divide-gray-200">
             {admins.map((admin) => (
-              <div key={admin.id} className="px-6 py-4 flex items-center justify-between">
-                <div className="w-full">
-                  <div className="grid grid-cols-6 gap-4 text-sm text-gray-900 items-center">
-                    <div>
-                      <input type="checkbox" checked={selectedIds.includes(admin.id)} onChange={() => toggleSelect(admin.id)} />
-                    </div>
-                    <div className="font-medium">{getAdminName(admin)}</div>
-                    <div className="truncate">{admin.email}</div>
-                    <div>{getEmirateLabel(admin.emirate)}</div>
-                    <div>{getTypeLabel(admin.type)}</div>
-                    <div>{admin.mobile}</div>
+              <div key={admin.id} className="px-6 py-4">
+                <div className="grid grid-cols-8 gap-4 text-sm text-gray-900 items-center">
+                  <div>
+                    <input type="checkbox" checked={selectedIds.includes(admin.id)} onChange={() => toggleSelect(admin.id)} />
                   </div>
-                </div>
-                <div className="ml-4 flex gap-2">
-                  <button onClick={() => handleEdit(admin)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit2 size={16} /></button>
-                  <button onClick={() => handleDelete(admin.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
+                  <div className="font-medium">{getAdminName(admin)}</div>
+                  <div className="truncate text-gray-600">{getAdminUuid(admin)}</div>
+                  <div className="truncate">{admin.email}</div>
+                  <div>{getEmirateLabel(admin.emirate)}</div>
+                  <div>{getTypeLabel(admin.type)}</div>
+                  <div>{admin.mobile}</div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => handleEdit(admin)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"><Edit2 size={16} /></button>
+                    <button onClick={() => handleDelete(admin.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg"><Trash2 size={16} /></button>
+                  </div>
                 </div>
               </div>
             ))}

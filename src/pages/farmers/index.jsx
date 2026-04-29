@@ -225,14 +225,6 @@ export default function Index(props) {
     });
   };
 
-  // Helper function to check if text contains Arabic characters
-  const hasArabic = (text) => {
-    if (!text) return false;
-    const arabicPattern =
-      /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
-    return arabicPattern.test(text);
-  };
-
   // Fetch all data from all pages
   const fetchAllData = async () => {
     try {
@@ -295,15 +287,17 @@ const downloadPDF = async () => {
 
       // 1. STATIC HEADERS (Reverse order for Arabic)
       let headers = isArabic 
-        ? ["تاريخ التسجيل", "رقم الهوية", "رقم الهاتف", "الاسم"] 
-        : ["Name", "Phone Number", "Emirate ID", "Created At"];
+        ? ["تاريخ التسجيل", t("farmers.agriculturalId"), t("farmers.accountNumber"), "رقم الهوية", "رقم الهاتف", "الاسم"] 
+        : ["Name", "Phone Number", "Emirate ID", "Account Number", "Agricultural ID", "Created At"];
 
       // 2. DATA MAPPING (Reverse row for Arabic)
       let tableData = allFarmers.map(farmer => {
         const row = [
           getFarmerName(farmer),
-          farmer.phoneNumber || t('common.nA'),
+          farmer.mobile || farmer.phoneNumber || t('common.nA'),
           farmer.emirateId || t('common.nA'),
+          farmer.accountNumber || t('common.nA'),
+          farmer.agriculturalId || farmer.agricultureID || t('common.nA'),
           formatDate(farmer.createdAt)
         ];
         return isArabic ? row.reverse() : row;
@@ -370,8 +364,10 @@ const downloadPDF = async () => {
           ? t("farmers.imageAvailable")
           : t("farmers.noImage"),
         [t("farmers.name")]: getFarmerName(farmer),
-        [t("farmers.phoneNumber")]: farmer.phoneNumber || t('common.nA'),
+        [t("farmers.phoneNumber")]: farmer.mobile || farmer.phoneNumber || t('common.nA'),
         [t("farmers.emirateId")]: farmer.emirateId || t('common.nA'),
+        [t("farmers.accountNumber")]: farmer.accountNumber || t('common.nA'),
+        [t("farmers.agriculturalId")]: farmer.agriculturalId || farmer.agricultureID || t('common.nA'),
         [t("farmers.createdAt")]: formatDate(farmer.createdAt),
       })),
     );
@@ -410,14 +406,18 @@ const downloadPDF = async () => {
       t("farmers.name"),
       t("farmers.phoneNumber"),
       t("farmers.emirateId"),
+      t("farmers.accountNumber"),
+      t("farmers.agriculturalId"),
       t("farmers.createdAt"),
     ];
 
     const csvData = allFarmers.map((farmer) => [
       farmer.image ? t("farmers.imageAvailable") : t("farmers.noImage"),
       getFarmerName(farmer),
-      farmer.phoneNumber || t("farmers.noData"),
+      farmer.mobile || farmer.phoneNumber || t("farmers.noData"),
       farmer.emirateId || t("farmers.noData"),
+      farmer.accountNumber || t("farmers.noData"),
+      farmer.agriculturalId || farmer.agricultureID || t("farmers.noData"),
       formatDate(farmer.createdAt),
     ]);
 

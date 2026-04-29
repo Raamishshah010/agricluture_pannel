@@ -325,7 +325,7 @@ export default function AdminManage() {
 
       {/* Table Header */}
       <div className="px-6 py-4 border-b border-gray-200">
-        <div className="grid grid-cols-7 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider items-center">
+        <div className="grid grid-cols-8 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider items-center">
           <div>
             <input
               type="checkbox"
@@ -342,6 +342,7 @@ export default function AdminManage() {
           <div>{t('admin.emirate')}</div>
           <div>{t('admin.adminType')}</div>
           <div>{t('admin.mobileNumberHeader')}</div>
+          <div>{t('common.actions') || 'Action'}</div>
         </div>
       </div>
 
@@ -350,9 +351,9 @@ export default function AdminManage() {
         {admins.map(admin => (
           <div
             key={admin.id}
-            className="px-6 py-4 flex items-center justify-between"
+            className="px-6 py-4"
           >
-            <div className="grid grid-cols-7 gap-4 text-sm text-gray-900 items-center w-full">
+            <div className="grid grid-cols-8 gap-4 text-sm text-gray-900 items-center">
               <div>
                 <input
                   type="checkbox"
@@ -366,26 +367,25 @@ export default function AdminManage() {
               <div>{admin.emirate}</div>
               <div>{admin.type}</div>
               <div>{admin.mobile}</div>
-            </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() =>
+                    navigate('/dashboard/addAdmin', {
+                      state: { editAdmin: admin }
+                    })
+                  }
+                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                >
+                  <Edit2 size={16} />
+                </button>
 
-            <div className="ml-4 flex gap-2">
-              <button
-                onClick={() =>
-                  navigate('/dashboard/addAdmin', {
-                    state: { editAdmin: admin }
-                  })
-                }
-                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
-              >
-                <Edit2 size={16} />
-              </button>
-
-              <button
-                onClick={() => deleteOne(admin.id)}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-              >
-                <Trash2 size={16} />
-              </button>
+                <button
+                  onClick={() => deleteOne(admin.id)}
+                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
             </div>
           </div>
         ))}

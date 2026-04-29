@@ -185,7 +185,7 @@ export const UaePassLogin = () => {
       const storedState = window.sessionStorage.getItem(STATE_KEY);
       if (!storedState || parsed.state !== storedState) {
         setStateMismatch(false);
-        setError(t('auth.stateMismatchMessage'));
+        setError(t('auth.uaePassLoginExceptionStatus'));
         setStatusMessage('');
         return;
       }
@@ -228,15 +228,14 @@ export const UaePassLogin = () => {
         setAdminToken(null);
 
         // Inform the user clearly that they are not an admin
-        const notAdminMsg = t('auth.notAdmin') || 'You are not registered as an admin for this dashboard.';
-        setError(notAdminMsg);
+        setError(t('auth.uaePassRegisteredUsersOnlyStatus'));
         setStatusMessage('');
       }
 
 
     } catch (decodeError) {
       console.error('UAE-PASS:payload-decode-error', decodeError);
-      setError(t('auth.payloadDecodeFailed'));
+      setError(t('auth.uaePassLoginExceptionStatus'));
       setStatusMessage('');
       setLoading(false);
     } finally {
@@ -258,8 +257,8 @@ export const UaePassLogin = () => {
     try {
       const { authorizationUrl } = await requestAuthorizationUrl(environment, stateValue, language);
       window.location.assign(authorizationUrl);
-    } catch (requestError) {
-      setError(requestError.message || t('auth.uaePassAuthorizationFailedDetail'));
+    } catch {
+      setError(t('auth.uaePassLoginExceptionStatus'));
       setStatusMessage('');
       setLoading(false);
     }
