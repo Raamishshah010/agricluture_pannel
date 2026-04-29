@@ -5,13 +5,35 @@ import useTranslation from '../../hooks/useTranslation';
 import { API_BASE_URL } from "../../utils";
 import useStore from '../../store/store';
 import logo from '../../assets/logo.png';
-import UaePassLogo from '../../assets/UaePassLogo';
+import uaePassButtonDefault from '../../assets/uae-pass-button/uae-pass-button-active.svg';
+import uaePassButtonPressed from '../../assets/uae-pass-button/uae-pass-button-pressed.svg';
+import uaePassButtonFocus from '../../assets/uae-pass-button/uae-pass-button-focus.svg';
+import uaePassButtonDisabled from '../../assets/uae-pass-button/uae-pass-button-disabled.svg';
+import uaePassButtonDefaultAr from '../../assets/uae-pass-button/ar/uae-pass-button-active.svg';
+import uaePassButtonPressedAr from '../../assets/uae-pass-button/ar/uae-pass-button-pressed.svg';
+import uaePassButtonFocusAr from '../../assets/uae-pass-button/ar/uae-pass-button-focus.svg';
+import uaePassButtonDisabledAr from '../../assets/uae-pass-button/ar/uae-pass-button-disabled.svg';
 import { getUaePassOutcome } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
 const INVITE_TOKEN_KEY = "admin-invite-token";
 const INVITE_CODE_KEY = "admin-invite-code";
+
+const UAE_PASS_BUTTON_ASSETS = {
+  en: {
+    default: uaePassButtonDefault,
+    pressed: uaePassButtonPressed,
+    focus: uaePassButtonFocus,
+    disabled: uaePassButtonDisabled,
+  },
+  ar: {
+    default: uaePassButtonDefaultAr,
+    pressed: uaePassButtonPressedAr,
+    focus: uaePassButtonFocusAr,
+    disabled: uaePassButtonDisabledAr,
+  },
+};
 
 const formatValue = (value) => {
   if (value === null || value === undefined) {
@@ -82,6 +104,7 @@ export const UaePassStagingAdmin = () => {
   const t = useTranslation();
   const navigate = useNavigate();
   const { language, setLanguage, setAdminToken, setAdmin } = useStore((state) => state);
+  const buttonAssets = UAE_PASS_BUTTON_ASSETS[language] || UAE_PASS_BUTTON_ASSETS.en;
   const [statusMessage, setStatusMessage] = useState(t('auth.readyToStart'));
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -295,14 +318,40 @@ export const UaePassStagingAdmin = () => {
 
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-center">
           <button
+            type="button"
             onClick={startLogin}
             disabled={loading || !inviteToken}
-            className="relative inline-flex min-h-[48px] min-w-[140px] w-full max-w-[520px] cursor-pointer items-center justify-center rounded-[12px] border border-black bg-black px-5 py-2.5 text-center text-base font-semibold leading-none text-white transition-all duration-150 hover:bg-neutral-900 hover:shadow-[0_6px_16px_rgba(0,0,0,0.25)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500 focus-visible:ring-offset-2 active:bg-neutral-800 active:shadow-[0_2px_8px_rgba(0,0,0,0.2)] md:min-h-[56px] md:max-w-[640px] md:px-8 md:py-3 md:text-lg lg:min-h-[60px] lg:text-xl disabled:cursor-not-allowed disabled:border-neutral-500 disabled:bg-neutral-600 disabled:text-neutral-200 disabled:shadow-none"
-            aria-label={`${t('auth.loginWithUaePass')} (${t('auth.uaePassStaging')})`}
+            className="group relative inline-flex w-full max-w-[264px] cursor-pointer items-center justify-center bg-transparent p-0 align-middle leading-none focus-visible:outline-none disabled:cursor-not-allowed"
+            aria-label={t('auth.loginWithUaePass')}
+            aria-busy={loading}
           >
-            <span className="inline-flex items-center justify-center gap-3 md:gap-4">
-              <UaePassLogo className="h-6 w-6 shrink-0 md:h-7 md:w-7" size={24} />
-              <span className="whitespace-nowrap leading-none">{`${t('auth.loginWithUaePass')} (${t('auth.uaePassStaging')})`}</span>
+            <span className="relative block w-full">
+              <img
+                src={buttonAssets.default}
+                alt=""
+                className="block h-auto w-full select-none"
+                draggable="false"
+              />
+              <img
+                src={buttonAssets.focus}
+                alt=""
+                className="pointer-events-none absolute inset-0 h-full w-full select-none opacity-0 transition-opacity duration-150 group-focus-visible:opacity-100"
+                draggable="false"
+              />
+              <img
+                src={buttonAssets.pressed}
+                alt=""
+                className="pointer-events-none absolute inset-0 h-full w-full select-none opacity-0 transition-opacity duration-75 group-active:opacity-100"
+                draggable="false"
+              />
+              {loading && (
+                <img
+                  src={buttonAssets.disabled}
+                  alt=""
+                  className="pointer-events-none absolute inset-0 h-full w-full select-none"
+                  draggable="false"
+                />
+              )}
             </span>
           </button>
         </div>
