@@ -895,7 +895,10 @@
     },
     "sheetName": "المزارعون",
     "pdfTitle": "قائمة المزارعين",
-    "pdfTotalRecords": "إجمالي السجلات:"
+    "pdfTotalRecords": "إجمالي السجلات:",
+    "sampleCsv": "نموذج CSV",
+    "importCsv": "استيراد CSV",
+    "importing": "جارٍ الاستيراد..."
   },
   "auth": {
     "welcomeBack": "مرحباً بعودتك!",
@@ -1378,6 +1381,9 @@
   "manageFarms": {
     "title": "المزارع",
     "addFarm": "إضافة مزرعة",
+    "sampleCsv": "نموذج CSV",
+    "importCsv": "استيراد CSV",
+    "importing": "جارٍ الاستيراد...",
     "searchByFarmName": "البحث باسم المزرعة أو رقم الزراعة",
     "selectEmirate": "اختر الإمارة",
     "selectCenter": "اختر المركز",

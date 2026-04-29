@@ -360,7 +360,7 @@ export default function Index(props) {
                         download
                         className="px-4 py-2.5 border border-emerald-200 text-emerald-700 rounded-xl hover:bg-emerald-50 transition-colors font-medium"
                     >
-                        Sample CSV
+                        {t('manageFarms.sampleCsv')}
                     </a>
                     <button
                         onClick={() => importInputRef.current?.click()}
@@ -368,7 +368,7 @@ export default function Index(props) {
                         className="px-5 py-2.5 bg-white border border-emerald-300 text-emerald-700 rounded-xl hover:bg-emerald-50 transition-colors flex items-center gap-2 font-medium disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                         <Upload size={18} />
-                        <span>{isImporting ? 'Importing...' : 'Import CSV'}</span>
+                        <span>{isImporting ? t('manageFarms.importing') : t('manageFarms.importCsv')}</span>
                     </button>
                     {/* Download Dropdown */}
                     <div className="relative">

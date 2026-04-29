@@ -478,7 +478,7 @@ const downloadPDF = async () => {
             download
             className="px-4 py-3 border border-emerald-200 text-emerald-700 rounded-lg hover:bg-emerald-50 transition-colors font-medium"
           >
-            Sample CSV
+            {t('farmers.sampleCsv')}
           </a>
           <button
             onClick={() => importInputRef.current?.click()}
@@ -486,7 +486,7 @@ const downloadPDF = async () => {
             className="flex items-center gap-2 px-5 py-3 rounded-lg border border-emerald-300 text-emerald-700 bg-white hover:bg-emerald-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Upload size={20} />
-            {isImporting ? "Importing..." : "Import CSV"}
+            {isImporting ? t('farmers.importing') : t('farmers.importCsv')}
           </button>
 
         {/* Download Dropdown */}

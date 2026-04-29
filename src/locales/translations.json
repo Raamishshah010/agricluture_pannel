@@ -289,6 +289,9 @@
   "manageFarms": {
     "title": "Farms",
     "addFarm": "Add Farm",
+    "sampleCsv": "Sample CSV",
+    "importCsv": "Import CSV",
+    "importing": "Importing...",
     "searchByFarmName": "Search by Farm Name, Agriculture ID",
     "selectEmirate": "Select Emirate",
     "selectCenter": "Select Center",
@@ -812,6 +815,9 @@
         "rejected": "Rejected"
       }
     },
+    "sampleCsv": "Sample CSV",
+    "importCsv": "Import CSV",
+    "importing": "Importing...",
     "farmerApprovals": {
       "title": "Account Approvals",
       "subtitle": "Review accounts registered from the mobile app and approve or reject them.",
