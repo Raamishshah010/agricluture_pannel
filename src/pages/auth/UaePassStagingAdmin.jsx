@@ -12,7 +12,6 @@ const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
 const INVITE_TOKEN_KEY = "admin-invite-token";
 const INVITE_CODE_KEY = "admin-invite-code";
-const AUTO_START_KEY = "admin-invite-auto-started";
 
 const formatValue = (value) => {
   if (value === null || value === undefined) {
@@ -245,22 +244,6 @@ export const UaePassStagingAdmin = () => {
     }
   }
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (!inviteToken) return;
-
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("payload")) return;
-
-    const storedAutoStart = window.sessionStorage.getItem(AUTO_START_KEY);
-    if (storedAutoStart === inviteToken) {
-      return;
-    }
-
-    window.sessionStorage.setItem(AUTO_START_KEY, inviteToken);
-    void startLogin();
-  }, [inviteToken]);
-
   const resetFlow = () => {
     setUserData(null);
     setError("");
@@ -273,7 +256,6 @@ export const UaePassStagingAdmin = () => {
       window.sessionStorage.removeItem(ENVIRONMENT_KEY);
       window.sessionStorage.removeItem(INVITE_TOKEN_KEY);
       window.sessionStorage.removeItem(INVITE_CODE_KEY);
-      window.sessionStorage.removeItem(AUTO_START_KEY);
       setAdminToken(null);
       const cleanUrl = `${window.location.origin}${window.location.pathname}`;
       window.history.replaceState({}, "", cleanUrl);
