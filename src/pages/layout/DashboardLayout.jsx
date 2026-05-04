@@ -30,7 +30,6 @@ const FarmerApprovals = lazy(() => import('../farmer-approvals'));
 const Possessions = lazy(() => import('../master-data/possession'));
 const FarmingSystem = lazy(() => import('../master-data/farmingSystem'));
 const Regions = lazy(() => import('../master-data/regions'));
-const CropTypes = lazy(() => import('../master-data/cropTypes'));
 const CultivationMethods = lazy(() => import('../master-data/cultivationMethods'));
 const Locations = lazy(() => import('../master-data/locations'));
 const GreenHouseTypes = lazy(() => import('../master-data/greenHouseTypes'));
@@ -104,7 +103,7 @@ const renderDashboardPage = (selectedPage, farmsNumber) => {
     case 'regions':
       return <Regions />;
     case 'crop-types':
-      return <CropTypes />;
+      return <Crops />;
     case 'cultivation-methods':
       return <CultivationMethods />;
     case 'locations':
@@ -259,7 +258,7 @@ const DashboardLayout = () => {
       submenuItems: [
         { id: 'Fruit Types', icon: Wheat, label: t('common.components.dashboard.fruitTypes') },
         { id: 'Vegetable Types', icon: Wheat, label: t('common.components.dashboard.vegetableTypes') },
-        { id: 'crop-types', icon: Wheat, label: t('common.components.dashboard.cropTypes') },
+        { id: 'crops-management', icon: Wheat, label: t('common.components.dashboard.greenhouseCrops') },
         { id: 'Cover Types', icon: Wheat, label: t('common.components.dashboard.coverTypes') },
         { id: 'Fodder Types', icon: Wheat, label: t('common.components.dashboard.fodderTypes') },
         { id: 'varieties', icon: TrendingUpDown, label: t('common.components.dashboard.varieties') },

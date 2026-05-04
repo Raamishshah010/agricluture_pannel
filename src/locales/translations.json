@@ -492,6 +492,7 @@
         "accountApprovals": "Account Approvals",
         "masterData": "Master Data",
         "cropsManagement": "Crops Management",
+        "greenhouseCrops": "Greenhouse Crops",
         "fruitTypes": "Fruit Types",
         "vegetableTypes": "Vegetable Types",
         "coverTypes": "Cover Types",
@@ -1477,7 +1478,7 @@
     "found": "Found"
   },
   "crops": {
-    "title": "Crops Management",
+    "title": "Greenhouse Crops",
     "subtitle": "Manage your agricultural crops",
     "addCrop": "Add Crop",
     "nameEnglish": "Name (English)",

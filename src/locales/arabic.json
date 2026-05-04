@@ -493,6 +493,7 @@
         "accountApprovals": "اعتماد الحسابات",
         "masterData": "البيانات الرئيسية",
         "cropsManagement": "إدارة المحاصيل",
+        "greenhouseCrops": "محاصيل الدفيئة",
         "fruitTypes": "أنواع الفواكه",
         "vegetableTypes": "أنواع الخضروات",
         "coverTypes": "أنواع الغطاء",
@@ -1585,7 +1586,7 @@
     "found": "تم العثور"
   },
   "crops": {
-    "title": "إدارة المحاصيل",
+    "title": "محاصيل الدفيئة",
     "subtitle": "إدارة محاصيلك الزراعية",
     "addCrop": "إضافة محصول",
     "nameEnglish": "الاسم (الإنجليزية)",

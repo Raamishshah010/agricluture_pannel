@@ -1,32 +1,22 @@
 import { useEffect, useState, useMemo } from 'react';
-import { X, Edit2, Trash2, Plus, Search, RefreshCw } from 'lucide-react';
+import { X, Edit2, Trash2, Plus, Search } from 'lucide-react';
 import cropService from '../../services/cropService';
-import cropTypeService from '../../services/cropTypeService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
-import useStore from '../../store/store';
 import Loader from '../../components/Loader';
 
 export default function Crops() {
     const [crops, setCrops] = useState([]);
-    const [cropTypes, setCropTypes] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const t = useTranslation();
-    const { language: lang } = useStore(st => st);
-    const isLTR = lang.includes('en');
-    const getCropTypeLabel = (type) => (isLTR ? type.name : type.nameInArrabic || type.scientificName || type.name);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const [cropRes, typeRes] = await Promise.all([
-                    cropService.getCrops(),
-                    cropTypeService.getAll()
-                ]);
+                const cropRes = await cropService.getCrops();
                 setCrops(cropRes.data);
-                setCropTypes(typeRes.data);
             } catch (err) {
                 toast.error(err.message);
             } finally {
@@ -41,8 +31,8 @@ export default function Crops() {
     const [formData, setFormData] = useState({
         name: '',
         scientificName: '',
-        typeId: '',
         cultivationDuration: '',
+        productionValue: 0,
         isActive: true
     });
 
@@ -53,13 +43,14 @@ export default function Crops() {
         return crops.filter(crop =>
             crop.name?.toLowerCase().includes(q) ||
             crop.scientificName?.toLowerCase().includes(q) ||
-            crop.cultivationDuration?.toLowerCase().includes(q)
+            crop.cultivationDuration?.toLowerCase().includes(q) ||
+            String(crop.productionValue ?? '').toLowerCase().includes(q)
         );
     }, [crops, searchQuery]);
 
     const openAddModal = () => {
         setEditingCrop(null);
-        setFormData({ name: '', scientificName: '', typeId: '', cultivationDuration: '', isActive: true });
+        setFormData({ name: '', scientificName: '', cultivationDuration: '', productionValue: 0, isActive: true });
         setIsModalOpen(true);
     };
 
@@ -68,8 +59,8 @@ export default function Crops() {
         setFormData({
             name: crop.name || '',
             scientificName: crop.scientificName || '',
-            typeId: crop.typeId || '',
             cultivationDuration: crop.cultivationDuration || '',
+            productionValue: crop.productionValue ?? 0,
             isActive: crop.isActive ?? true
         });
         setIsModalOpen(true);
@@ -229,6 +220,7 @@ export default function Crops() {
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">{t('crops.nameEnglish')}</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">{t('crops.nameArabic')}</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">{t('crops.duration')}</th>
+                                                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Production Value</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">{t('crops.status')}</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">{t('crops.createdAt')}</th>
                                             <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">{t('crops.actions')}</th>
@@ -240,6 +232,7 @@ export default function Crops() {
                                                 <td className="px-6 py-4 font-medium">{crop.name}</td>
                                                 <td className="px-6 py-4 text-gray-600">{crop.scientificName}</td>
                                                 <td className="px-6 py-4 text-gray-600">{crop.cultivationDuration}</td>
+                                                <td className="px-6 py-4 text-gray-600">{crop.productionValue ?? 0}</td>
                                                 <td className="px-6 py-4">
                                                     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
                                                         crop.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
@@ -325,26 +318,6 @@ export default function Crops() {
                                 />
                             </div>
 
-                            {/* type */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                                    {t('crops.selectCropTypeLabel')} <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    name="typeId"
-                                    value={formData.typeId}
-                                    onChange={handleInputChange}
-                                    className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                                >
-                                    <option value="">{t('crops.selectType')}</option>
-                                    {cropTypes.map(type => (
-                                        <option key={type.id} value={type.id}>
-                                            {getCropTypeLabel(type)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
                             {/* duration */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -356,6 +329,22 @@ export default function Crops() {
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                     placeholder={t('crops.cultivationDurationPlaceholder')}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Production Value
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    name="productionValue"
+                                    value={formData.productionValue}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    placeholder="0"
                                 />
                             </div>
 
