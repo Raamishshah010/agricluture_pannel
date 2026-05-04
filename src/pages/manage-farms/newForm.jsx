@@ -14,6 +14,7 @@ import {
     calculateGreenhouseProduction,
     calculateRowProduction,
     errorMessages,
+    findFarmerByEmiratesId,
     isPolygonInsidePolygon,
     normalizeFarmerOption,
 } from '../../utils';
@@ -100,9 +101,13 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             greenhouses: []
         }
     });
+    const matchedOwnerByEmiratesId = useMemo(
+        () => findFarmerByEmiratesId(farmerOptions, formData.emiratesID),
+        [farmerOptions, formData.emiratesID]
+    );
     const selectedOwner = useMemo(
-        () => farmerOptions.find((item) => item.id === formData.owner) || null,
-        [farmerOptions, formData.owner]
+        () => farmerOptions.find((item) => item.id === formData.owner) || matchedOwnerByEmiratesId || null,
+        [farmerOptions, formData.owner, matchedOwnerByEmiratesId]
     );
     const handleChange = (e) => {
         e.preventDefault();
@@ -161,6 +166,16 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             thirdCropProductionPercent: calculateGreenhouseProduction(thirdCropArea, greenhouseType),
         };
     };
+    useEffect(() => {
+        if (!matchedOwnerByEmiratesId || formData.owner === matchedOwnerByEmiratesId.id) {
+            return;
+        }
+
+        setFormData((prev) => ({
+            ...prev,
+            owner: matchedOwnerByEmiratesId.id,
+        }));
+    }, [matchedOwnerByEmiratesId, formData.owner]);
     useEffect(() => {
         setFormData((prev) => {
             const linkedFields = buildFarmDataFromFarmer(selectedOwner);

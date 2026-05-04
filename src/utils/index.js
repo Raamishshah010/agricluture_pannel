@@ -137,6 +137,20 @@ export function buildFarmDataFromFarmer(farmer) {
     };
 }
 
+export function normalizeEmiratesId(value) {
+    return String(value || '').replace(/\D/g, '').trim();
+}
+
+export function findFarmerByEmiratesId(farmers = [], emiratesId = '') {
+    const normalizedTarget = normalizeEmiratesId(emiratesId);
+    if (!normalizedTarget) return null;
+
+    return (farmers || []).find((farmer) => {
+        const candidate = farmer?.emirateId || farmer?.emiratesID || farmer?.emiratesId;
+        return normalizeEmiratesId(candidate) === normalizedTarget;
+    }) || null;
+}
+
 export function normalizeFarmerOption(farmer) {
     if (!farmer) return null;
     const displayName = String(farmer.fullnameEN || farmer.name || farmer.email || farmer.mobile || '').trim();

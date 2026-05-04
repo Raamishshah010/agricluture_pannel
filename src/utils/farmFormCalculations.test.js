@@ -7,6 +7,7 @@ import {
   calculateGreenhouseArea,
   calculateGreenhouseProduction,
   calculateRowProduction,
+  findFarmerByEmiratesId,
 } from './index.js';
 
 test('buildFarmDataFromFarmer keeps only Emirates ID as hidden stored farm data', () => {
@@ -21,6 +22,17 @@ test('buildFarmDataFromFarmer keeps only Emirates ID as hidden stored farm data'
   assert.deepEqual(result, {
     emiratesID: '784-1988-1234567-1',
   });
+});
+
+test('findFarmerByEmiratesId matches farmer Emirates ID regardless of formatting', () => {
+  const farmers = [
+    { id: 'farmer-a', fullnameEN: 'Aisha Khan', emirateId: '784-1988-1234567-1' },
+    { id: 'farmer-b', fullnameEN: 'Omar Ali', emirateId: '784199912345672' },
+  ];
+
+  const result = findFarmerByEmiratesId(farmers, '784198812345671');
+
+  assert.equal(result.id, 'farmer-a');
 });
 
 test('calculateFieldCropAreaTotal sums area safely', () => {
