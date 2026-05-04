@@ -29,13 +29,15 @@ export default function CropTypes() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
-        name: ''
+        name: '',
+        productionValue: 0,
     });
 
     const openAddModal = () => {
         setEditingItem(null);
         setFormData({
             name: '',
+            productionValue: 0,
         });
         setIsModalOpen(true);
     };
@@ -44,6 +46,7 @@ export default function CropTypes() {
         setEditingItem(item);
         setFormData({
             name: item.name,
+            productionValue: item.productionValue || 0,
         });
         setIsModalOpen(true);
     };
@@ -135,6 +138,7 @@ export default function CropTypes() {
                             <thead className="bg-gray-100 border-b border-gray-200">
                                 <tr>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('cropTypes.name')}</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Production Value</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('cropTypes.createdAt')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('cropTypes.actions')}</th>
                                 </tr>
@@ -143,6 +147,7 @@ export default function CropTypes() {
                                 {list.map((item) => (
                                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.name}</td>
+                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.productionValue ?? 0}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2">
@@ -208,6 +213,23 @@ export default function CropTypes() {
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                         placeholder={t('cropTypes.enterName')}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-4 mt-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Production Value *
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        name="productionValue"
+                                        value={formData.productionValue}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        placeholder="0"
                                     />
                                 </div>
                             </div>

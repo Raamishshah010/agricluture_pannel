@@ -16,6 +16,7 @@ const useStore = create((set) => ({
     vegetableTypes: [],
     fodderTypes: [],
     crops: [],
+    cropTypes: [],
     greenHouseTypes: [],
     farmingSystems: [],
     coverTypes: [],

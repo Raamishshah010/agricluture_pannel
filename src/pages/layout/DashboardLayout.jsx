@@ -259,6 +259,7 @@ const DashboardLayout = () => {
       submenuItems: [
         { id: 'Fruit Types', icon: Wheat, label: t('common.components.dashboard.fruitTypes') },
         { id: 'Vegetable Types', icon: Wheat, label: t('common.components.dashboard.vegetableTypes') },
+        { id: 'crop-types', icon: Wheat, label: t('common.components.dashboard.cropTypes') },
         { id: 'Cover Types', icon: Wheat, label: t('common.components.dashboard.coverTypes') },
         { id: 'Fodder Types', icon: Wheat, label: t('common.components.dashboard.fodderTypes') },
         { id: 'varieties', icon: TrendingUpDown, label: t('common.components.dashboard.varieties') },
