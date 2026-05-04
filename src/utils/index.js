@@ -185,8 +185,8 @@ export function calculateGreenhouseArea(houseArea, greenhouseCount) {
     return roundToTwo(safeToNumber(houseArea) * safeToNumber(greenhouseCount));
 }
 
-export function calculateGreenhouseProduction(cropArea, type) {
-    return roundToTwo(safeToNumber(cropArea) * safeToNumber(type?.productionValue));
+export function calculateGreenhouseProduction(cropArea, crop) {
+    return roundToTwo(safeToNumber(cropArea) * safeToNumber(crop?.productionValue));
 }
 
 export const errorMessages = {

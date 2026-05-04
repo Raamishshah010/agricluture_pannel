@@ -28,6 +28,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
         fruitTypes,
         vegetableTypes,
         fodderTypes,
+        crops,
         cropTypes,
         greenHouseTypes,
         farmingSystems,
@@ -45,7 +46,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
         dashboardLoading,
         dashboardErrors,
     } = useStore(st => st);
-    const greenhouseCropTypes = cropTypes || [];
+    const greenhouseCropTypes = crops?.length ? crops : (cropTypes || []);
     const isLTR = lang.includes('en');
     const readOnlyInputClass = "px-3 py-2 border border-gray-300 rounded-lg w-full bg-gray-100 text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-transparent";
     const farmerOptions = useMemo(
@@ -152,7 +153,8 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
         };
     };
     const hydrateGreenhouseRow = (row) => {
-        const cropType = greenhouseCropTypes.find((item) => item.id === row.cropId);
+        const cropType = greenhouseCropTypes.find((item) => item.id === row.cropId)
+            || cropTypes.find((item) => item.id === row.cropId);
         const firstCropArea = calculateGreenhouseArea(row.firstCropHouseArea, row.firstCropNoOfGreenhouses);
         const secondCropArea = calculateGreenhouseArea(row.secondCropHouseArea, row.secondCropNoOfGreenhouses);
         const thirdCropArea = calculateGreenhouseArea(row.thirdCropHouseArea, row.thirdCropNoOfGreenhouses);
@@ -1389,14 +1391,14 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                                 updateGreenhouse(index, 'cropId', e.target.value);
                                                 const item = greenhouseCropTypes.find(it => it.id === e.target.value);
                                                 if (item) {
-                                                    updateGreenhouse(index, 'crop', item.nameInArrabic || item.name);
+                                                    updateGreenhouse(index, 'crop', item.nameInArabic || item.nameInArrabic || item.name);
                                                 }
                                             }}
                                             className="px-3 py-2 border border-gray-300 rounded-lg w-full"
                                         >
                                             {
                                                 greenhouseCropTypes.map((item) => (
-                                                    <option key={item.id} value={item.id}>{isLTR ? item.name : (item.nameInArrabic || item.name)}</option>
+                                                    <option key={item.id} value={item.id}>{isLTR ? item.name : (item.nameInArabic || item.nameInArrabic || item.name)}</option>
                                                 ))
                                             }
                                         </select>

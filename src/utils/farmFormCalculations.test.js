@@ -74,6 +74,6 @@ test('calculateGreenhouseArea multiplies house area by greenhouse count', () => 
   assert.equal(calculateGreenhouseArea('12.5', 3), 37.5);
 });
 
-test('calculateGreenhouseProduction uses calculated crop area and production value', () => {
+test('calculateGreenhouseProduction uses crop production value from the crops table', () => {
   assert.equal(calculateGreenhouseProduction(37.5, { productionValue: 1.2 }), 45);
 });
