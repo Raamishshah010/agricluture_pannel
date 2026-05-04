@@ -193,7 +193,7 @@ export const FarmUpdateForm = React.memo(({ farm, onSave, onCancel }) => {
         });
     }, [selectedOwner]);
     useEffect(() => {
-        const total = calculateFieldCropAreaTotal(formData.crops.fieldCropsFodder);
+        const total = calculateFieldCropAreaTotal(formData.crops);
         if (formData.landUse.arrableLand.fieldCropsFodder === total) {
             return;
         }
@@ -208,7 +208,7 @@ export const FarmUpdateForm = React.memo(({ farm, onSave, onCancel }) => {
                 }
             }
         }));
-    }, [formData.crops.fieldCropsFodder, formData.landUse.arrableLand.fieldCropsFodder]);
+    }, [formData.crops, formData.landUse.arrableLand.fieldCropsFodder]);
 
     // Fruits Management
     const addFruit = () => {

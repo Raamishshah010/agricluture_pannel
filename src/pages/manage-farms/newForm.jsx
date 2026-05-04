@@ -190,7 +190,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
         });
     }, [selectedOwner]);
     useEffect(() => {
-        const total = calculateFieldCropAreaTotal(formData.crops.fieldCropsFodder);
+        const total = calculateFieldCropAreaTotal(formData.crops);
         if (formData.landUse.arrableLand.fieldCropsFodder === total) {
             return;
         }
@@ -205,7 +205,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                 }
             }
         }));
-    }, [formData.crops.fieldCropsFodder, formData.landUse.arrableLand.fieldCropsFodder]);
+    }, [formData.crops, formData.landUse.arrableLand.fieldCropsFodder]);
     const addFruit = () => {
         if (!fruitTypes.length) return;
         setFormData(prev => ({

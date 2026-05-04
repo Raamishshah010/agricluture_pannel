@@ -161,7 +161,15 @@ export function normalizeFarmerOption(farmer) {
     };
 }
 
-export function calculateFieldCropAreaTotal(rows = []) {
+export function calculateFieldCropAreaTotal(crops = {}) {
+    const rows = Array.isArray(crops)
+        ? crops
+        : [
+            ...(Array.isArray(crops?.fruits) ? crops.fruits : []),
+            ...(Array.isArray(crops?.vegetables) ? crops.vegetables : []),
+            ...(Array.isArray(crops?.fieldCropsFodder) ? crops.fieldCropsFodder : []),
+        ];
+
     return roundToTwo(rows.reduce((sum, row) => sum + safeToNumber(row?.area), 0));
 }
 

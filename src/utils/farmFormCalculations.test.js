@@ -35,15 +35,23 @@ test('findFarmerByEmiratesId matches farmer Emirates ID regardless of formatting
   assert.equal(result.id, 'farmer-a');
 });
 
-test('calculateFieldCropAreaTotal sums area safely', () => {
-  const total = calculateFieldCropAreaTotal([
-    { area: 10 },
-    { area: '2.345' },
-    { area: null },
-    { area: -4 },
-  ]);
+test('calculateFieldCropAreaTotal sums fruit, vegetable, and fodder areas safely', () => {
+  const total = calculateFieldCropAreaTotal({
+    fruits: [
+      { area: 10 },
+      { area: '2.34' },
+    ],
+    vegetables: [
+      { area: 4 },
+      { area: null },
+    ],
+    fieldCropsFodder: [
+      { area: 6 },
+      { area: -4 },
+    ],
+  });
 
-  assert.equal(total, 12.35);
+  assert.equal(total, 22.34);
 });
 
 test('calculateFruitProduction uses fruit-bearing trees and production value', () => {
