@@ -14,7 +14,8 @@ export default function FodderTypes() {
 
     const [formData, setFormData] = useState({
         name: '',
-        nameInArabic: ''
+        nameInArabic: '',
+        productionValue: 0,
     });
 
     useEffect(() => {
@@ -35,7 +36,7 @@ export default function FodderTypes() {
 
     const openAddModal = () => {
         setEditingItem(null);
-        setFormData({ name: '', nameInArabic: '' });
+        setFormData({ name: '', nameInArabic: '', productionValue: 0 });
         setIsModalOpen(true);
     };
 
@@ -43,7 +44,8 @@ export default function FodderTypes() {
         setEditingItem(item);
         setFormData({
             name: item?.name || '',
-            nameInArabic: item?.nameInArabic || ''
+            nameInArabic: item?.nameInArabic || '',
+            productionValue: item?.productionValue || 0,
         });
         setIsModalOpen(true);
     };
@@ -153,6 +155,9 @@ export default function FodderTypes() {
                                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                                                 {t('fodderTypes.createdAt')}
                                             </th>
+                                            <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                                                Production Value
+                                            </th>
                                             <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider w-32">
                                                 {t('fodderTypes.actions')}
                                             </th>
@@ -169,6 +174,9 @@ export default function FodderTypes() {
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">
                                                     {formatDate(item.createdAt)}
+                                                </td>
+                                                <td className="px-6 py-4 text-sm text-gray-700">
+                                                    {item.productionValue ?? 0}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                     <div className="flex gap-2">
@@ -255,6 +263,21 @@ export default function FodderTypes() {
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
                                     placeholder={t('fodderTypes.nameEnglishPlaceholder') || 'e.g. Alfalfa'}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                                    Production Value <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    name="productionValue"
+                                    value={formData.productionValue}
+                                    onChange={handleInputChange}
+                                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    placeholder="0"
                                 />
                             </div>
                         </div>

@@ -146,9 +146,9 @@ export default function Index(props) {
         return farms.filter(farm => {
             const matchesSearch =
                 !lowerQuery ||
-                farm.farmName.toLowerCase().includes(lowerQuery) ||
-                (farm.agricultureId &&
-                    farm.agricultureId.toString().toLowerCase().includes(lowerQuery));
+                (farm.farmNo && farm.farmNo.toString().toLowerCase().includes(lowerQuery)) ||
+                (farm.farmSerial && farm.farmSerial.toString().toLowerCase().includes(lowerQuery)) ||
+                (farm.id && farm.id.toString().toLowerCase().includes(lowerQuery));
 
             const matchesFilters =
                 (emirate ? farm.emirate === emirate.id : true) &&
@@ -203,8 +203,6 @@ export default function Index(props) {
 
         // Static Headers (English + Arabic)
         const tableHeaders = [
-            'Name\nالاسم',
-            'Agriculture ID\nمعرف الزراعة',
             'Farm Number\nرقم المزرعة',
             'Serial\nالتسلسل',
             'Emirate\nالإمارة',
@@ -215,8 +213,6 @@ export default function Index(props) {
         ];
 
         const tableData = filteredFarms.map(farm => [
-            farm.farmName || '',
-            farm.agricultureId || '',
             farm.farmNo?.toString() || '',
             farm.farmSerial?.toString() || '',
             getEmirateName(farm.emirate) || '',
@@ -282,8 +278,6 @@ export default function Index(props) {
     const downloadExcel = () => {
         const worksheet = XLSX.utils.json_to_sheet(
             filteredFarms.map((farm) => ({
-                'Name | الاسم': farm.farmName || '',
-                'Agriculture ID | معرف الزراعة': farm.agricultureId || '',
                 'Farm Number | رقم المزرعة': farm.farmNo?.toString() || '',
                 'Serial | التسلسل': farm.farmSerial?.toString() || '',
                 'Emirate | الإمارة': getEmirateName(farm.emirate) || '',
@@ -304,8 +298,6 @@ export default function Index(props) {
     // Download as CSV
     const downloadCSV = () => {
         const headers = [
-            'Name | الاسم',
-            'Agriculture ID | معرف الزراعة',
             'Farm Number | رقم المزرعة',
             'Serial | التسلسل',
             'Emirate | الإمارة',
@@ -316,8 +308,6 @@ export default function Index(props) {
         ];
 
         const csvData = filteredFarms.map((farm) => [
-            farm.farmName || '',
-            farm.agricultureId || '',
             farm.farmNo?.toString() || '',
             farm.farmSerial?.toString() || '',
             getEmirateName(farm.emirate) || '',
@@ -482,7 +472,7 @@ export default function Index(props) {
             <div className='flex justify-between items-center mb-4 flex-col sm:flex-row gap-4'>
                 <input
                     type="text"
-                    placeholder={t('manageFarms.searchByFarmName')}
+                    placeholder="Search by farm number, serial, or ID"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     className="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"

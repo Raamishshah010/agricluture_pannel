@@ -120,7 +120,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     const serviceCenterName = isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic;
 
     const quickFacts = [
-        { label: t('farmCodingDetails.agricultureId'), value: farm.agricultureId || t('common.nA') },
         { label: t('farmCodingDetails.farmNo'), value: farm.farmNo || t('common.nA') },
         { label: t('farmCodingDetails.farmSerial'), value: farm.farmSerial || t('common.nA') },
         { label: t('farmCodingDetails.size'), value: `${Math.round(farm.size)} ha` },
@@ -140,7 +139,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         // Title
         doc.setFontSize(18);
         doc.setTextColor(34, 197, 94);
-        const titleText = `${t('farmCodingDetails.farmDetailsTitle')}: ${farm.farmName}`;
+        const titleText = `${t('farmCodingDetails.farmDetailsTitle')}: #${farm.farmNo || farm.farmSerial || farm.id}`;
         doc.text(titleText, 105, yPosition, { align: 'center' });
         yPosition += 15;
 
@@ -151,8 +150,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         yPosition += 10;
 
         const basicInfo = [
-            [t('farmCodingDetails.agricultureId'), farm.agricultureId || t('common.nA')],
-            [t('farmCodingDetails.phone'), farm.phoneNumber || t('common.nA')],
             [t('farmCodingDetails.farmNo'), farm.farmNo || t('common.nA')],
             [t('farmCodingDetails.farmSerial'), farm.farmSerial || t('common.nA')],
             [t('common.components.farmCoding.statusHeader'), farm.status || t('common.nA')],
@@ -185,7 +182,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         const ownerInfo = [
             [t('farmCodingDetails.name'), farm.owner?.name || t('common.nA')],
             [t('farmCodingDetails.email'), farm.owner?.email || t('common.nA')],
-            [t('farmCodingDetails.emiratesID'), farm.emiratesID || t('common.nA')],
             [t('farmCodingDetails.emailVerified'), farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')],
         ];
 
@@ -443,7 +439,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             yPosition = doc.lastAutoTable.finalY + 15;
         }
 
-        doc.save(`farm-details-${farm.farmName}.pdf`);
+        doc.save(`farm-details-${farm.id}.pdf`);
         setIsDownloadOpen(false);
         toast.success(t('common.downloadSuccess'));
     };
@@ -455,9 +451,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         // Basic Information Sheet
         const basicData = [
             [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
-            [t('farms.farmName'), farm.farmName],
-            [t('farmCodingDetails.agricultureId'), farm.agricultureId],
-            [t('farmCodingDetails.phone'), farm.phoneNumber],
             [t('farmCodingDetails.farmNo'), farm.farmNo],
             [t('farmCodingDetails.farmSerial'), farm.farmSerial],
             [t('common.components.farmCoding.statusHeader'), farm.status],
@@ -475,7 +468,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
             [t('farmCodingDetails.name'), farm.owner?.name || t('common.nA')],
             [t('farmCodingDetails.email'), farm.owner?.email || t('common.nA')],
-            [t('farmCodingDetails.emiratesID'), farm.emiratesID || t('common.nA')],
             [t('farmCodingDetails.emailVerified'), farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')],
         ];
         const ownerSheet = XLSX.utils.aoa_to_sheet(ownerData);
@@ -610,7 +602,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             XLSX.utils.book_append_sheet(workbook, livestocksSheet, isLTR ? 'Livestocks' : 'الثروة الحيوانية');
         }
 
-        XLSX.writeFile(workbook, `farm-details-${farm.farmName}.xlsx`);
+        XLSX.writeFile(workbook, `farm-details-${farm.id}.xlsx`);
         setIsDownloadOpen(false);
         toast.success(t('common.downloadSuccess'));
     };
@@ -619,9 +611,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     const downloadCSV = () => {
         const headers = [isLTR ? 'Field' : 'الحقل', isLTR ? 'Value' : 'القيمة'];
         const csvData = [
-            [isLTR ? 'Farm Name' : 'اسم المزرعة', farm.farmName],
-            [isLTR ? 'Agriculture ID' : 'معرف الزراعة', farm.agricultureId],
-            [isLTR ? 'Phone Number' : 'رقم الهاتف', farm.phoneNumber],
             [isLTR ? 'Farm Number' : 'رقم المزرعة', farm.farmNo],
             [isLTR ? 'Farm Serial' : 'مسلسل المزرعة', farm.farmSerial],
             [isLTR ? 'Status' : 'الحالة', farm.status],
@@ -632,7 +621,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             [isLTR ? 'Workers' : 'العمال', farm.noOfWorkers || 0],
             [t('farmCodingDetails.name'), farm.owner?.name || t('common.nA')],
             [t('farmCodingDetails.email'), farm.owner?.email || t('common.nA')],
-            [t('farmCodingDetails.emiratesID'), farm.emiratesID || t('common.nA')],
             [t('farmCodingDetails.location'), (isLTR ? farm.location?.name : farm.location?.nameInArrabic) || t('common.nA')],
             [t('farmCodingDetails.region'), (isLTR ? farm.region?.name : farm.region?.nameInArrabic) || t('common.nA')],
             [t('farmCodingDetails.emirate'), (isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic) || t('common.nA')],
@@ -651,7 +639,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `farm-details-${farm.farmName}.csv`;
+        link.download = `farm-details-${farm.id}.csv`;
         link.click();
         setIsDownloadOpen(false);
         toast.success(t('common.downloadSuccess'));
@@ -761,7 +749,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                     {farm.status}
                                 </span>
                             </div>
-                            <h1 className="max-w-3xl text-4xl font-black tracking-tight md:text-5xl" dir="rtl">{farm.farmName}</h1>
+                            <h1 className="max-w-3xl text-4xl font-black tracking-tight md:text-5xl" dir="rtl">#{farm.farmNo || farm.farmSerial || farm.id}</h1>
                             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/85 md:text-base">
                                 {farm.notes || t('common.nA')}
                             </p>
@@ -803,14 +791,12 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <InfoCard icon={User} title={t('farmCodingDetails.ownerInformation')} gradient="from-blue-50 to-cyan-50">
                         <InfoRow label={t('farmCodingDetails.name')} value={farm.owner?.name} />
-                        <InfoRow label={t('farmCodingDetails.emiratesID')} value={farm.emiratesID} />
                         <InfoRow label={t('farmCodingDetails.email')} value={farm.owner?.email} />
                         <InfoRow
                             label={t('farmCodingDetails.emailVerified')}
                             value={farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')}
                             valueClass={farm.owner?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                         />
-                        <InfoRow label={t('farmCodingDetails.phoneNumber')} value={farm.phoneNumber} />
                     </InfoCard>
 
                     <InfoCard icon={Users} title={t('farmCodingDetails.holderInformation')} gradient="from-purple-50 to-pink-50">
@@ -863,7 +849,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
                     <InfoCard icon={Home} title={t('farmCodingDetails.farmProperties')} gradient="from-green-50 to-lime-50">
                         <InfoRow label={t('farmCodingDetails.farmSerial')} value={farm.farmSerial} />
-                        <InfoRow label={t('farmCodingDetails.accountNo')} value={farm.accountNo} />
                         <InfoRow label={t('farmCodingDetails.size')} value={`${Math.round(farm.size)} ha`} />
                         <InfoRow label={t('farmCodingDetails.possessionStyle')} value={isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic} />
                         <InfoRow label={t('farmCodingDetails.farmingSystem')} value={farm.farmingSystem?.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ')} />

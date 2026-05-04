@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 
 
 function App() {
-  const { setCrops, setFarms, setFarmers, setDashboardLoading, adminToken, setAdminToken, setAdmin } = useStore((state) => state);
+  const { setCrops, setFarms, setFarmers, setDashboardLoading, setDashboardError, adminToken, setAdminToken, setAdmin } = useStore((state) => state);
   const sortFarmersByCreatedAtDesc = (farmers = []) => [...farmers].sort((a, b) => {
     const aTime = new Date(a?.createdAt || 0).getTime();
     const bTime = new Date(b?.createdAt || 0).getTime();
@@ -41,7 +41,9 @@ function App() {
       try {
         const res = await service.getMasterData();
         setCrops(res);
+        setDashboardError('masterData', null);
       } catch (err) {
+        setDashboardError('masterData', err.message);
         toast.error(err.message);
       } finally {
         setDashboardLoading('masterData', false);
@@ -64,7 +66,9 @@ function App() {
       try {
         const res = await farmService.getAllfarms();
         setFarms(res.data);
+        setDashboardError('farms', null);
       } catch (err) {
+        setDashboardError('farms', err.message);
         toast.error(err.message);
       } finally {
         setDashboardLoading('farms', false);
@@ -76,7 +80,9 @@ function App() {
       try {
         const res = await farmerService.getAllFarmers();
         setFarmers(sortFarmersByCreatedAtDesc(res.data));
+        setDashboardError('farmers', null);
       } catch (err) {
+        setDashboardError('farmers', err.message);
         toast.error(err.message);
       } finally {
         setDashboardLoading('farmers', false);
@@ -84,7 +90,7 @@ function App() {
     };
 
     void Promise.allSettled([loadCurrentAdmin(), loadMasterData(), loadFarms(), loadFarmers()]);
-  }, [adminToken, setCrops, setFarms, setFarmers, setDashboardLoading, setAdminToken, setAdmin]);
+  }, [adminToken, setCrops, setFarms, setFarmers, setDashboardLoading, setDashboardError, setAdminToken, setAdmin]);
   return (
     <Router>
       <Routes>

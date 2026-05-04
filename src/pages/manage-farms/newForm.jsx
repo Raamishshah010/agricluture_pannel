@@ -1,11 +1,22 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Save, X, Plus, Trash2, MapPin, Sprout, Home, TreePine, ArrowLeft } from 'lucide-react';
 import useStore from '../../store/store';
 import MultiSelect from '../../components/multiSelect';
 import PolygonMapSelector from '../../components/polygonSelector';
 import { Modal } from 'react-responsive-modal';
 import PolygonDisplayComponent from '../../components/displayPolygon';
-import { anyPolygonsOverlap, errorMessages, isPolygonInsidePolygon } from '../../utils';
+import {
+    anyPolygonsOverlap,
+    buildFarmDataFromFarmer,
+    calculateFieldCropAreaTotal,
+    calculateFruitProduction,
+    calculateGreenhouseArea,
+    calculateGreenhouseProduction,
+    calculateRowProduction,
+    errorMessages,
+    isPolygonInsidePolygon,
+    normalizeFarmerOption,
+} from '../../utils';
 import Dropdown from '../../components/dropdownWithSearch';
 import useTranslation from '../../hooks/useTranslation';
 import { toast } from 'react-toastify';
@@ -29,19 +40,22 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
         locations,
         emirates,
         livestocks,
-        language: lang
+        language: lang,
+        dashboardLoading,
+        dashboardErrors,
     } = useStore(st => st);
     const isLTR = lang.includes('en');
+    const readOnlyInputClass = "px-3 py-2 border border-gray-300 rounded-lg w-full bg-gray-100 text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-transparent";
+    const farmerOptions = useMemo(
+        () => (farmers || []).map(normalizeFarmerOption).filter(Boolean),
+        [farmers]
+    );
     const [open, setOpen] = useState(false);
     const [cropType, setCropType] = useState('');
     const [selectedCropIndex, setSelectedCropIndex] = useState(-1);
     const [formData, setFormData] = useState({
-        farmName: '',
-        accountNo: '',
         farmSerial: 0,
         farmNo: '',
-        agricultureId: '',
-        phoneNumber: '',
         region: regions[0]?.id || '',
         primaryCrop: "b1266a9f-d600-484c-93bf-3dafb7de141b",
         primaryVariety: "77a1fe4b-f4fb-48fe-a503-6e2dafdd8ebc",
@@ -86,6 +100,10 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             greenhouses: []
         }
     });
+    const selectedOwner = useMemo(
+        () => farmerOptions.find((item) => item.id === formData.owner) || null,
+        [farmerOptions, formData.owner]
+    );
     const handleChange = (e) => {
         e.preventDefault();
         const { name, value, type, checked } = e.target;
@@ -106,12 +124,80 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             }
         }));
     };
+    const hydrateFruitRow = (row) => {
+        const fruitType = fruitTypes.find((item) => item.id === row.fruidId);
+        return {
+            ...row,
+            productionPercent: calculateFruitProduction(row, fruitType),
+        };
+    };
+    const hydrateVegetableRow = (row) => {
+        const vegetableType = vegetableTypes.find((item) => item.id === row.vegetableId);
+        return {
+            ...row,
+            productionPercent: calculateRowProduction(row, vegetableType),
+        };
+    };
+    const hydrateFieldCropRow = (row) => {
+        const fodderType = fodderTypes.find((item) => item.id === row.fodderId);
+        return {
+            ...row,
+            productionPercent: calculateRowProduction(row, fodderType),
+        };
+    };
+    const hydrateGreenhouseRow = (row) => {
+        const greenhouseType = greenHouseTypes.find((item) => item.id === row.greenhouseTypeId);
+        const firstCropArea = calculateGreenhouseArea(row.firstCropHouseArea, row.firstCropNoOfGreenhouses);
+        const secondCropArea = calculateGreenhouseArea(row.secondCropHouseArea, row.secondCropNoOfGreenhouses);
+        const thirdCropArea = calculateGreenhouseArea(row.thirdCropHouseArea, row.thirdCropNoOfGreenhouses);
+
+        return {
+            ...row,
+            firstCropArea,
+            secondCropArea,
+            thirdCropArea,
+            firstCropProductionPercent: calculateGreenhouseProduction(firstCropArea, greenhouseType),
+            secondCropProductionPercent: calculateGreenhouseProduction(secondCropArea, greenhouseType),
+            thirdCropProductionPercent: calculateGreenhouseProduction(thirdCropArea, greenhouseType),
+        };
+    };
+    useEffect(() => {
+        setFormData((prev) => {
+            const linkedFields = buildFarmDataFromFarmer(selectedOwner);
+            if (prev.emiratesID === linkedFields.emiratesID) {
+                return prev;
+            }
+
+            return {
+                ...prev,
+                ...linkedFields,
+            };
+        });
+    }, [selectedOwner]);
+    useEffect(() => {
+        const total = calculateFieldCropAreaTotal(formData.crops.fieldCropsFodder);
+        if (formData.landUse.arrableLand.fieldCropsFodder === total) {
+            return;
+        }
+
+        setFormData((prev) => ({
+            ...prev,
+            landUse: {
+                ...prev.landUse,
+                arrableLand: {
+                    ...prev.landUse.arrableLand,
+                    fieldCropsFodder: total,
+                }
+            }
+        }));
+    }, [formData.crops.fieldCropsFodder, formData.landUse.arrableLand.fieldCropsFodder]);
     const addFruit = () => {
+        if (!fruitTypes.length) return;
         setFormData(prev => ({
             ...prev,
             crops: {
                 ...prev.crops,
-                fruits: [...prev.crops.fruits, {
+                fruits: [...prev.crops.fruits, hydrateFruitRow({
                     fruitType: fruitTypes[0].nameInArrabic,
                     fruidId: fruitTypes[0].id,
                     area: 0,
@@ -119,7 +205,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                     fruitBearing: 0,
                     productionPercent: 0,
                     coordinates: []
-                }]
+                })]
             }
         }));
     };
@@ -143,7 +229,9 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             crops: {
                 ...prev.crops,
                 fruits: prev.crops.fruits.map((fruit, i) =>
-                    i === index ? { ...fruit, [field]: (field === 'fruidId' || field === 'fruitType' || field === 'coordinates') ? value : parseFloat(value) || 0 } : fruit
+                    i === index
+                        ? hydrateFruitRow({ ...fruit, [field]: (field === 'fruidId' || field === 'fruitType' || field === 'coordinates') ? value : parseFloat(value) || 0 })
+                        : fruit
                 )
             }
         }));
@@ -168,17 +256,18 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
         }));
     };
     const addVegetable = () => {
+        if (!vegetableTypes.length) return;
         setFormData(prev => ({
             ...prev,
             crops: {
                 ...prev.crops,
-                vegetables: [...prev.crops.vegetables, {
+                vegetables: [...prev.crops.vegetables, hydrateVegetableRow({
                     vegetableId: vegetableTypes[0].id,
                     vegetableType: vegetableTypes[0].nameInArrabic,
                     area: 0,
                     productionPercent: 0,
                     coordinates: []
-                }]
+                })]
             }
         }));
     };
@@ -188,7 +277,9 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             crops: {
                 ...prev.crops,
                 vegetables: prev.crops.vegetables.map((veg, i) =>
-                    i === index ? { ...veg, [field]: (field === 'vegetableType' || field === 'vegetableId' || field === 'coordinates') ? value : parseFloat(value) || 0 } : veg
+                    i === index
+                        ? hydrateVegetableRow({ ...veg, [field]: (field === 'vegetableType' || field === 'vegetableId' || field === 'coordinates') ? value : parseFloat(value) || 0 })
+                        : veg
                 )
             }
         }));
@@ -203,17 +294,18 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
         }));
     };
     const addFieldCrop = () => {
+        if (!fodderTypes.length) return;
         setFormData(prev => ({
             ...prev,
             crops: {
                 ...prev.crops,
-                fieldCropsFodder: [...prev.crops.fieldCropsFodder, {
+                fieldCropsFodder: [...prev.crops.fieldCropsFodder, hydrateFieldCropRow({
                     fodderType: fodderTypes[0].nameInArrabic,
                     fodderId: fodderTypes[0].id,
                     area: 0,
                     productionPercent: 0,
                     coordinates: []
-                }]
+                })]
             }
         }));
     };
@@ -223,7 +315,9 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             crops: {
                 ...prev.crops,
                 fieldCropsFodder: prev.crops.fieldCropsFodder.map((crop, i) =>
-                    i === index ? { ...crop, [field]: (field === 'fodderType' || field === 'fodderId' || field === 'coordinates') ? value : parseFloat(value) || 0 } : crop
+                    i === index
+                        ? hydrateFieldCropRow({ ...crop, [field]: (field === 'fodderType' || field === 'fodderId' || field === 'coordinates') ? value : parseFloat(value) || 0 })
+                        : crop
                 )
             }
         }));
@@ -244,11 +338,12 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
         }));
     };
     const addGreenhouse = () => {
+        if (!crops.length || !greenHouseTypes.length || !coverTypes.length || !farmingSystems.length) return;
         setFormData(prev => ({
             ...prev,
             crops: {
                 ...prev.crops,
-                greenhouses: [...prev.crops.greenhouses, {
+                greenhouses: [...prev.crops.greenhouses, hydrateGreenhouseRow({
                     crop: crops[0].nameInArrabic,
                     cropId: crops[0].id,
                     greenhouseType: greenHouseTypes[0].nameInArrabic,
@@ -270,7 +365,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                     thirdCropArea: 0,
                     thirdCropProductionPercent: 0,
                     coordinates: []
-                }]
+                })]
             }
         }));
     };
@@ -280,7 +375,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
             crops: {
                 ...prev.crops,
                 greenhouses: prev.crops.greenhouses.map((gh, i) =>
-                    i === index ? {
+                    i === index ? hydrateGreenhouseRow({
                         ...gh,
                         [field]: [
                             'crop',
@@ -295,7 +390,7 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                         ].includes(field)
                             ? value
                             : parseFloat(value) || 0
-                    } : gh
+                    }) : gh
                 )
             }
         }));
@@ -439,61 +534,28 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div className="mb-4">
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                    {t('farms.farmName')} <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type='text'
-                                    name="farmName"
-                                    value={formData.farmName}
-                                    onChange={(e) => setFormData(pre => ({ ...pre, farmName: e.target.value }))}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">
                                     {t('farms.owner')}
                                 </label>
                                 <Dropdown
-                                    options={farmers}
-                                    value={farmers.find(it => it.id === formData.owner)}
+                                    options={farmerOptions}
+                                    value={selectedOwner}
                                     onChange={(item) => setFormData(pre => ({ ...pre, owner: item.id }))}
-                                    placeholder={t('common.select')}
+                                    placeholder={dashboardLoading.farmers ? 'Loading farmers...' : t('common.select')}
                                     classes='w-full'
+                                    disabled={dashboardLoading.farmers || !farmerOptions.length}
                                 />
+                                {!!dashboardErrors.farmers && <p className="mt-1 text-xs text-red-500">{dashboardErrors.farmers}</p>}
+                                {!dashboardLoading.farmers && !dashboardErrors.farmers && !farmerOptions.length && <p className="mt-1 text-xs text-amber-600">No farmers available.</p>}
                             </div>
                             <div className="mb-4">
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">
                                     {t('farms.holder')}
                                 </label>
-                                <Dropdown
-                                    options={farmers}
-                                    value={farmers.find(it => it.id === formData.holder)}
-                                    onChange={(item) => setFormData(pre => ({ ...pre, holder: item.id }))}
-                                    placeholder={t('common.select')}
-                                    classes='w-full'
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                    {t('farms.agricultureId')} <span className="text-red-500">*</span>
-                                </label>
                                 <input
                                     type='text'
-                                    name="agricultureId"
-                                    value={formData.agricultureId}
-                                    onChange={(e) => setFormData(pre => ({ ...pre, agricultureId: e.target.value }))}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                    {t('farms.accountNumber')} <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type='text'
-                                    name="accountNo"
-                                    value={formData.accountNo}
-                                    onChange={(e) => setFormData(pre => ({ ...pre, accountNo: e.target.value }))}
+                                    name="holder"
+                                    value={formData.holder}
+                                    onChange={(e) => setFormData(pre => ({ ...pre, holder: e.target.value }))}
                                     className="px-3 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 />
                             </div>
@@ -518,28 +580,6 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                     name="farmNo"
                                     value={formData.farmNo}
                                     onChange={(e) => setFormData(pre => ({ ...pre, farmNo: parseInt(e.target.value) }))}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                    {t('farms.phoneNumber')} <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    name="phoneNumber"
-                                    value={formData.phoneNumber}
-                                    onChange={(e) => setFormData(pre => ({ ...pre, phoneNumber: e.target.value }))}
-                                    className="px-3 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">
-                                    {t('farms.emiratesId')} <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    name="emiratesID"
-                                    value={formData.emiratesID}
-                                    onChange={(e) => setFormData(pre => ({ ...pre, emiratesID: e.target.value }))}
                                     className="px-3 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 />
                             </div>
@@ -783,11 +823,12 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                 <input
                                     type="number"
                                     value={formData.landUse.arrableLand.fieldCropsFodder}
-                                    onChange={(e) => handleLandUseChange('arrableLand', 'fieldCropsFodder', e.target.value)}
+                                    readOnly
                                     min="0"
                                     step="0.01"
-                                    className="px-3 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-green-500"
+                                    className={readOnlyInputClass}
                                 />
+                                <p className="mt-1 text-xs text-gray-500">Auto-calculated</p>
                             </div>
                             <div className="mb-4">
                                 <label className="block text-sm font-semibold text-gray-700 mb-1">{t('farms.leftForRest')}</label>
@@ -1062,10 +1103,11 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             type="number"
                                             placeholder={t('farms.production')}
                                             value={fruit.productionPercent}
-                                            onChange={(e) => updateFruit(index, 'productionPercent', e.target.value)}
-                                            className="px-3 py-2 border border-gray-300 rounded-lg w-full"
+                                            readOnly
+                                            className={readOnlyInputClass}
                                             min="0"
                                         />
+                                        <p className="mt-1 text-xs text-gray-500">Auto-calculated</p>
                                     </div>
                                 </div>
                                 {
@@ -1161,10 +1203,11 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             type="number"
                                             placeholder={t('farms.production')}
                                             value={veg.productionPercent}
-                                            onChange={(e) => updateVegetable(index, 'productionPercent', e.target.value)}
-                                            className="px-3 py-2 border border-gray-300 rounded-lg w-full"
+                                            readOnly
+                                            className={readOnlyInputClass}
                                             min="0"
                                         />
+                                        <p className="mt-1 text-xs text-gray-500">Auto-calculated</p>
                                     </div>
                                 </div>
                                 {
@@ -1262,10 +1305,11 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                             type="number"
                                             placeholder={t('farms.production')}
                                             value={crop.productionPercent}
-                                            onChange={(e) => updateFieldCrop(index, 'productionPercent', e.target.value)}
-                                            className="px-3 py-2 border border-gray-300 rounded-lg w-full"
+                                            readOnly
+                                            className={readOnlyInputClass}
                                             min="0"
                                         />
+                                        <p className="mt-1 text-xs text-gray-500">Auto-calculated</p>
                                     </div>
                                 </div>
                                 {
@@ -1445,8 +1489,8 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                                 type="number"
                                                 placeholder={t('farms.cropArea')}
                                                 value={greenhouse.firstCropArea}
-                                                onChange={(e) => updateGreenhouse(index, 'firstCropArea', e.target.value)}
-                                                className="px-3 py-2 border border-gray-300 rounded-lg w-full"
+                                                readOnly
+                                                className={readOnlyInputClass}
                                                 min="0"
                                             />
                                         </div>
@@ -1458,8 +1502,8 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                                 type="number"
                                                 placeholder={t('farms.production')}
                                                 value={greenhouse.firstCropProductionPercent}
-                                                onChange={(e) => updateGreenhouse(index, 'firstCropProductionPercent', e.target.value)}
-                                                className="px-3 py-2 border border-gray-300 rounded-lg w-full"
+                                                readOnly
+                                                className={readOnlyInputClass}
                                                 min="0"
                                             />
                                         </div>
@@ -1502,8 +1546,8 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                                 type="number"
                                                 placeholder={t('farms.cropArea')}
                                                 value={greenhouse.secondCropArea}
-                                                onChange={(e) => updateGreenhouse(index, 'secondCropArea', e.target.value)}
-                                                className="px-3 py-2 border border-gray-300 rounded-lg w-full"
+                                                readOnly
+                                                className={readOnlyInputClass}
                                                 min="0"
                                             />
                                         </div>
@@ -1515,8 +1559,8 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                                 type="number"
                                                 placeholder={t('farms.production')}
                                                 value={greenhouse.secondCropProductionPercent}
-                                                onChange={(e) => updateGreenhouse(index, 'secondCropProductionPercent', e.target.value)}
-                                                className="px-3 py-2 border border-gray-300 rounded-lg w-full"
+                                                readOnly
+                                                className={readOnlyInputClass}
                                                 min="0"
                                             />
                                         </div>
@@ -1559,8 +1603,8 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                                 type="number"
                                                 placeholder={t('farms.cropArea')}
                                                 value={greenhouse.thirdCropArea}
-                                                onChange={(e) => updateGreenhouse(index, 'thirdCropArea', e.target.value)}
-                                                className="px-3 py-2 border border-gray-300 rounded-lg w-full"
+                                                readOnly
+                                                className={readOnlyInputClass}
                                                 min="0"
                                             />
                                         </div>
@@ -1572,8 +1616,8 @@ export const NewFarmForm = React.memo(({ onSave, onCancel }) => {
                                                 type="number"
                                                 placeholder={t('farms.production')}
                                                 value={greenhouse.thirdCropProductionPercent}
-                                                onChange={(e) => updateGreenhouse(index, 'thirdCropProductionPercent', e.target.value)}
-                                                className="px-3 py-2 border border-gray-300 rounded-lg w-full"
+                                                readOnly
+                                                className={readOnlyInputClass}
                                                 min="0"
                                             />
                                         </div>

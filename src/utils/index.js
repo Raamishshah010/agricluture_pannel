@@ -113,14 +113,63 @@ export function formatNumber(num) {
     return Math.round(num).toLocaleString('en-US');
 }
 
+export function safeToNumber(value) {
+    const parsed = Number.parseFloat(value);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+        return 0;
+    }
+    return parsed;
+}
+
+export function roundToTwo(value) {
+    return Number(safeToNumber(value).toFixed(2));
+}
+
+export function buildFarmDataFromFarmer(farmer) {
+    if (!farmer) {
+        return {
+            emiratesID: '',
+        };
+    }
+
+    return {
+        emiratesID: String(farmer.emirateId || farmer.emiratesID || farmer.emiratesId || '').trim(),
+    };
+}
+
+export function normalizeFarmerOption(farmer) {
+    if (!farmer) return null;
+    const displayName = String(farmer.fullnameEN || farmer.name || farmer.email || farmer.mobile || '').trim();
+    return {
+        ...farmer,
+        name: displayName,
+        nameInArabic: farmer.fullnameAR || farmer.nameInArabic || farmer.nameInArrabic || displayName,
+    };
+}
+
+export function calculateFieldCropAreaTotal(rows = []) {
+    return roundToTwo(rows.reduce((sum, row) => sum + safeToNumber(row?.area), 0));
+}
+
+export function calculateRowProduction(row, type) {
+    return roundToTwo(safeToNumber(row?.area) * safeToNumber(type?.productionValue));
+}
+
+export function calculateFruitProduction(row, type) {
+    return roundToTwo(safeToNumber(row?.fruitBearing) * safeToNumber(type?.productionValue));
+}
+
+export function calculateGreenhouseArea(houseArea, greenhouseCount) {
+    return roundToTwo(safeToNumber(houseArea) * safeToNumber(greenhouseCount));
+}
+
+export function calculateGreenhouseProduction(cropArea, type) {
+    return roundToTwo(safeToNumber(cropArea) * safeToNumber(type?.productionValue));
+}
+
 export const errorMessages = {
-    farmName: 'Farm Name is required',
-    accountNo: 'Account Number is required',
     farmSerial: "Farm Serial",
     farmNo: 'Farm Number is required',
-    agricultureId: 'Agriculture Id is required',
-    phoneNumber: 'Phone Number is required',
-    emiratesID: 'Emirates ID is required',
     notes: 'Notes is required',
     emirate: 'Emirate is required',
     serviceCenter: 'Center is required',

@@ -30,14 +30,16 @@ export default function VegetableType() {
     const [editingEmirate, setEditingEmirate] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
-        nameInArrabic: ''
+        nameInArrabic: '',
+        productionValue: 0,
     });
 
     const openAddModal = () => {
         setEditingEmirate(null);
         setFormData({
             name: '',
-            nameInArrabic: ''
+            nameInArrabic: '',
+            productionValue: 0,
         });
         setIsModalOpen(true);
     };
@@ -47,6 +49,7 @@ export default function VegetableType() {
         setFormData({
             name: item.name,
             nameInArrabic: item.nameInArrabic,
+            productionValue: item.productionValue || 0,
         });
         setIsModalOpen(true);
     };
@@ -205,6 +208,9 @@ export default function VegetableType() {
                                             {t('vegetableTypes.table.headers.nameArabic')}
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                            Production Value
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                             {t('vegetableTypes.table.headers.createdAt')}
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
@@ -217,6 +223,7 @@ export default function VegetableType() {
                                         <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 text-sm text-gray-900">{item.name}</td>
                                             <td className="px-6 py-4 text-sm text-gray-900">{item.nameInArrabic}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-900">{item.productionValue ?? 0}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
                                             <td className="px-6 py-4">
                                                 <div className="flex gap-2">
@@ -293,6 +300,21 @@ export default function VegetableType() {
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
                                         placeholder={t('vegetableTypes.modal.placeholders.nameArabic')}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Production Value <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        name="productionValue"
+                                        value={formData.productionValue}
+                                        onChange={handleInputChange}
+                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                                        placeholder="0"
                                     />
                                 </div>
                             </div>

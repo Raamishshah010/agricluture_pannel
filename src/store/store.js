@@ -35,6 +35,11 @@ const useStore = create((set) => ({
         farms: Boolean(sessionStorage.getItem('adminToken')),
         farmers: Boolean(sessionStorage.getItem('adminToken')),
     },
+    dashboardErrors: {
+        masterData: null,
+        farms: null,
+        farmers: null,
+    },
     adminToken: sessionStorage.getItem('adminToken'),
     admin: (typeof window !== 'undefined' && sessionStorage.getItem('admin')) ? JSON.parse(sessionStorage.getItem('admin')) : null,
     setCrops: (fruitTypes) => {
@@ -55,6 +60,14 @@ const useStore = create((set) => ({
         set((state) => ({
             dashboardLoading: {
                 ...state.dashboardLoading,
+                [section]: value,
+            },
+        }))
+    },
+    setDashboardError: (section, value) => {
+        set((state) => ({
+            dashboardErrors: {
+                ...state.dashboardErrors,
                 [section]: value,
             },
         }))

@@ -63,7 +63,7 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
 
     const handleDelete = async (farm) => {
         try {
-            if (window.confirm(t('manageFarms.farms.deleteConfirmation') + " " + farm.farmName)) {
+            if (window.confirm(t('manageFarms.farms.deleteConfirmation') + " #" + (farm.farmNo || farm.farmSerial || farm.id))) {
                 await farmService.delete(farm.id);
                 setList(farm.id);
                 toast.success(t('manageFarms.farms.deletedSuccessfully'));
@@ -139,10 +139,8 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                         <table className="w-full">
                             <thead className="bg-gray-100 border-b border-gray-200">
                                 <tr>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.name')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.agricultureId')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.farmNumber')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.serial')}</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.farmNumber')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.emirate')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.center')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.location')}</th>
@@ -167,10 +165,8 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                                     
                                     return (
                                         <tr key={farm.id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{farm.farmName}</td>
-                                            <td className="px-6 py-4 text-sm font-medium text-gray-900 text-nowrap">{farm.agricultureId}</td>
-                                            <td className="px-6 py-4 text-sm text-gray-600">{farm.farmNo}</td>
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">{farm.farmSerial}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{farm.farmNo}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600">
                                                 {getLocalizedName(emirateObj)}
                                             </td>

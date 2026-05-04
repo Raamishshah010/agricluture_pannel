@@ -30,7 +30,8 @@ export default function GreenHouseTypes() {
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
-        nameInArrabic: ''
+        nameInArrabic: '',
+        productionValue: 0,
     });
 
     const openAddModal = () => {
@@ -38,6 +39,7 @@ export default function GreenHouseTypes() {
         setFormData({
             name: '',
             nameInArrabic: '',
+            productionValue: 0,
         });
         setIsModalOpen(true);
     };
@@ -47,6 +49,7 @@ export default function GreenHouseTypes() {
         setFormData({
             name: item.name,
             nameInArrabic: item.nameInArrabic,
+            productionValue: item.productionValue || 0,
         });
         setIsModalOpen(true);
     };
@@ -139,6 +142,7 @@ export default function GreenHouseTypes() {
                                 <tr>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('greenHouseTypes.nameEnglish')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('greenHouseTypes.nameArabic')}</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">Production Value</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('greenHouseTypes.createdAt')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('greenHouseTypes.actions')}</th>
                                 </tr>
@@ -148,6 +152,7 @@ export default function GreenHouseTypes() {
                                     <tr key={item.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.name}</td>
                                         <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.nameInArrabic}</td>
+                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{item.productionValue ?? 0}</td>
                                         <td className="px-6 py-4 text-sm text-gray-600">{formatDate(item.createdAt)}</td>
                                         <td className="px-6 py-4">
                                             <div className="flex gap-2">
@@ -228,6 +233,23 @@ export default function GreenHouseTypes() {
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                         placeholder={t('greenHouseTypes.nameArabicPlaceholder')}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Production Value *
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        name="productionValue"
+                                        value={formData.productionValue}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        placeholder="0"
                                     />
                                 </div>
                             </div>
