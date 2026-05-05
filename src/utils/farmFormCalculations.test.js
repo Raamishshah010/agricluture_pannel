@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildFarmDataFromFarmer,
+  buildFarmsCsvContent,
+  buildFarmsExportRows,
   calculateFieldCropAreaTotal,
   calculateFruitProduction,
   calculateGreenhouseArea,
@@ -33,6 +35,50 @@ test('findFarmerByEmiratesId matches farmer Emirates ID regardless of formatting
   const result = findFarmerByEmiratesId(farmers, '784198812345671');
 
   assert.equal(result.id, 'farmer-a');
+});
+
+test('buildFarmsCsvContent exports every farm table field and dynamic attributes', () => {
+  const csv = buildFarmsCsvContent([
+    {
+      id: 'farm-1',
+      emiratesID: '784198812345671',
+      farmNo: 42,
+      farmSerial: 7,
+      totalArea: 120.5,
+      crops: {
+        fruits: [{ fruitType: 'date palm', area: 10 }],
+      },
+      mapData: [{ lat: 24.1, lng: 55.2 }],
+      customTableField: 'kept',
+    },
+  ]);
+
+  const [headers, row] = csv.split('\n');
+
+  assert.match(headers, /^id,emiratesID,owner,holder,location,/);
+  assert.ok(headers.includes('ownerID'));
+  assert.ok(headers.endsWith('customTableField'));
+  assert.ok(row.includes('"farm-1"'));
+  assert.ok(row.includes('"[{""lat"":24.1,""lng"":55.2}]"'));
+  assert.ok(row.endsWith('"kept"'));
+});
+
+test('buildFarmsExportRows prepares full farm table fields for xlsx export', () => {
+  const rows = buildFarmsExportRows([
+    {
+      id: 'farm-1',
+      farmNo: 42,
+      crops: { vegetables: [{ vegetableType: 'tomato' }] },
+      customTableField: 'xlsx-kept',
+    },
+  ]);
+
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].id, 'farm-1');
+  assert.equal(rows[0].farmNo, '42');
+  assert.equal(rows[0].ownerID, '');
+  assert.equal(rows[0].crops, '{"vegetables":[{"vegetableType":"tomato"}]}');
+  assert.equal(rows[0].customTableField, 'xlsx-kept');
 });
 
 test('calculateFieldCropAreaTotal sums fruit, vegetable, and fodder areas safely', () => {

@@ -4,6 +4,7 @@ import service from '../../services/fruitService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import Loader from '../../components/Loader';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function FruitTypes() {
     const [items, setItems] = useState([]);
@@ -11,19 +12,20 @@ export default function FruitTypes() {
     const [searchQuery, setSearchQuery] = useState('');
     const t = useTranslation();
 
+    const loadItems = async () => {
+        try {
+            setLoading(true);
+            const res = await service.getItems();
+            setItems(res.data);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetch = async () => {
-            try {
-                setLoading(true);
-                const res = await service.getItems();
-                setItems(res.data);
-            } catch (err) {
-                toast.error(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetch();
+        loadItems();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -133,13 +135,31 @@ export default function FruitTypes() {
                                 {t('fruitTypes.subtitle')}
                             </p>
                         </div>
-                        <button
-                            onClick={openAddModal}
-                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm"
-                        >
-                            <Plus size={18} />
-                            {t('fruitTypes.addNewItem')}
-                        </button>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <MasterDataCsvToolbar
+                                items={items}
+                                exportFields={['name', 'nameInArrabic', 'productionValue']}
+                                exportFileName="fruit-types.csv"
+                                importLabel={t('common.importCsv') || 'Import CSV'}
+                                exportLabel={t('common.exportCsv') || 'Export CSV'}
+                                itemLabel="fruit types"
+                                createItem={service.addItem}
+                                mapCsvRowToPayload={(row) => ({
+                                    name: row.name || row.Name || '',
+                                    nameInArrabic: row.nameInArrabic || row.nameInArabic || row.NameInArrabic || '',
+                                    productionValue: row.productionValue || row.ProductionValue || 0,
+                                })}
+                                refreshItems={loadItems}
+                                loading={loading}
+                            />
+                            <button
+                                onClick={openAddModal}
+                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm"
+                            >
+                                <Plus size={18} />
+                                {t('fruitTypes.addNewItem')}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Stats Cards */}

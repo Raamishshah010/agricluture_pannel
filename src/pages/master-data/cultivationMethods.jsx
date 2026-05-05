@@ -4,6 +4,7 @@ import cultivationMethodsService from '../../services/cultivationMethodsService'
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import Loader from '../../components/Loader';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function CultivationMethods() {
     const t = useTranslation();
@@ -16,10 +17,6 @@ export default function CultivationMethods() {
         name: ''
     });
 
-    useEffect(() => {
-        fetchMethods();
-    }, []);
-
     const fetchMethods = async () => {
         try {
             setLoading(true);
@@ -31,6 +28,10 @@ export default function CultivationMethods() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchMethods();
+    }, []);
 
     const openAddModal = () => {
         setEditingMethod(null);
@@ -123,13 +124,29 @@ export default function CultivationMethods() {
                             {t('cultivationMethods.subtitle')}
                         </p>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-colors"
-                    >
-                        <Plus size={20} />
-                        {t('cultivationMethods.add')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={methods}
+                            exportFields={['name']}
+                            exportFileName="cultivation-methods.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="cultivation methods"
+                            createItem={cultivationMethodsService.addItem}
+                            mapCsvRowToPayload={(row) => ({
+                                name: row.name || row.Name || '',
+                            })}
+                            refreshItems={fetchMethods}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-colors"
+                        >
+                            <Plus size={20} />
+                            {t('cultivationMethods.add')}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Table Card */}

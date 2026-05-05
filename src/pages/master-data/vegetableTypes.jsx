@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus, Search } from 'lucide-react';
 import service from '../../services/vegetableService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import Loader from '../../components/Loader';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function VegetableType() {
     const t = useTranslation();
@@ -11,20 +12,21 @@ export default function VegetableType() {
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
+    const loadItems = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await service.getItems();
+            setItems(Array.isArray(res.data) ? res.data : res.data?.items || []);
+        } catch (err) {
+            toast.error(err.message || t('common.errorOccurred'));
+        } finally {
+            setLoading(false);
+        }
+    }, [t]);
+
     useEffect(() => {
-        const fetch = async () => {
-            try {
-                setLoading(true);
-                const res = await service.getItems();
-                setItems(res.data);
-            } catch (err) {
-                toast.error(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetch();
-    }, []);
+        loadItems();
+    }, [loadItems]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEmirate, setEditingEmirate] = useState(null);
@@ -76,22 +78,22 @@ export default function VegetableType() {
         try {
             setLoading(true);
             if (editingEmirate) {
-                await service.updateItem(editingEmirate.id, formData);
+                const res = await service.updateItem(editingEmirate.id, formData);
                 setItems(prev => prev.map(item =>
                     item.id === editingEmirate.id
-                        ? { ...item, ...formData, updatedAt: new Date().toISOString() }
+                        ? { ...item, ...(res.data || formData), updatedAt: new Date().toISOString() }
                         : item
                 ));
             } else {
                 const res = await service.addItem(formData);
                 setItems(prev => [...prev, res.data]);
             }
-            setLoading(false);
+            closeModal();
         } catch (error) {
+            toast.error(error.response?.data?.message || error.message || t('common.errorOccurred'));
+        } finally {
             setLoading(false);
-            toast.error(error.response?.data?.message || error.message);
         }
-        closeModal();
     };
 
     const handleDelete = async (id) => {
@@ -124,7 +126,7 @@ export default function VegetableType() {
             <div className="max-w-7xl mx-auto">
                 {/* Header Section */}
                 <div className="mb-6">
-                    <div className="flex justify-between items-start mb-6">
+                    <div className="flex justify-between items-start mb-6 gap-4">
                         <div>
                             <h1 className="text-2xl font-semibold text-gray-900 mb-1">
                                 {t('vegetableTypes.title')}
@@ -133,13 +135,31 @@ export default function VegetableType() {
                                 {t('vegetableTypes.subtitle')}
                             </p>
                         </div>
-                        <button
-                            onClick={openAddModal}
-                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm"
-                        >
-                            <Plus size={18} />
-                            {t('vegetableTypes.modal.addNewItem')}
-                        </button>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <MasterDataCsvToolbar
+                                items={items}
+                                exportFields={['name', 'nameInArrabic', 'productionValue']}
+                                exportFileName="vegetable-types.csv"
+                                importLabel={t('common.importCsv') || 'Import CSV'}
+                                exportLabel={t('common.exportCsv') || 'Export CSV'}
+                                itemLabel="vegetable types"
+                                createItem={service.addItem}
+                                mapCsvRowToPayload={(row) => ({
+                                    name: row.name || row.Name || '',
+                                    nameInArrabic: row.nameInArrabic || row.nameInArabic || row.NameInArrabic || row.NameInArabic || '',
+                                    productionValue: row.productionValue || row.production_value || 0,
+                                })}
+                                refreshItems={loadItems}
+                                loading={loading}
+                            />
+                            <button
+                                onClick={openAddModal}
+                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium shadow-sm"
+                            >
+                                <Plus size={18} />
+                                {t('vegetableTypes.modal.addNewItem')}
+                            </button>
+                        </div>
                     </div>
 
                     {/* Stats Cards */}

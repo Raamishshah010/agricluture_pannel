@@ -161,6 +161,107 @@ export function normalizeFarmerOption(farmer) {
     };
 }
 
+export const FARM_TABLE_EXPORT_FIELDS = [
+    'id',
+    'emiratesID',
+    'owner',
+    'holder',
+    'location',
+    'primaryCrop',
+    'primaryVeriety',
+    'coordinates',
+    'possessionStyle',
+    'irrigationSystem',
+    'farmingSystem',
+    'waterSources',
+    'livestocks',
+    'region',
+    'emirate',
+    'serviceCenter',
+    'numberOfProductionWells',
+    'totalArea',
+    'percentageOfCultivatedArea',
+    'size',
+    'notes',
+    'farmNo',
+    'farmSerial',
+    'desalinationUnits',
+    'noOfWorkers',
+    'landUse',
+    'crops',
+    'completedSteps',
+    'ownerSignature',
+    'status',
+    'mapData',
+    'rejectionReason',
+    'updatingData',
+    'activeStatus',
+    'isAssigned',
+    'createdAt',
+    'updatedAt',
+    'areaLeftForAgriculture',
+    'cultivatedArea',
+    'nonCultivatedArea',
+    'numberOfDestinationMachines',
+    'prodCapacityDestMachines',
+    'externalSourceIrrigationAns',
+    'numberOfTrees',
+    'agriculturalSystem',
+    'greenhouseType',
+    'externalSourceIrrigation',
+    'numberOfGreenhouse',
+    'cropArea',
+    'height',
+    'width',
+    'ownerID',
+];
+
+export function getFarmTableExportHeaders(farms = []) {
+    const dynamicFields = [];
+
+    farms.forEach((farm) => {
+        Object.keys(farm || {}).forEach((field) => {
+            if (!FARM_TABLE_EXPORT_FIELDS.includes(field) && !dynamicFields.includes(field)) {
+                dynamicFields.push(field);
+            }
+        });
+    });
+
+    return [...FARM_TABLE_EXPORT_FIELDS, ...dynamicFields];
+}
+
+export function normalizeCsvCellValue(value) {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'object') {
+        return JSON.stringify(value);
+    }
+    return String(value);
+}
+
+export function escapeCsvCell(value) {
+    return `"${normalizeCsvCellValue(value).replace(/"/g, '""')}"`;
+}
+
+export function buildFarmsExportRows(farms = []) {
+    const headers = getFarmTableExportHeaders(farms);
+
+    return farms.map((farm) => headers.reduce((row, header) => {
+        row[header] = normalizeCsvCellValue(farm?.[header]);
+        return row;
+    }, {}));
+}
+
+export function buildFarmsCsvContent(farms = []) {
+    const headers = getFarmTableExportHeaders(farms);
+    const exportRows = buildFarmsExportRows(farms);
+    const rows = exportRows.map((row) => headers.map((header) => escapeCsvCell(row[header])).join(','));
+
+    return [
+        headers.join(','),
+        ...rows,
+    ].join('\n');
+}
+
 export function calculateFieldCropAreaTotal(crops = {}) {
     const rows = Array.isArray(crops)
         ? crops

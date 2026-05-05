@@ -4,6 +4,7 @@ import service from '../../services/regionService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import Loader from '../../components/Loader';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function Regions() {
     const [list, setList] = useState([]);
@@ -11,19 +12,20 @@ export default function Regions() {
     const t = useTranslation();
 
 
+    const loadItems = async () => {
+        try {
+            setLoading(true);
+            const res = await service.getAll();
+            setList(res.data);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetch = async () => {
-            try {
-                setLoading(true);
-                const res = await service.getAll();
-                setList(res.data);
-            } catch (err) {
-                toast.error(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetch();
+        loadItems();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -120,13 +122,30 @@ export default function Regions() {
                     <div>
                         <h1 className="text-xl md:text-3xl font-bold text-gray-900">{t('regions.title')}</h1>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
-                    >
-                        <Plus size={20} />
-                        {t('regions.add')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={list}
+                            exportFields={['nameInArrabic', 'name']}
+                            exportFileName="regions.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="regions"
+                            createItem={service.addItem}
+                            mapCsvRowToPayload={(row) => ({
+                                name: row.name || row.Name || '',
+                                nameInArrabic: row.nameInArrabic || row.nameInArabic || row.NameInArrabic || '',
+                            })}
+                            refreshItems={loadItems}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
+                        >
+                            <Plus size={20} />
+                            {t('regions.add')}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">

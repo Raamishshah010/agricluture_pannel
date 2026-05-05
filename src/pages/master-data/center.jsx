@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import Loader from '../../components/Loader';
 import useStore from '../../store/store';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function Centers() {
     const [items, setItems] = useState([]);
@@ -16,20 +17,39 @@ export default function Centers() {
     const { language } = useStore((state) => state);
     const isLTR = language === 'en';
 
+    const loadItems = async () => {
+        try {
+            setLoading(true);
+            const res = await service.getCenters();
+            const freshItems = Array.isArray(res.data) ? res.data : res.data?.items || [];
+            setItems((previous) =>
+                freshItems.map((item) => {
+                    const existing = previous.find((entry) => entry.id === item.id);
+                    return existing ? { ...existing, ...item } : item;
+                })
+            );
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loadEmirates = async () => {
+        try {
+            setOptionsLoading(true);
+            const res = await emirateService.getEmirates();
+            setEmirates(Array.isArray(res.data) ? res.data : res.data?.items || []);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setOptionsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetch = async () => {
-            try {
-                setLoading(true);
-                const res = await service.getCenters();
-                setItems(res.data);
-            } catch (err) {
-                toast.error(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetch();
+        loadItems();
+        loadEmirates();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,18 +60,7 @@ export default function Centers() {
         emirateId: '',
     });
 
-    const openAddModal = async () => {
-        if (emirates.length <= 0) {
-            try {
-                setOptionsLoading(true);
-                const res = await emirateService.getEmirates();
-                setEmirates(res.data);
-            } catch (err) {
-                toast.error(err.message);
-            } finally {
-                setOptionsLoading(false);
-            }
-        }
+    const openAddModal = () => {
         setEditingEmirate(null);
         setFormData({
             name: '',
@@ -61,23 +70,12 @@ export default function Centers() {
         setIsModalOpen(true);
     };
 
-    const openEditModal = async (center) => {
-        if (emirates.length <= 0) {
-            try {
-                setOptionsLoading(true);
-                const res = await emirateService.getEmirates();
-                setEmirates(res.data);
-            } catch (err) {
-                toast.error(err.message);
-            } finally {
-                setOptionsLoading(false);
-            }
-        }
+    const openEditModal = (center) => {
         setEditingEmirate(center);
         setFormData({
-            name: center.name,
-            nameInArrabic: center.nameInArrabic,
-            emirateId: center.emirateId,
+            name: center.name || '',
+            nameInArrabic: center.nameInArrabic || '',
+            emirateId: center.emirateId || '',
         });
         setIsModalOpen(true);
     };
@@ -105,22 +103,17 @@ export default function Centers() {
             setLoading(true);
             if (editingEmirate) {
                 await service.updateCenter(editingEmirate.id, formData);
-                setItems(prev => prev.map(center =>
-                    center.id === editingEmirate.id
-                        ? { ...center, ...formData, updatedAt: new Date().toISOString() }
-                        : center
-                ));
+                await loadItems();
             } else {
                 const res = await service.addCenter(formData);
                 setItems(prev => [...prev, res.data]);
             }
-            setLoading(false);
-
+            closeModal();
         } catch (error) {
-            setLoading(false);
             toast.error(error.response?.data?.message || error.message);
+        } finally {
+            setLoading(false);
         }
-        closeModal();
     };
 
     const handleDelete = async (id) => {
@@ -129,13 +122,13 @@ export default function Centers() {
                 await service.deleteEmirate(id);
                 setItems(prev => prev.filter(center => center.id !== id));
             } catch (error) {
-                setLoading(false);
                 toast.error(error.response?.data?.message || error.message);
             }
         }
     };
 
     const formatDate = (dateString) => {
+        if (!dateString) return '-';
         return new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
@@ -143,21 +136,45 @@ export default function Centers() {
         });
     };
 
+    const exportItems = items.map((center) => ({
+        ...center,
+        emirateName: isLTR
+            ? center.emirate?.name || center.emirate?.nameInArrabic || ''
+            : center.emirate?.nameInArrabic || center.emirate?.name || '',
+    }));
 
     return (
         <div className="min-h-screen bg-gray-50 p-0 md:p-8">
             <div className="max-w-7xl mx-auto">
-                <div className="mb-8 flex flex-col-reverse md:flex-row mt-2 justify-between items-center">
+                <div className="mb-8 flex flex-col-reverse md:flex-row mt-2 justify-between items-center gap-4">
                     <div>
                         <h1 className="text-xl md:text-3xl font-bold text-gray-900">{t('analytics.center.title')}</h1>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
-                    >
-                        <Plus size={20} />
-                        {t('analytics.center.addCenter')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={exportItems}
+                            exportFields={['nameInArrabic', 'name', 'emirateName']}
+                            exportFileName="centers.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="centers"
+                            createItem={service.addCenter}
+                            mapCsvRowToPayload={(row) => ({
+                                name: row.name || row.Name || '',
+                                nameInArrabic: row.nameInArrabic || row.nameInArabic || row.NameInArrabic || row.NameInArabic || '',
+                                emirateId: row.emirateId || row.EmirateId || row.emirate_id || '',
+                            })}
+                            refreshItems={loadItems}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
+                        >
+                            <Plus size={20} />
+                            {t('analytics.center.addCenter')}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -166,47 +183,50 @@ export default function Centers() {
                     ) : (
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                            <thead className="bg-gray-100 border-b border-gray-200">
-                                <tr>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.nameArabic')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.nameEnglish')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.emirate')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.createdAt')}</th>
-                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.actions')}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {items.map((center) => (
-                                    <tr key={center.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{center.nameInArrabic}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{center.name}</td>
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{center.emirate?.nameInArrabic}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-600">{formatDate(center.createdAt)}</td>
-                                        <td className="px-6 py-4">
-                                            <div className="flex gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(center)}
-                                                    className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title={t('center.editCenter')}
-                                                >
-                                                    <Edit2 size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(center.id)}
-                                                    className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
-                                                    title={t('common.delete')}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
+                                <thead className="bg-gray-100 border-b border-gray-200">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.nameArabic')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.nameEnglish')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.emirate')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.createdAt')}</th>
+                                        <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('center.actions')}</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-gray-200">
+                                    {items.map((center) => (
+                                        <tr key={center.id} className="hover:bg-gray-50 transition-colors">
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{center.nameInArrabic || '-'}</td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">{center.name || '-'}</td>
+                                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                                                {isLTR ? center.emirate?.name || center.emirate?.nameInArrabic : center.emirate?.nameInArrabic || center.emirate?.name || '-'}
+                                            </td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{formatDate(center.createdAt)}</td>
+                                            <td className="px-6 py-4">
+                                                <div className="flex gap-2">
+                                                    <button
+                                                        onClick={() => openEditModal(center)}
+                                                        className="p-2 cursor-pointer text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title={t('center.editCenter')}
+                                                    >
+                                                        <Edit2 size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(center.id)}
+                                                        className="p-2 text-red-600 cursor-pointer hover:bg-red-50 rounded-lg transition-colors"
+                                                        title={t('common.delete')}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
 
-                    )} {!loading && items.length === 0 && (
+                    {!loading && items.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                             {t('analytics.center.noItemsFound')}
                         </div>
@@ -249,7 +269,7 @@ export default function Centers() {
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-4">
+                            <div className="space-y-4 mt-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         {t('analytics.center.nameEnglishLabel')}
@@ -264,7 +284,7 @@ export default function Centers() {
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-4">
+                            <div className="space-y-4 mt-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         {t('analytics.center.emirateLabel')}
@@ -281,11 +301,9 @@ export default function Centers() {
                                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                         >
                                             <option value="">{t('analytics.center.selectEmirate')}</option>
-                                            {
-                                                emirates.map(it => (
-                                                    <option key={it.id} value={it.id}>{isLTR ? it.name : it.nameInArrabic}</option>
-                                                ))
-                                            }
+                                            {emirates.map(it => (
+                                                <option key={it.id} value={it.id}>{isLTR ? it.name : it.nameInArrabic}</option>
+                                            ))}
                                         </select>
                                     )}
                                 </div>
@@ -302,29 +320,13 @@ export default function Centers() {
                                     onClick={handleSubmit}
                                     className="px-4 py-2 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
                                 >
-                                    {
-                                        loading ? (
-                                            <>
-                                                <div>
-                                                    <svg aria-hidden="true" className="inline w-5 h-5 text-gray-200 animate-spin dark:text-gray-600 fill-green-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor" />
-                                                        <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill" />
-                                                    </svg>
-                                                    <span className="sr-only">{t('common.loading')}</span>
-                                                </div>
-                                            </>
-                                        ) : (<>
-                                            {editingEmirate ? t('center.update') : t('center.add')}
-                                        </>)
-                                    }
-
+                                    {loading ? t('common.loading') : (editingEmirate ? t('center.update') : t('center.add'))}
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
-            )
-            }
-        </div >
+            )}
+        </div>
     );
 }

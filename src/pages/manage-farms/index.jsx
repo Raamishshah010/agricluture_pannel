@@ -14,6 +14,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { amiriFontBase64 } from '../../assets/AmiriFont';
+import { buildFarmsCsvContent, buildFarmsExportRows } from '../../utils';
 
 export default function Index(props) {
     const t = useTranslation();
@@ -277,15 +278,7 @@ export default function Index(props) {
     // Download as Excel
     const downloadExcel = () => {
         const worksheet = XLSX.utils.json_to_sheet(
-            filteredFarms.map((farm) => ({
-                'Farm Number | رقم المزرعة': farm.farmNo?.toString() || '',
-                'Serial | التسلسل': farm.farmSerial?.toString() || '',
-                'Emirate | الإمارة': getEmirateName(farm.emirate) || '',
-                'Center | المركز': getCenterName(farm.serviceCenter) || '',
-                'Location | الموقع': getLocationName(farm.location) || '',
-                'Area | المساحة': farm.size ? Math.round(farm.size).toString() : '',
-                'Status | الحالة': farm.status || ''
-            }))
+            buildFarmsExportRows(filteredFarms)
         );
 
         const workbook = XLSX.utils.book_new();
@@ -297,32 +290,8 @@ export default function Index(props) {
 
     // Download as CSV
     const downloadCSV = () => {
-        const headers = [
-            'Farm Number | رقم المزرعة',
-            'Serial | التسلسل',
-            'Emirate | الإمارة',
-            'Center | المركز',
-            'Location | الموقع',
-            'Area | المساحة',
-            'Status | الحالة'
-        ];
-
-        const csvData = filteredFarms.map((farm) => [
-            farm.farmNo?.toString() || '',
-            farm.farmSerial?.toString() || '',
-            getEmirateName(farm.emirate) || '',
-            getCenterName(farm.serviceCenter) || '',
-            getLocationName(farm.location) || '',
-            farm.size ? Math.round(farm.size).toString() : '',
-            farm.status || ''
-        ]);
-
-        const csvContent = [
-            headers.join(","),
-            ...csvData.map((row) => row.map(cell => `"${cell}"`).join(",")),
-        ].join("\n");
-
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const csvContent = buildFarmsCsvContent(filteredFarms);
+        const blob = new Blob(['\uFEFF' + csvContent], { type: "text/csv;charset=utf-8;" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = "farms-list.csv";

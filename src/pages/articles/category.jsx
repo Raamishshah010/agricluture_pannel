@@ -1,29 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import service from '../../services/articleService';
 import { toast } from 'react-toastify';
 import Loader from '../../components/Loader';
 import useTranslation from '../../hooks/useTranslation';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function ArticleCategories() {
     const t = useTranslation();
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const res = await service.getCategories();
-                setList(res.data || []);
-            } catch (err) {
-                toast.error(err?.message || 'Error fetching categories');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+    const fetchCategories = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await service.getCategories();
+            setList(res.data || []);
+        } catch (err) {
+            toast.error(err?.message || 'Error fetching categories');
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchCategories();
+    }, [fetchCategories]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingData, setEditingData] = useState(null);
@@ -109,23 +111,50 @@ export default function ArticleCategories() {
             day: 'numeric'
         });
 
+    const getCsvValue = (row, keys) => {
+        for (const key of keys) {
+            const value = row?.[key];
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+                return String(value).trim();
+            }
+        }
+        return '';
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 p-0 md:p-8">
             <div className="max-w-7xl mx-auto">
 
                 {/* Header */}
-                <div className="mb-8 flex flex-col-reverse md:flex-row justify-between items-center">
+                <div className="mb-8 flex flex-col-reverse md:flex-row justify-between items-center gap-4">
                     <h1 className="text-xl md:text-3xl font-bold">
                         {t('articles.category.title')}
                     </h1>
 
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2"
-                    >
-                        <Plus size={20} />
-                        {t('articles.category.add')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={list}
+                            exportFields={['name', 'nameInArabic']}
+                            exportFileName="article-categories.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="categories"
+                            createItem={service.addCategory}
+                            mapCsvRowToPayload={(row) => ({
+                                name: getCsvValue(row, ['name', 'Name']),
+                                nameInArabic: getCsvValue(row, ['nameInArabic', 'nameInArrabic']),
+                            })}
+                            refreshItems={fetchCategories}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2"
+                        >
+                            <Plus size={20} />
+                            {t('articles.category.add')}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Table */}

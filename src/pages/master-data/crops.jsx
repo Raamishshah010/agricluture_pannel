@@ -4,6 +4,7 @@ import cropService from '../../services/cropService';
 import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import Loader from '../../components/Loader';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function Crops() {
     const [crops, setCrops] = useState([]);
@@ -11,19 +12,20 @@ export default function Crops() {
     const [searchQuery, setSearchQuery] = useState('');
     const t = useTranslation();
 
+    const loadItems = async () => {
+        try {
+            setLoading(true);
+            const cropRes = await cropService.getCrops();
+            setCrops(cropRes.data);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                const cropRes = await cropService.getCrops();
-                setCrops(cropRes.data);
-            } catch (err) {
-                toast.error(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+        loadItems();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -134,11 +136,38 @@ export default function Crops() {
             {/* Header & Controls */}
             <div className="bg-white border-b border-gray-200 shadow-sm">
                 <div className="max-w-[1400px] mx-auto px-6 py-5">
-                    <div className="flex justify-between items-center mb-6">
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">{t('crops.title')}</h1>
-                            <p className="text-sm text-gray-500 mt-1">{t('crops.subtitle')}</p>
-                        </div>
+                <div className="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900">{t('crops.title')}</h1>
+                        <p className="text-sm text-gray-500 mt-1">{t('crops.subtitle')}</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={crops}
+                            exportFields={['name', 'scientificName', 'cultivationDuration', 'productionValue', 'isActive']}
+                            exportFileName="crops.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="crops"
+                            createItem={cropService.addCrop}
+                            mapCsvRowToPayload={(row) => ({
+                                name: row.name || row.Name || '',
+                                scientificName: row.scientificName || row.scientific_name || row.scientificNameArabic || row.scientificname || '',
+                                cultivationDuration: row.cultivationDuration || row.cultivation_duration || '',
+                                productionValue:
+                                    row.productionValue === '' || row.productionValue === undefined
+                                        ? 0
+                                        : Number(row.productionValue),
+                                isActive:
+                                    String(row.isActive ?? row.active ?? '').toLowerCase() === 'false'
+                                        ? false
+                                        : String(row.isActive ?? row.active ?? '').toLowerCase() === '0'
+                                            ? false
+                                            : true,
+                            })}
+                            refreshItems={loadItems}
+                            loading={loading}
+                        />
                         <button
                             onClick={openAddModal}
                             className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-md hover:shadow-lg transition-all flex items-center gap-2"
@@ -147,6 +176,7 @@ export default function Crops() {
                             {t('crops.addCrop')}
                         </button>
                     </div>
+                </div>
 
                     {/* Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

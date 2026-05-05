@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import service from '../../services/locationService';
 import emirateService from '../../services/emirateService';
@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import Loader from '../../components/Loader';
 import useStore from '../../store/store';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function Locations() {
     const t  = useTranslation();
@@ -18,22 +19,21 @@ export default function Locations() {
     const [loading, setLoading] = useState(false);
     const [emiratesLoading, setEmiratesLoading] = useState(false);
     const [centersLoading, setCentersLoading] = useState(false);
-
+    const loadItems = useCallback(async () => {
+        try {
+            setLoading(true);
+            const res = await service.getAll();
+            setList(Array.isArray(res.data) ? res.data : res.data?.items || []);
+        } catch (err) {
+            toast.error(err.message || t('common.errorOccurred'));
+        } finally {
+            setLoading(false);
+        }
+    }, [t]);
 
     useEffect(() => {
-        const fetch = async () => {
-            try {
-                setLoading(true);
-                const res = await service.getAll();
-                setList(res.data);
-            } catch (err) {
-                toast.error(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetch();
-    }, []);
+        loadItems();
+    }, [loadItems]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
@@ -140,23 +140,22 @@ export default function Locations() {
         try {
             setLoading(true);
             if (editingItem) {
-                await service.updateItem(editingItem.id, formData);
+                const res = await service.updateItem(editingItem.id, formData);
                 setList(prev => prev.map(item =>
                     item.id === editingItem.id
-                        ? { ...item, ...formData, updatedAt: new Date().toISOString() }
+                        ? { ...item, ...(res.data || formData), updatedAt: new Date().toISOString() }
                         : item
                 ));
             } else {
                 const res = await service.addItem(formData);
                 setList(prev => [...prev, res.data]);
             }
-            setLoading(false);
-
+            closeModal();
         } catch (error) {
+            toast.error(error.response?.data?.message || error.message || t('common.errorOccurred'));
+        } finally {
             setLoading(false);
-            toast.error(error.response?.data?.message || error.message);
         }
-        closeModal();
     };
 
     const handleDelete = async (id) => {
@@ -179,21 +178,50 @@ export default function Locations() {
         });
     };
 
+    const exportItems = list.map((item) => ({
+        ...item,
+        emirateName: isLTR
+            ? item.center?.emirate?.name || item.center?.emirate?.nameInArrabic || ''
+            : item.center?.emirate?.nameInArrabic || item.center?.emirate?.name || '',
+        centerName: isLTR
+            ? item.center?.name || item.center?.nameInArrabic || ''
+            : item.center?.nameInArrabic || item.center?.name || '',
+    }));
+
 
     return (
        <div className="min-h-screen bg-gray-50 p-0 md:p-8">
             <div className="max-w-7xl mx-auto">
-                <div className="mb-8 flex flex-col-reverse md:flex-row mt-2 justify-between items-center">
+                <div className="mb-8 flex flex-col-reverse md:flex-row mt-2 justify-between items-center gap-4">
                     <div>
                         <h1 className="text-xl md:text-3xl font-bold text-gray-900">{t('locations.title')}</h1>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
-                    >
-                        <Plus size={20} />
-                        {t('locations.add')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={exportItems}
+                            exportFields={['nameInArrabic', 'name', 'emirateName', 'centerName']}
+                            exportFileName="locations.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="locations"
+                            createItem={service.addItem}
+                            mapCsvRowToPayload={(row) => ({
+                                name: row.name || row.Name || '',
+                                nameInArrabic: row.nameInArrabic || row.nameInArabic || row.NameInArrabic || row.NameInArabic || '',
+                                emirateId: row.emirateId || row.EmirateId || row.emirate_id || '',
+                                centerId: row.centerId || row.CenterId || row.center_id || '',
+                            })}
+                            refreshItems={loadItems}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
+                        >
+                            <Plus size={20} />
+                            {t('locations.add')}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">
@@ -282,8 +310,8 @@ export default function Locations() {
                                     </label>
                                     <input
                                         type="text"
-                                        name="name"
-                                        value={formData.name}
+                                        name="nameInArrabic"
+                                        value={formData.nameInArrabic}
                                         onChange={handleInputChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                                         placeholder={t('locations.nameArabicPlaceholder')}

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus } from 'lucide-react';
-import fodderService from '../../services/fodderService';
 import { toast } from 'react-toastify';
+import fodderService from '../../services/fodderService';
 import useTranslation from '../../hooks/useTranslation';
 import Loader from '../../components/Loader';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function FodderTypes() {
     const t = useTranslation();
@@ -11,28 +12,27 @@ export default function FodderTypes() {
     const [loading, setLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
-
     const [formData, setFormData] = useState({
         name: '',
         nameInArabic: '',
         productionValue: 0,
     });
 
-    useEffect(() => {
-        fetchFodderTypes();
-    }, []);
-
-    const fetchFodderTypes = async () => {
+    const loadItems = async () => {
         try {
             setLoading(true);
             const res = await fodderService.getItems();
-            setItems(res.data || []);
+            setItems(Array.isArray(res.data) ? res.data : res.data?.items || []);
         } catch (err) {
             toast.error(t('common.errorLoading') || err.message);
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        loadItems();
+    }, []);
 
     const openAddModal = () => {
         setEditingItem(null);
@@ -45,7 +45,7 @@ export default function FodderTypes() {
         setFormData({
             name: item?.name || '',
             nameInArabic: item?.nameInArabic || '',
-            productionValue: item?.productionValue || 0,
+            productionValue: item?.productionValue ?? 0,
         });
         setIsModalOpen(true);
     };
@@ -70,11 +70,11 @@ export default function FodderTypes() {
             setLoading(true);
 
             if (editingItem) {
-                await fodderService.updateItem(editingItem.id, formData);
+                const res = await fodderService.updateItem(editingItem.id, formData);
                 setItems(prev =>
                     prev.map(item =>
                         item.id === editingItem.id
-                            ? { ...item, ...formData, updatedAt: new Date().toISOString() }
+                            ? { ...item, ...(res.data || formData), updatedAt: new Date().toISOString() }
                             : item
                     )
                 );
@@ -117,7 +117,6 @@ export default function FodderTypes() {
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-                {/* Header */}
                 <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -125,16 +124,36 @@ export default function FodderTypes() {
                         </h1>
                         <p className="text-gray-600 mt-1">{t('fodderTypes.subtitle') || 'Manage fodder types'}</p>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-colors"
-                    >
-                        <Plus size={20} />
-                        {t('fodderTypes.add')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={items}
+                            exportFields={['name', 'nameInArabic', 'productionValue']}
+                            exportFileName="fodder-types.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="fodder types"
+                            createItem={fodderService.addItem}
+                            mapCsvRowToPayload={(row) => ({
+                                name: row.name || row.Name || '',
+                                nameInArabic: row.nameInArabic || row.nameInArrabic || row.NameInArabic || '',
+                                productionValue:
+                                    row.productionValue === '' || row.productionValue === undefined
+                                        ? 0
+                                        : Number(row.productionValue),
+                            })}
+                            refreshItems={loadItems}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-colors"
+                        >
+                            <Plus size={20} />
+                            {t('fodderTypes.add')}
+                        </button>
+                    </div>
                 </div>
 
-                {/* Table Card */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     {loading ? (
                         <div className="py-16">
@@ -211,7 +230,6 @@ export default function FodderTypes() {
                     )}
                 </div>
 
-                {/* Footer stats */}
                 {!loading && (
                     <div className="mt-4 text-sm text-gray-600 text-right">
                         {t('fodderTypes.totalItems')}: <span className="font-medium">{items.length}</span>
@@ -219,7 +237,6 @@ export default function FodderTypes() {
                 )}
             </div>
 
-            {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
@@ -236,7 +253,6 @@ export default function FodderTypes() {
                         </div>
 
                         <div className="p-6 space-y-5">
-                            {/* Arabic name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                     {t('fodderTypes.nameArabic')} <span className="text-red-500">*</span>
@@ -251,7 +267,6 @@ export default function FodderTypes() {
                                 />
                             </div>
 
-                            {/* English name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                     {t('fodderTypes.nameEnglish')} <span className="text-red-500">*</span>

@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import articleService from '../../services/articleService'; // renamed import for clarity
 import { toast } from 'react-toastify';
 import Loader from '../../components/Loader';
 import useTranslation from '../../hooks/useTranslation';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function Articles() {
     const t = useTranslation();
@@ -25,11 +26,32 @@ export default function Articles() {
     });
     const [imagePreview, setImagePreview] = useState('');
 
-    useEffect(() => {
-        fetchArticles();
-    }, []);
+    const getCsvValue = (row, keys) => {
+        for (const key of keys) {
+            const value = row?.[key];
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+                return String(value).trim();
+            }
+        }
+        return '';
+    };
 
-    const fetchArticles = async () => {
+    const buildCsvPayload = (row) => {
+        const payload = new FormData();
+        payload.append('title', getCsvValue(row, ['title', 'Title']));
+        payload.append('description', getCsvValue(row, ['description', 'Description']));
+        payload.append('categoryId', getCsvValue(row, ['categoryId', 'categoryID', 'category']));
+        payload.append('subCategoryId', getCsvValue(row, ['subCategoryId', 'subCategoryID', 'subCategory']));
+
+        const imageUrl = getCsvValue(row, ['image', 'imageUrl', 'imageURL']);
+        if (imageUrl) {
+            payload.append('image', imageUrl);
+        }
+
+        return payload;
+    };
+
+    const fetchArticles = useCallback(async () => {
         try {
             setLoading(true);
             const res = await articleService.getArticles();
@@ -39,7 +61,11 @@ export default function Articles() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [t, unknownErrorMessage]);
+
+    useEffect(() => {
+        fetchArticles();
+    }, [fetchArticles]);
 
     const fetchCategories = async () => {
         if (categories.length > 0) return;
@@ -201,13 +227,27 @@ export default function Articles() {
                         <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{t('articles.title')}</h1>
                         <p className="text-gray-600 mt-1">{t('articles.subtitle')}</p>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-colors"
-                    >
-                        <Plus size={20} />
-                        {t('articles.cta')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={articles}
+                            exportFields={['title', 'description', 'categoryId', 'subCategoryId', 'image']}
+                            exportFileName="articles.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="articles"
+                            createItem={articleService.addArticle}
+                            mapCsvRowToPayload={buildCsvPayload}
+                            refreshItems={fetchArticles}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-colors"
+                        >
+                            <Plus size={20} />
+                            {t('articles.cta')}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Table */}

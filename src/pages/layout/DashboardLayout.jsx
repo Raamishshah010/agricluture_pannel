@@ -261,7 +261,6 @@ const DashboardLayout = () => {
         { id: 'crops-management', icon: Wheat, label: t('common.components.dashboard.greenhouseCrops') },
         { id: 'Cover Types', icon: Wheat, label: t('common.components.dashboard.coverTypes') },
         { id: 'Fodder Types', icon: Wheat, label: t('common.components.dashboard.fodderTypes') },
-        { id: 'varieties', icon: TrendingUpDown, label: t('common.components.dashboard.varieties') },
         { id: 'regions', icon: ShieldHalf, label: t('common.components.dashboard.regions') },
         { id: 'emirates management', icon: Flag, label: t('common.components.dashboard.emiratesManagement') },
         { id: 'centers management', icon: Flag, label: t('common.components.dashboard.centersManagement') },
@@ -272,10 +271,8 @@ const DashboardLayout = () => {
         { id: 'possessions', icon: ListMusic, label: t('common.components.dashboard.possessions') },
         { id: 'farming-system', icon: Footprints, label: t('common.components.dashboard.farmingSystems') },
         { id: 'irrigation-system', icon: Ship, label: t('common.components.dashboard.irrigationSystem') },
-        { id: 'external-irrigation-system', icon: AudioWaveform, label: t('common.components.dashboard.externalIrrigationSystem') },
         { id: 'green-house-types', icon: House, label: t('common.components.dashboard.greenHouseTypes') },
         { id: 'water-sources', icon: Dam, label: t('common.components.dashboard.waterSources') },
-        { id: 'seasons', icon: SunSnow, label: t('common.components.dashboard.seasons') },
         { id: 'livestocks', icon: Sticker, label: t('common.components.dashboard.livestocks') },
       ]
     },

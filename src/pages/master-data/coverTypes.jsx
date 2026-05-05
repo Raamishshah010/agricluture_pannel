@@ -1,34 +1,50 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus, Search, FileText } from 'lucide-react';
-import useTranslation from '../../hooks/useTranslation';
+import service from '../../services/coverService';
 import { toast } from 'react-toastify';
+import useTranslation from '../../hooks/useTranslation';
+import Loader from '../../components/Loader';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function CoverTypes() {
     const t = useTranslation();
-    const [items, setItems] = useState([
-        { id: 1, name: 'Plastic Cover', nameInArrabic: 'غطاء بلاستيكي', createdAt: '2025-10-27T00:00:00Z' },
-        { id: 2, name: 'Glass Cover', nameInArrabic: 'غطاء زجاجي', createdAt: '2025-10-27T00:00:00Z' },
-        { id: 3, name: 'Net Cover', nameInArrabic: 'غطاء شبكي', createdAt: '2025-10-27T00:00:00Z' },
-    ]);
+    const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
-        nameInArrabic: ''
+        nameInArrabic: '',
     });
 
-    const filteredItems = items.filter(item => 
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.nameInArrabic.includes(searchQuery)
+    const loadItems = async () => {
+        try {
+            setLoading(true);
+            const res = await service.getItems();
+            setItems(res.data || []);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadItems();
+    }, []);
+
+    const filteredItems = items.filter(
+        (item) =>
+            item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            item.nameInArrabic?.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
     const openAddModal = () => {
         setEditingItem(null);
         setFormData({
             name: '',
-            nameInArrabic: ''
+            nameInArrabic: '',
         });
         setIsModalOpen(true);
     };
@@ -49,9 +65,9 @@ export default function CoverTypes() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
-            [name]: value
+            [name]: value,
         }));
     };
 
@@ -61,61 +77,79 @@ export default function CoverTypes() {
             return;
         }
 
-        setLoading(true);
-        setTimeout(() => {
+        try {
+            setLoading(true);
             if (editingItem) {
-                setItems(prev => prev.map(item =>
-                    item.id === editingItem.id
-                        ? { ...item, ...formData, updatedAt: new Date().toISOString() }
-                        : item
-                ));
+                await service.updateItem(editingItem.id, formData);
             } else {
-                setItems(prev => [...prev, { 
-                    id: Date.now(), 
-                    ...formData, 
-                    createdAt: new Date().toISOString() 
-                }]);
+                await service.addItem(formData);
             }
-            setLoading(false);
+            await loadItems();
             closeModal();
-        }, 500);
-    };
-
-    const handleDelete = async (id) => {
-        if (window.confirm(t('coverTypes.deleteConfirm'))) {
-            setItems(prev => prev.filter(item => item.id !== id));
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+    const handleDelete = async (id) => {
+        if (!window.confirm(t('coverTypes.deleteConfirm'))) {
+            return;
+        }
+
+        try {
+            setLoading(true);
+            await service.deleteItem(id);
+            await loadItems();
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const formatDate = (dateString) =>
+        new Date(dateString).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
-            day: 'numeric'
+            day: 'numeric',
         });
-    };
 
     return (
         <div className="min-h-screen bg-gray-50 p-6">
             <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="mb-6 flex justify-between items-start">
+                <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">
-                            {t('coverTypes.title')}
-                        </h1>
+                        <h1 className="text-2xl font-bold text-gray-900">{t('coverTypes.title')}</h1>
                         <p className="text-sm text-gray-500 mt-1">{t('coverTypes.subtitle')}</p>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors text-sm font-medium"
-                    >
-                        <Plus size={18} />
-                        {t('coverTypes.add')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={items}
+                            exportFields={['nameInArrabic', 'name']}
+                            exportFileName="cover-types.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="cover types"
+                            createItem={service.addItem}
+                            mapCsvRowToPayload={(row) => ({
+                                name: row.name || row.Name || '',
+                                nameInArrabic: row.nameInArrabic || row.nameInArabic || row.NameInArrabic || row.NameInArabic || '',
+                            })}
+                            refreshItems={loadItems}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md flex items-center gap-2 transition-colors text-sm font-medium"
+                        >
+                            <Plus size={18} />
+                            {t('coverTypes.add')}
+                        </button>
+                    </div>
                 </div>
 
-                {/* Stats Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div className="bg-blue-50 rounded-lg p-5">
                         <div className="flex items-center justify-between">
@@ -142,7 +176,6 @@ export default function CoverTypes() {
                     </div>
                 </div>
 
-                {/* Search Bar */}
                 <div className="bg-white rounded-lg p-4 mb-4 shadow-sm">
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
@@ -156,12 +189,12 @@ export default function CoverTypes() {
                     </div>
                 </div>
 
-                {/* Results Count */}
                 <div className="mb-3">
-                    <p className="text-sm text-gray-700 font-medium">{filteredItems.length} {t('coverTypes.found')}</p>
+                    <p className="text-sm text-gray-700 font-medium">
+                        {filteredItems.length} {t('coverTypes.found')}
+                    </p>
                 </div>
 
-                {/* Table */}
                 <div className="bg-white rounded-lg shadow-sm overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full">
@@ -219,7 +252,6 @@ export default function CoverTypes() {
                 </div>
             </div>
 
-            {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
@@ -279,9 +311,18 @@ export default function CoverTypes() {
                                 >
                                     {loading ? (
                                         <>
-                                            <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <svg
+                                                className="animate-spin h-4 w-4 text-white"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                fill="none"
+                                                viewBox="0 0 24 24"
+                                            >
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                ></path>
                                             </svg>
                                             {t('common.loading')}
                                         </>

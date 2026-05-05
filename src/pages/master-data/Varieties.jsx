@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import useTranslation from '../../hooks/useTranslation';
 import useStore from '../../store/store';
 import Loader from '../../components/Loader';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function Varieties() {
     const [varities, setVarieties] = useState([]);
@@ -16,19 +17,20 @@ export default function Varieties() {
     const isLTR = language === 'en';
 
 
+    const loadItems = async () => {
+        try {
+            setLoading(true);
+            const res = await service.getAll();
+            setVarieties(res.data.items);
+        } catch (err) {
+            toast.error(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetch = async () => {
-            try {
-                setLoading(true);
-                const res = await service.getAll();
-                setVarieties(res.data.items);
-            } catch (err) {
-                toast.error(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetch();
+        loadItems();
     }, []);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -146,13 +148,31 @@ export default function Varieties() {
                     <div>
                         <h1 className="text-xl md:text-3xl font-bold text-gray-900">{t('varieties.title')}</h1>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
-                    >
-                        <Plus size={20} />
-                        {t('varieties.add')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={varities}
+                            exportFields={['name', 'nameInArabic', 'cropId']}
+                            exportFileName="varieties.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="varieties"
+                            createItem={service.add}
+                            mapCsvRowToPayload={(row) => ({
+                                name: row.name || row.Name || '',
+                                nameInArabic: row.nameInArabic || row.nameInArrabic || row.NameInArabic || '',
+                                cropId: row.cropId || row.cropID || '',
+                            })}
+                            refreshItems={loadItems}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 cursor-pointer hover:bg-green-700 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors"
+                        >
+                            <Plus size={20} />
+                            {t('varieties.add')}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="bg-white rounded-lg shadow overflow-hidden">

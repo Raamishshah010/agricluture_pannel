@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus } from 'lucide-react';
 import articleService from '../../services/articleService';
 import { toast } from 'react-toastify';
 import Loader from '../../components/Loader';
 import useTranslation from '../../hooks/useTranslation';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function SubCategories() {
     const t = useTranslation();
@@ -21,11 +22,31 @@ export default function SubCategories() {
     });
     const [imagePreview, setImagePreview] = useState('');
 
-    useEffect(() => {
-        fetchSubCategories();
-    }, []);
+    const getCsvValue = (row, keys) => {
+        for (const key of keys) {
+            const value = row?.[key];
+            if (value !== undefined && value !== null && String(value).trim() !== '') {
+                return String(value).trim();
+            }
+        }
+        return '';
+    };
 
-    const fetchSubCategories = async () => {
+    const buildCsvPayload = (row) => {
+        const payload = new FormData();
+        payload.append('name', getCsvValue(row, ['name', 'Name']));
+        payload.append('nameInArabic', getCsvValue(row, ['nameInArabic', 'nameInArrabic']));
+        payload.append('categoryId', getCsvValue(row, ['categoryId', 'categoryID', 'category']));
+
+        const imageUrl = getCsvValue(row, ['image', 'imageUrl', 'imageURL']);
+        if (imageUrl) {
+            payload.append('image', imageUrl);
+        }
+
+        return payload;
+    };
+
+    const fetchSubCategories = useCallback(async () => {
         try {
             setLoading(true);
             const res = await articleService.getSubCategories();
@@ -35,7 +56,11 @@ export default function SubCategories() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [t]);
+
+    useEffect(() => {
+        fetchSubCategories();
+    }, [fetchSubCategories]);
 
     const fetchCategories = async () => {
         if (categories.length > 0) return;
@@ -167,13 +192,27 @@ export default function SubCategories() {
                         </h1>
                         <p className="text-gray-600 mt-1">{t('articles.subCategories.subtitle')}</p>
                     </div>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-colors"
-                    >
-                        <Plus size={20} />
-                        {t('articles.subCategories.add')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={subCategories}
+                            exportFields={['name', 'nameInArabic', 'categoryId', 'image']}
+                            exportFileName="article-sub-categories.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="subcategories"
+                            createItem={articleService.addSubCategory}
+                            mapCsvRowToPayload={buildCsvPayload}
+                            refreshItems={fetchSubCategories}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium shadow-sm transition-colors"
+                        >
+                            <Plus size={20} />
+                            {t('articles.subCategories.add')}
+                        </button>
+                    </div>
                 </div>
 
                 {/* Table */}

@@ -1,36 +1,43 @@
 import { useEffect, useState } from 'react';
 import { X, Edit2, Trash2, Plus } from 'lucide-react';
-import emirateService from '../../services/emirateService';
 import { toast } from 'react-toastify';
+import emirateService from '../../services/emirateService';
 import useTranslation from '../../hooks/useTranslation';
 import Loader from '../../components/Loader';
+import MasterDataCsvToolbar from '../../components/MasterDataCsvToolbar';
 
 export default function Emirates() {
     const [emirates, setEmirates] = useState([]);
     const [loading, setLoading] = useState(false);
-    const t = useTranslation();
-
-    useEffect(() => {
-        const fetchEmirates = async () => {
-            try {
-                setLoading(true);
-                const res = await emirateService.getEmirates();
-                setEmirates(res.data || []);
-            } catch (err) {
-                toast.error(err.message || t('common.errorOccurred'));
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchEmirates();
-    }, [t]);
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEmirate, setEditingEmirate] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         nameInArabic: ''
     });
+    const t = useTranslation();
+
+    const loadItems = async () => {
+        try {
+            setLoading(true);
+            const res = await emirateService.getEmirates();
+            const freshItems = Array.isArray(res.data) ? res.data : res.data?.items || [];
+            setEmirates((previous) =>
+                freshItems.map((item) => {
+                    const existing = previous.find((entry) => entry.id === item.id);
+                    return existing ? { ...existing, ...item } : item;
+                })
+            );
+        } catch (err) {
+            toast.error(err.message || t('common.errorOccurred'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadItems();
+    }, []);
 
     const openAddModal = () => {
         setEditingEmirate(null);
@@ -114,21 +121,36 @@ export default function Emirates() {
     return (
         <div className="min-h-screen bg-gray-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
-                {/* Header */}
                 <div className="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
                         {t('emirates.title')}
                     </h1>
-                    <button
-                        onClick={openAddModal}
-                        className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-colors shadow-sm"
-                    >
-                        <Plus size={20} />
-                        {t('emirates.add')}
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <MasterDataCsvToolbar
+                            items={emirates}
+                            exportFields={['name', 'nameInArabic']}
+                            exportFileName="emirates.csv"
+                            importLabel={t('common.importCsv') || 'Import CSV'}
+                            exportLabel={t('common.exportCsv') || 'Export CSV'}
+                            itemLabel="emirates"
+                            createItem={emirateService.addEmirate}
+                            mapCsvRowToPayload={(row) => ({
+                                name: row.name || row.Name || '',
+                                nameInArabic: row.nameInArabic || row.nameInArrabic || row.NameInArabic || '',
+                            })}
+                            refreshItems={loadItems}
+                            loading={loading}
+                        />
+                        <button
+                            onClick={openAddModal}
+                            className="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-lg flex items-center gap-2 font-medium transition-colors shadow-sm"
+                        >
+                            <Plus size={20} />
+                            {t('emirates.add')}
+                        </button>
+                    </div>
                 </div>
 
-                {/* Table Card */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                     {loading ? (
                         <div className="py-16">
@@ -199,7 +221,6 @@ export default function Emirates() {
                     )}
                 </div>
 
-                {/* Footer stats */}
                 {!loading && (
                     <div className="mt-4 text-sm text-gray-600 text-right">
                         {t('emirates.totalItems')}: <span className="font-medium">{emirates.length}</span>
@@ -207,7 +228,6 @@ export default function Emirates() {
                 )}
             </div>
 
-            {/* Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
@@ -224,7 +244,6 @@ export default function Emirates() {
                         </div>
 
                         <div className="p-6 space-y-5">
-                            {/* Arabic name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                     {t('emirates.nameArabicLabel')} <span className="text-red-500">*</span>
@@ -239,7 +258,6 @@ export default function Emirates() {
                                 />
                             </div>
 
-                            {/* English name */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
                                     {t('emirates.nameEnglishLabel')} <span className="text-red-500">*</span>
