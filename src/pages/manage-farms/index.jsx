@@ -14,7 +14,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { amiriFontBase64 } from '../../assets/AmiriFont';
-import { buildFarmsCsvContent, buildFarmsExportRows } from '../../utils';
+import { buildFarmsCsvContent, buildFarmsExportRows, getDisplayFarmStatus, shouldResetManageFarmsSession, sortAndFilterManageFarms } from '../../utils';
 
 export default function Index(props) {
     const t = useTranslation();
@@ -26,16 +26,25 @@ export default function Index(props) {
         return storedFarm ? JSON.parse(storedFarm) : null;
     });
     const [page, setPage] = useState(1);
-    const [randomNumber, setRandomNumber] = useState(() => sessionStorage.getItem('randomNumber') || 1);
+    const [randomNumber, setRandomNumber] = useState(() => sessionStorage.getItem('randomNumber') || props.number || 1);
     const { farms, setFarms, emirates, centers, locations } = useStore((state) => state);
     const [emirate, setEmirate] = useState(null);
     const [center, setCenter] = useState(null);
     const [location, setLocation] = useState(null);
     const [minSize, setMinSize] = useState('');
     const [maxSize, setMaxSize] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
     const [isDownloadOpen, setIsDownloadOpen] = useState(false);
     const [isImporting, setIsImporting] = useState(false);
     const importInputRef = useRef(null);
+    const statusOptions = useMemo(() => [
+        { value: '', label: t('status.all') },
+        { value: 'active', label: t('status.active') },
+        { value: 'pending', label: t('status.pending') },
+        { value: 'draft', label: t('status.drafts') },
+        { value: 'suspended', label: t('status.suspended') },
+        { value: 'rejected', label: t('status.rejected') },
+    ], [t]);
 
     useEffect(() => {
         sessionStorage.setItem('activeTab', activeTab);
@@ -54,7 +63,7 @@ export default function Index(props) {
     }, [randomNumber]);
 
     useEffect(() => {
-        if (props.number !== randomNumber) {
+        if (shouldResetManageFarmsSession(props.number, randomNumber)) {
             setRandomNumber(props.number);
             setActiveTab('farms');
             sessionStorage.removeItem('selectedFarm');
@@ -144,7 +153,7 @@ export default function Index(props) {
     const filteredFarms = useMemo(() => {
         const lowerQuery = query.trim().toLowerCase();
 
-        return farms.filter(farm => {
+        const filtered = farms.filter(farm => {
             const matchesSearch =
                 !lowerQuery ||
                 (farm.farmNo && farm.farmNo.toString().toLowerCase().includes(lowerQuery)) ||
@@ -164,7 +173,13 @@ export default function Index(props) {
 
             return matchesSearch && matchesFilters && matchesSizeRange;
         });
-    }, [center, emirate, farms, location, query, minSize, maxSize]);
+
+        return sortAndFilterManageFarms(filtered, { status: statusFilter });
+    }, [center, emirate, farms, location, query, minSize, maxSize, statusFilter]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [center, emirate, location, query, minSize, maxSize, statusFilter]);
 
     const itemsPerPage = 50;
     const totalPages = Math.ceil(filteredFarms.length / 50);
@@ -220,7 +235,7 @@ export default function Index(props) {
             getCenterName(farm.serviceCenter) || '',
             getLocationName(farm.location) || '',
             farm.size ? Math.round(farm.size).toString() : '',
-            farm.status || ''
+            getDisplayFarmStatus(farm)
         ]);
 
         // Title
@@ -463,6 +478,17 @@ export default function Index(props) {
                         onChange={(e) => setMaxSize(e.target.value)}
                         className="border border-gray-300 rounded-lg p-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="border border-gray-300 rounded-lg p-2 w-36 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        {statusOptions.map((option) => (
+                            <option key={option.value || 'all'} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="flex gap-2 sm:p-4 border-gray-200">
@@ -496,6 +522,7 @@ export default function Index(props) {
                             setQuery('');
                             setMinSize('');
                             setMaxSize('');
+                            setStatusFilter('');
                         }}
                     >
                         {t('manageFarms.clear')}

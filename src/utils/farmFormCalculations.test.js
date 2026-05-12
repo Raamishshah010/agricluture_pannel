@@ -10,6 +10,9 @@ import {
   calculateGreenhouseProduction,
   calculateRowProduction,
   findFarmerByEmiratesId,
+  getDisplayFarmStatus,
+  shouldResetManageFarmsSession,
+  sortAndFilterManageFarms,
 } from './index.js';
 
 test('buildFarmDataFromFarmer keeps only Emirates ID as hidden stored farm data', () => {
@@ -79,6 +82,35 @@ test('buildFarmsExportRows prepares full farm table fields for xlsx export', () 
   assert.equal(rows[0].ownerID, '');
   assert.equal(rows[0].crops, '{"vegetables":[{"vegetableType":"tomato"}]}');
   assert.equal(rows[0].customTableField, 'xlsx-kept');
+});
+
+test('getDisplayFarmStatus treats unassigned farms as draft', () => {
+  assert.equal(getDisplayFarmStatus({ status: 'active', isAssigned: false }), 'draft');
+  assert.equal(getDisplayFarmStatus({ status: 'pending', isAssigned: true }), 'pending');
+});
+
+test('sortAndFilterManageFarms returns recent farms first and filters by displayed status', () => {
+  const farms = [
+    { id: 'old-active', status: 'active', isAssigned: true, createdAt: '2025-01-01T00:00:00.000Z' },
+    { id: 'new-pending', status: 'pending', isAssigned: true, createdAt: '2026-01-01T00:00:00.000Z' },
+    { id: 'newer-unassigned', status: 'active', isAssigned: false, createdAt: '2026-02-01T00:00:00.000Z' },
+  ];
+
+  assert.deepEqual(
+    sortAndFilterManageFarms(farms).map((farm) => farm.id),
+    ['newer-unassigned', 'new-pending', 'old-active'],
+  );
+
+  assert.deepEqual(
+    sortAndFilterManageFarms(farms, { status: 'draft' }).map((farm) => farm.id),
+    ['newer-unassigned'],
+  );
+});
+
+test('shouldResetManageFarmsSession ignores number/string representation changes', () => {
+  assert.equal(shouldResetManageFarmsSession(1, '1'), false);
+  assert.equal(shouldResetManageFarmsSession('123456', 123456), false);
+  assert.equal(shouldResetManageFarmsSession(123456, 654321), true);
 });
 
 test('calculateFieldCropAreaTotal sums fruit, vegetable, and fodder areas safely', () => {

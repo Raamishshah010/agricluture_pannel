@@ -5,6 +5,7 @@ import service from '../../services/farmerService';
 import farmService from '../../services/farmService';
 import useStore from "../../store/store";
 import useTranslation from "../../hooks/useTranslation";
+import { getDisplayFarmStatus } from "../../utils";
 
 export default function Farmers({ list, setList, handleDetail, handleEdit }) {
     const t = useTranslation();
@@ -15,12 +16,6 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
     const [search, setSearch] = useState("");
     const [coders, setCoders] = useState([]);
     const { centers, emirates, locations, language } = useStore((state) => state);
-
-    // DEBUG: Log the data structure to console (remove after debugging)
-    console.log('Language:', language);
-    console.log('Sample Emirate:', emirates[0]);
-    console.log('Sample Center:', centers[0]);
-    console.log('Sample Location:', locations[0]);
 
     const handleSubmit = async () => {
         if (!selectedFarm) {
@@ -100,11 +95,6 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
 
     const getStatusLabel = (status) => statusLabelMap[status] || status;
 
-    const getStatus = (status, isAssigned) => {
-        if (!isAssigned) return 'draft';
-        return status;
-    };
-
     // Helper function to get localized name - supports multiple Arabic property names
     const getLocalizedName = (item) => {
         if (!item) return t('kpi.nA');
@@ -155,13 +145,7 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                                     const emirateObj = emirates.find(it => it.id === farm.emirate);
                                     const centerObj = centers.find(it => it.id === farm.serviceCenter);
                                     const locationObj = locations.find(it => it.id === farm.location);
-                                    
-                                    // DEBUG: Log for first farm only
-                                    if (farm === list[0]) {
-                                        console.log('First farm emirate object:', emirateObj);
-                                        console.log('First farm center object:', centerObj);
-                                        console.log('First farm location object:', locationObj);
-                                    }
+                                    const displayStatus = getDisplayFarmStatus(farm);
                                     
                                     return (
                                         <tr key={farm.id} className="hover:bg-gray-50 transition-colors">
@@ -178,8 +162,8 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                                             </td>
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">{Math.round(farm.size)}</td>
                                             <td className="py-5 px-6">
-                                                <span className={getStatusBadge(getStatus(farm.status, farm.isAssigned))}>
-                                                    {getStatusLabel(getStatus(farm.status, farm.isAssigned))}
+                                                <span className={getStatusBadge(displayStatus)}>
+                                                    {getStatusLabel(displayStatus)}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">

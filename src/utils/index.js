@@ -262,6 +262,29 @@ export function buildFarmsCsvContent(farms = []) {
     ].join('\n');
 }
 
+export function getDisplayFarmStatus(farm = {}) {
+    if (!farm.isAssigned) return 'draft';
+    return farm.status || 'draft';
+}
+
+function getFarmSortTime(farm = {}) {
+    const dateValue = farm.createdAt || farm.updatedAt || '';
+    const time = Date.parse(dateValue);
+    return Number.isFinite(time) ? time : 0;
+}
+
+export function sortAndFilterManageFarms(farms = [], filters = {}) {
+    const { status } = filters;
+
+    return [...farms]
+        .filter((farm) => !status || getDisplayFarmStatus(farm) === status)
+        .sort((a, b) => getFarmSortTime(b) - getFarmSortTime(a));
+}
+
+export function shouldResetManageFarmsSession(currentNumber, storedNumber) {
+    return String(currentNumber ?? '') !== String(storedNumber ?? '');
+}
+
 export function calculateFieldCropAreaTotal(crops = {}) {
     const rows = Array.isArray(crops)
         ? crops

@@ -5,7 +5,6 @@ import {
   Trash2,
   Plus,
   Eye,
-  MapPinned,
   Download,
   ChevronDown,
   CheckCircle2,
@@ -47,11 +46,6 @@ export default function Coders() {
   const { farms, language } = useStore((st) => st);
   const getCoderName = (coder) => getLocalizedPersonName(coder, language) || t("common.nA");
   const getCoderMobile = (coder) => coder?.mobile || coder?.phoneNumber || t("common.nA");
-  const getCoderPrimaryFarm = (coder) => {
-    const farmId = coder?.farms?.[0];
-    if (!farmId) return null;
-    return farms.find((item) => item.id === farmId) || { id: farmId };
-  };
 
   useEffect(() => {
     const fetch = async () => {
@@ -67,7 +61,7 @@ export default function Coders() {
       }
     };
     fetch();
-  }, []);
+  }, [t]);
 
   const openAddModal = () => {
     setEditingItem(null);
@@ -112,17 +106,35 @@ export default function Coders() {
     setSelectedCoder(null);
   };
 
-  const handleViewFarm = async (farm) => {
-    if (!farm?.id) return;
+  const getAssignedFarm = (farmId) => farms.find((item) => item.id === farmId);
+
+  const handleViewFarm = async (farmOrId) => {
+    const farmId = typeof farmOrId === "string" ? farmOrId : farmOrId?.id;
+    if (!farmId) return;
+
+    const cachedFarm = typeof farmOrId === "object" && farmOrId?.id ? farmOrId : getAssignedFarm(farmId);
+
+    if (cachedFarm) {
+      sessionStorage.setItem('selectedFarm', JSON.stringify(cachedFarm));
+      sessionStorage.setItem('activeTab', 'farm-details');
+      navigate('/dashboard/managefarms');
+      closeDetailsModal();
+      return;
+    }
 
     try {
       setLoading(true);
-      const res = await farmService.getfarmById(farm.id);
+      const res = await farmService.getfarmById(farmId);
       sessionStorage.setItem('selectedFarm', JSON.stringify(res.data));
       sessionStorage.setItem('activeTab', 'farm-details');
-      navigate('/dashboard/manageFarms');
+      navigate('/dashboard/managefarms');
       closeDetailsModal();
     } catch (error) {
+      if (error.response?.status === 404 || String(error.response?.data?.error || error.response?.data?.message || "").toLowerCase().includes("farm not found")) {
+        toast.error("This farm record is no longer available.");
+        return;
+      }
+
       toast.error(error.response?.data?.message || error.message);
     } finally {
       setLoading(false);
@@ -682,14 +694,6 @@ const downloadPDF = () => {
                           <Eye size={18} />
                         </button>
                         <button
-                          onClick={() => handleViewFarm(getCoderPrimaryFarm(coder))}
-                          disabled={!getCoderPrimaryFarm(coder)}
-                          className="p-2.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                          title={t("common.components.viewDetails")}
-                        >
-                          <MapPinned size={18} />
-                        </button>
-                        <button
                           onClick={() => openEditModal(coder)}
                           className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:shadow-md"
                           title={t("coders.edit")}
@@ -1082,14 +1086,14 @@ const downloadPDF = () => {
                   </h3>
                   {selectedCoder.farms?.length > 0 ? (
                     <div className="space-y-3">
-                      {selectedCoder.farms.map((farmId) => {
-                        const farm = farms.find((item) => item.id === farmId);
+                      {selectedCoder.farms.map((assignedFarmId) => {
+                        const farm = getAssignedFarm(assignedFarmId);
                         return (
-                          <div key={farmId} className="bg-white rounded-lg p-4 border border-gray-200">
+                          <div key={assignedFarmId} className="bg-white rounded-lg p-4 border border-gray-200">
                             <div className="flex justify-between items-start gap-4">
                               <div>
                                 <h4 className="font-medium text-gray-900">
-                                  {farm?.farmName || farm?.name || farmId}
+                                  {farm?.farmName || farm?.name || assignedFarmId}
                                 </h4>
                                 <p className="text-sm text-gray-600 mt-1">
                                   {t("coders.farmLocation")}: {farm?.location?.name || farm?.location || t('common.nA')}
@@ -1103,18 +1107,16 @@ const downloadPDF = () => {
                                   {farm?.status || t("coders.active")}
                                 </span>
                                 <span className="text-xs text-gray-500 break-all">
-                                  {farmId}
+                                  {assignedFarmId}
                                 </span>
-                                {farm?.id && (
-                                  <button
-                                    type="button"
-                                    onClick={() => handleViewFarm(farm)}
-                                    className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
-                                  >
-                                    <Eye size={14} />
-                                    {t("common.components.viewDetails")}
-                                  </button>
-                                )}
+                                <button
+                                  type="button"
+                                  onClick={() => handleViewFarm(assignedFarmId)}
+                                  className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
+                                >
+                                  <Eye size={14} />
+                                  {t("common.components.viewDetails")}
+                                </button>
                               </div>
                             </div>
                           </div>
