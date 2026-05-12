@@ -5,6 +5,7 @@ import {
   Trash2,
   Plus,
   Eye,
+  MapPinned,
   Download,
   ChevronDown,
   CheckCircle2,
@@ -46,6 +47,11 @@ export default function Coders() {
   const { farms, language } = useStore((st) => st);
   const getCoderName = (coder) => getLocalizedPersonName(coder, language) || t("common.nA");
   const getCoderMobile = (coder) => coder?.mobile || coder?.phoneNumber || t("common.nA");
+  const getCoderPrimaryFarm = (coder) => {
+    const farmId = coder?.farms?.[0];
+    if (!farmId) return null;
+    return farms.find((item) => item.id === farmId) || { id: farmId };
+  };
 
   useEffect(() => {
     const fetch = async () => {
@@ -674,6 +680,14 @@ const downloadPDF = () => {
                           title={t("coders.view")}
                         >
                           <Eye size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleViewFarm(getCoderPrimaryFarm(coder))}
+                          disabled={!getCoderPrimaryFarm(coder)}
+                          className="p-2.5 text-amber-600 hover:bg-amber-50 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={t("common.components.viewDetails")}
+                        >
+                          <MapPinned size={18} />
                         </button>
                         <button
                           onClick={() => openEditModal(coder)}
