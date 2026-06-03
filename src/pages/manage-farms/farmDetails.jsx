@@ -8,6 +8,7 @@ import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { amiriFontBase64 } from '../../assets/AmiriFont';
 import { toast } from 'react-toastify';
+import { getLocalizedPersonName } from '../../utils/localizedName';
 
 const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     const t = useTranslation();
@@ -113,7 +114,24 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
     const isLTR = lang.includes('en');
     const coder = farmers.find(f => f.farms?.includes(farm.id));
-    const assignedCoderName = coder?.name || t('common.nA');
+    const getDisplayValue = (value) => {
+        if (value === null || value === undefined || value === '') {
+            return t('common.nA');
+        }
+        return value;
+    };
+    const getCoderName = (item) => getLocalizedPersonName(item, lang) || t('common.nA');
+    const getCoderMobile = (item) => getDisplayValue(item?.mobile || item?.phoneNumber);
+    const getCoderEmail = (item) => getDisplayValue(item?.email);
+    const getCoderStatus = (item) => {
+        const status = String(item?.status || '').toLowerCase().trim();
+        if (status === 'active') return t('status.active');
+        if (status === 'inactive') return t('status.inactive');
+        if (status === 'suspended') return t('status.suspended');
+        if (status === 'pending') return t('status.pending');
+        return getDisplayValue(item?.status);
+    };
+    const assignedCoderName = coder ? getCoderName(coder) : t('common.nA');
     const locationName = isLTR ? farm.location?.name : farm.location?.nameInArrabic;
     const regionName = isLTR ? farm.region?.name : farm.region?.nameInArrabic;
     const emirateName = isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic;
@@ -767,7 +785,10 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">{t('farmCodingDetails.coderInformation')}</p>
                                 <p className="mt-2 text-2xl font-bold">{assignedCoderName}</p>
                                 <p className="mt-1 text-sm text-white/80">
-                                    {coder ? `${t('farmCodingDetails.email')}: ${coder.email}` : t('common.nA')}
+                                    {coder ? `${t('farmCodingDetails.email')}: ${getCoderEmail(coder)}` : t('common.nA')}
+                                </p>
+                                <p className="mt-1 text-sm text-white/80">
+                                    {coder ? `${t('farmCodingDetails.phoneNumber')}: ${getCoderMobile(coder)}` : t('common.nA')}
                                 </p>
                             </div>
                             <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur">
@@ -812,14 +833,20 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                     {
                         coder && (
                             <InfoCard icon={Users} title={t('farmCodingDetails.coderInformation')} gradient="from-purple-50 to-pink-50">
-                                <InfoRow label={t('farmCodingDetails.name')} value={coder?.name} />
-                                <InfoRow label={t('farmCodingDetails.email')} value={coder?.email} />
+                                <InfoRow label={t('farmCodingDetails.name')} value={getCoderName(coder)} />
+                                <InfoRow label={t('farmCodingDetails.email')} value={getCoderEmail(coder)} />
+                                <InfoRow label={t('farmCodingDetails.phoneNumber')} value={getCoderMobile(coder)} />
+                                <InfoRow label={t('farmCodingDetails.emiratesID')} value={getDisplayValue(coder?.emirateId)} />
+                                <InfoRow label={t('farmCodingDetails.accountNumber')} value={getDisplayValue(coder?.accountNumber)} />
+                                <InfoRow label={t('farmCodingDetails.agricultureId')} value={getDisplayValue(coder?.agriculturalId || coder?.agricultureID)} />
+                                <InfoRow label={t('farmCodingDetails.userType')} value={getDisplayValue(coder?.userType)} />
+                                <InfoRow label={t('farmCodingDetails.gender')} value={getDisplayValue(coder?.gender)} />
+
                                 <InfoRow
                                     label={t('farmCodingDetails.emailVerified')}
                                     value={coder?.isEmailVerified ? t('common.yes') : t('common.no')}
                                     valueClass={coder?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                                 />
-                                <InfoRow label={t('farmCodingDetails.phoneNumber')} value={coder?.phoneNumber || t('common.nA')} />
                             </InfoCard>
                         )
                     }
