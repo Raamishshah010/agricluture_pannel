@@ -45,7 +45,56 @@ export default function Coders() {
   });
   const { farms, language } = useStore((st) => st);
   const getCoderName = (coder) => getLocalizedPersonName(coder, language) || t("common.nA");
-  const getCoderMobile = (coder) => coder?.mobile || coder?.phoneNumber || t("common.nA");
+
+  const getDisplayValue = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return t("common.nA");
+    }
+    return value;
+  };
+
+  const getCoderMobile = (coder) => getDisplayValue(coder?.mobile || coder?.phoneNumber);
+  const getCoderEmail = (coder) => getDisplayValue(coder?.email);
+  const getCoderAccountNumber = (coder) => getDisplayValue(coder?.accountNumber);
+  const getCoderAgriculturalId = (coder) => getDisplayValue(coder?.agriculturalId || coder?.agricultureID);
+  const getCoderFarmCount = (coder) => Array.isArray(coder?.farms) ? coder.farms.length : 0;
+
+  const formatDate = (dateString) => {
+    if (!dateString) return t("common.nA");
+
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return t("common.nA");
+
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const formatDateTime = (dateString) => {
+    if (!dateString) return t("common.nA");
+
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return t("common.nA");
+
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getCoderStatusLabel = (coder) => {
+    const status = String(coder?.status || "").toLowerCase().trim();
+    if (status === "active") return t("status.active");
+    if (status === "inactive") return t("status.inactive");
+    if (status === "suspended") return t("status.suspended");
+    if (status === "pending") return t("status.pending");
+    return getDisplayValue(coder?.status);
+  };
 
   useEffect(() => {
     const fetch = async () => {
@@ -197,14 +246,6 @@ export default function Coders() {
       await service.delete(id);
       setList((prev) => prev.filter((coder) => coder.id !== id));
     }
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
   };
 
   const getNormalizedApprovalStatus = (coder) => {
@@ -1046,29 +1087,37 @@ const downloadPDF = () => {
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.emirateId")}</label>
-                      <p className="text-gray-900 font-medium">{selectedCoder.emirateId || t('common.nA')}</p>
+                      <p className="text-gray-900 font-medium">{getDisplayValue(selectedCoder.emirateId)}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.accountNumber")}</label>
-                      <p className="text-gray-900 font-medium">{selectedCoder.accountNumber || t('common.nA')}</p>
+                      <p className="text-gray-900 font-medium">{getCoderAccountNumber(selectedCoder)}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.agriculturalId")}</label>
-                      <p className="text-gray-900 font-medium">{selectedCoder.agriculturalId || selectedCoder.agricultureID || t('common.nA')}</p>
+                      <p className="text-gray-900 font-medium">{getCoderAgriculturalId(selectedCoder)}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.email")}</label>
-                      <p className="text-gray-900 font-medium">{selectedCoder.email}</p>
+                      <p className="text-gray-900 font-medium">{getCoderEmail(selectedCoder)}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.phoneNumber")}</label>
                       <p className="text-gray-900 font-medium">{getCoderMobile(selectedCoder)}</p>
                     </div>
-                    <div className="md:col-span-2">
+                    <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.createdAt")}</label>
                       <p className="text-gray-900 font-medium">{formatDate(selectedCoder.createdAt)}</p>
                     </div>
-                    <div className="md:col-span-2">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">{t("coders.updatedAt")}</label>
+                      <p className="text-gray-900 font-medium">{formatDateTime(selectedCoder.updatedAt)}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">{t("coders.lastLoginAt")}</label>
+                      <p className="text-gray-900 font-medium">{formatDateTime(selectedCoder.lastLoginAt)}</p>
+                    </div>
+                    <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.approvalStatus")}</label>
                       <p className="mt-1">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border whitespace-nowrap ${getApprovalBadgeClasses(getNormalizedApprovalStatus(selectedCoder))}`}>
