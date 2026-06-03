@@ -19,6 +19,8 @@ const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
 const INVITE_TOKEN_KEY = "admin-invite-token";
 const INVITE_CODE_KEY = "admin-invite-code";
+const UAE_PASS_INELIGIBLE_MESSAGE =
+  "You are not eligible to access this service. Your account is either not upgraded or you have a visitor account. Please contact Mazraty to access the services.";
 
 const UAE_PASS_BUTTON_ASSETS = {
   en: {
@@ -230,7 +232,9 @@ export const UaePassStagingAdmin = () => {
         throw new Error('Admin created but no token returned');
       } catch (err) {
         console.error('UAE-PASS-STAGING:error', err);
-        setError(t('auth.uaePassLoginExceptionStatus'));
+        setError(err?.message === UAE_PASS_INELIGIBLE_MESSAGE
+          ? t('auth.uaePassUnverifiedUserStatus')
+          : t('auth.uaePassLoginExceptionStatus'));
         setStatusMessage('');
       } finally {
         const cleanUrl = `${window.location.origin}${window.location.pathname}`;

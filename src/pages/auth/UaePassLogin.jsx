@@ -18,6 +18,7 @@ import { getUaePassOutcome } from './uaePassFlow';
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
 const TESTING_FLOW_KEY = "uae-pass-testing-flow";
+const BLOCKED_UAE_PASS_USER_TYPE = "SOP1";
 
 const ENVIRONMENT_OPTIONS = [
   { value: "staging", labelKey: "auth.uaePassStaging" },
@@ -103,6 +104,11 @@ const requestAuthorizationUrl = async (environment, state, language) => {
 
   return data;
 };
+
+const isBlockedUaePassUserType = (user) =>
+  String(user?.userType || user?.uaePassProfile?.userType || "")
+    .trim()
+    .toUpperCase() === BLOCKED_UAE_PASS_USER_TYPE;
 
 export const UaePassLogin = () => {
   const t = useTranslation();
@@ -194,6 +200,14 @@ export const UaePassLogin = () => {
       // normalized user payload
       const receivedUser = parsed.user || parsed.userResponse || parsed.userResponse?.user || null;
       setUserData(receivedUser);
+
+      if (isBlockedUaePassUserType(receivedUser)) {
+        window.sessionStorage.removeItem('adminToken');
+        setAdminToken(null);
+        setError(t('auth.uaePassUnverifiedUserStatus'));
+        setStatusMessage('');
+        return;
+      }
 
       // Determine tokens: adminToken (for admin panel) and appToken (for app/mobile)
       const adminToken = parsed.adminToken || parsed.token || null;
