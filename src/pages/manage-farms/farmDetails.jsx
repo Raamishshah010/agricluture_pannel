@@ -837,16 +837,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                 <InfoRow label={t('farmCodingDetails.email')} value={getCoderEmail(coder)} />
                                 <InfoRow label={t('farmCodingDetails.phoneNumber')} value={getCoderMobile(coder)} />
                                 <InfoRow label={t('farmCodingDetails.emiratesID')} value={getDisplayValue(coder?.emirateId)} />
-                                <InfoRow label={t('farmCodingDetails.accountNumber')} value={getDisplayValue(coder?.accountNumber)} />
-                                <InfoRow label={t('farmCodingDetails.agricultureId')} value={getDisplayValue(coder?.agriculturalId || coder?.agricultureID)} />
-                                <InfoRow label={t('farmCodingDetails.userType')} value={getDisplayValue(coder?.userType)} />
-                                <InfoRow label={t('farmCodingDetails.gender')} value={getDisplayValue(coder?.gender)} />
-
-                                <InfoRow
-                                    label={t('farmCodingDetails.emailVerified')}
-                                    value={coder?.isEmailVerified ? t('common.yes') : t('common.no')}
-                                    valueClass={coder?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
-                                />
                             </InfoCard>
                         )
                     }
