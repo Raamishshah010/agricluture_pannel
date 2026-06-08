@@ -36,6 +36,7 @@ const PolygonDisplayComponent = ({
   coordinates,
   polygonCoordinates,
   additionalPolygons = [],
+  legendItems = [],
   polygonStyle = {},
   height = "h-[600px]"
 }) => {
@@ -49,6 +50,10 @@ const PolygonDisplayComponent = ({
   const { apiLoaded } = useGoogleMaps(false);
 
   const validCoordinates = coordinates;
+  const visibleLegendItems = legendItems.length > 0
+    ? legendItems
+    : additionalPolygons.filter(item => item.label);
+  const legendTitle = t('common.legend') === 'common.legend' ? 'Legend' : t('common.legend');
   // Initialize map
   useEffect(() => {
     if (!apiLoaded || !mapRef.current || map || !window.google?.maps) return;
@@ -175,6 +180,26 @@ const PolygonDisplayComponent = ({
       {/* Map Container */}
       <div className="flex-1 relative">
         <div ref={mapRef} className="w-full h-full" />
+
+        {visibleLegendItems.length > 0 && (
+          <div className="absolute bottom-4 right-4 max-w-[260px] rounded-lg bg-white/95 p-3 text-sm text-gray-800 shadow-lg">
+            <div className="mb-2 font-semibold text-gray-900">{legendTitle}</div>
+            <div className="space-y-1.5">
+              {visibleLegendItems.map((item, index) => (
+                <div key={`${item.label}-${index}`} className="flex items-center gap-2">
+                  <span
+                    className="h-3 w-3 shrink-0 rounded-sm border"
+                    style={{
+                      backgroundColor: item.fillColor,
+                      borderColor: item.strokeColor || item.fillColor,
+                    }}
+                  />
+                  <span className="truncate">{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {!polygonCoordinates || polygonCoordinates.length === 0 ? (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-lg shadow-lg text-sm text-gray-700">

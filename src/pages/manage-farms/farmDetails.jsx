@@ -154,22 +154,27 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     const registeredAreaPolygons = [
         ...(farm.livestocks || []).filter(hasPolygonCoordinates).map(stock => ({
             ...areaPolygonStyles.livestock,
+            label: stockType(stock),
             coordinates: stock.coordinates,
         })),
         ...(farm.crops?.fruits || []).filter(hasPolygonCoordinates).map(fruit => ({
             ...areaPolygonStyles.fruit,
+            label: fruitType(fruit),
             coordinates: fruit.coordinates,
         })),
         ...(farm.crops?.vegetables || []).filter(hasPolygonCoordinates).map(veg => ({
             ...areaPolygonStyles.vegetable,
+            label: vegetableType(veg),
             coordinates: veg.coordinates,
         })),
         ...(farm.crops?.fieldCropsFodder || []).filter(hasPolygonCoordinates).map(fodder => ({
             ...areaPolygonStyles.fodder,
+            label: fodderTypeHandler(fodder),
             coordinates: fodder.coordinates,
         })),
         ...(farm.crops?.greenhouses || []).filter(hasPolygonCoordinates).map(greenhouse => ({
             ...areaPolygonStyles.greenhouse,
+            label: greenhouse.crop || t('farmCodingDetails.greenhouse'),
             coordinates: greenhouse.coordinates,
         })),
     ];

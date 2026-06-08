@@ -519,25 +519,30 @@ export const FarmUpdateForm = React.memo(({ farm, onSave, onCancel }) => {
     const registeredAreaPolygons = useMemo(() => [
         ...formData.livestocks.filter(hasPolygonCoordinates).map(stock => ({
             ...areaPolygonStyles.livestock,
+            label: stock.stockType || t('farms.livestocks'),
             coordinates: stock.coordinates,
         })),
         ...formData.crops.fruits.filter(hasPolygonCoordinates).map(fruit => ({
             ...areaPolygonStyles.fruit,
+            label: fruit.fruitType || t('farmCodingDetails.fruitTrees'),
             coordinates: fruit.coordinates,
         })),
         ...formData.crops.vegetables.filter(hasPolygonCoordinates).map(veg => ({
             ...areaPolygonStyles.vegetable,
+            label: veg.vegetableType || t('farmCodingDetails.vegetables'),
             coordinates: veg.coordinates,
         })),
         ...formData.crops.fieldCropsFodder.filter(hasPolygonCoordinates).map(fodder => ({
             ...areaPolygonStyles.fodder,
+            label: fodder.fodderType || t('farmCodingDetails.fieldCropsFodderLabel'),
             coordinates: fodder.coordinates,
         })),
         ...formData.crops.greenhouses.filter(hasPolygonCoordinates).map(greenhouse => ({
             ...areaPolygonStyles.greenhouse,
+            label: greenhouse.crop || t('farmCodingDetails.greenhouse'),
             coordinates: greenhouse.coordinates,
         })),
-    ], [formData.crops.fieldCropsFodder, formData.crops.fruits, formData.crops.greenhouses, formData.crops.vegetables, formData.livestocks]);
+    ], [formData.crops.fieldCropsFodder, formData.crops.fruits, formData.crops.greenhouses, formData.crops.vegetables, formData.livestocks, t]);
 
     return (
         <div className="min-h-0 h-full bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 p-0 md:p-6">
