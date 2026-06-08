@@ -20,6 +20,8 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         coverTypes,
         farmers,
         livestocks,
+        crops,
+        cropTypes,
         language: lang
     } = useStore((state) => state);
 
@@ -88,6 +90,12 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     const fodderTypeHandler = (fodd) => {
         const item = fodderTypes.find((it) => it.id === fodd.fodderId);
         return !lang.includes('en') ? (item?.nameInArrabic ?? fodd.fodderType) : (item?.name ?? fodd.fodderType);
+    };
+
+    const greenhouseCropTypes = crops?.length ? crops : (cropTypes || []);
+    const greenhouseType = (greenhouse) => {
+        const item = greenhouseCropTypes.find((it) => it.id === greenhouse.cropId);
+        return !lang.includes('en') ? (item?.nameInArrabic ?? greenhouse.crop) : (item?.name ?? greenhouse.crop);
     };
 
     const farmingSystemHandler = (fs) => {
@@ -174,7 +182,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         })),
         ...(farm.crops?.greenhouses || []).filter(hasPolygonCoordinates).map(greenhouse => ({
             ...areaPolygonStyles.greenhouse,
-            label: greenhouse.crop || t('farmCodingDetails.greenhouse'),
+            label: greenhouseType(greenhouse) || t('farmCodingDetails.greenhouse'),
             coordinates: greenhouse.coordinates,
         })),
     ];

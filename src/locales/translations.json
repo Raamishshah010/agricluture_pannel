@@ -407,6 +407,7 @@
     "annual": "Annual"
   },
   "common": {
+    "legend": "Legend",
     "loading": "Loading...",
     "noDataToExport": "No data to export",
     "processing": "Processing...",

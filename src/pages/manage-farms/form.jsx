@@ -53,7 +53,10 @@ export const FarmUpdateForm = React.memo(({ farm, onSave, onCancel }) => {
         dashboardLoading,
         dashboardErrors,
     } = useStore(st => st);
-    const greenhouseCropTypes = crops?.length ? crops : (cropTypes || []);
+    const greenhouseCropTypes = useMemo(
+        () => (crops?.length ? crops : (cropTypes || [])),
+        [crops, cropTypes]
+    );
     const readOnlyInputClass = "px-3 py-2 border border-gray-300 rounded-lg w-full bg-gray-100 text-gray-600 focus:ring-2 focus:ring-green-500 focus:border-transparent";
     const farmerOptions = useMemo(
         () => (farmers || []).map(normalizeFarmerOption).filter(Boolean),
@@ -516,33 +519,48 @@ export const FarmUpdateForm = React.memo(({ farm, onSave, onCancel }) => {
         const stocks = formData.livestocks.filter(it => it.coordinates).map(it => it.coordinates);
         return [mapData, ...fruits, ...vegetables, ...fodders, ...greenhouses, ...stocks]
     }, [farm.mapData, formData.crops.fieldCropsFodder, formData.crops.fruits, formData.crops.greenhouses, formData.crops.vegetables, formData.livestocks, formData.mapData]);
-    const registeredAreaPolygons = useMemo(() => [
-        ...formData.livestocks.filter(hasPolygonCoordinates).map(stock => ({
-            ...areaPolygonStyles.livestock,
-            label: stock.stockType || t('farms.livestocks'),
-            coordinates: stock.coordinates,
-        })),
-        ...formData.crops.fruits.filter(hasPolygonCoordinates).map(fruit => ({
-            ...areaPolygonStyles.fruit,
-            label: fruit.fruitType || t('farmCodingDetails.fruitTrees'),
-            coordinates: fruit.coordinates,
-        })),
-        ...formData.crops.vegetables.filter(hasPolygonCoordinates).map(veg => ({
-            ...areaPolygonStyles.vegetable,
-            label: veg.vegetableType || t('farmCodingDetails.vegetables'),
-            coordinates: veg.coordinates,
-        })),
-        ...formData.crops.fieldCropsFodder.filter(hasPolygonCoordinates).map(fodder => ({
-            ...areaPolygonStyles.fodder,
-            label: fodder.fodderType || t('farmCodingDetails.fieldCropsFodderLabel'),
-            coordinates: fodder.coordinates,
-        })),
-        ...formData.crops.greenhouses.filter(hasPolygonCoordinates).map(greenhouse => ({
-            ...areaPolygonStyles.greenhouse,
-            label: greenhouse.crop || t('farmCodingDetails.greenhouse'),
-            coordinates: greenhouse.coordinates,
-        })),
-    ], [formData.crops.fieldCropsFodder, formData.crops.fruits, formData.crops.greenhouses, formData.crops.vegetables, formData.livestocks, t]);
+    const registeredAreaPolygons = useMemo(() => {
+        const localizedName = (item, fallback) => {
+            if (!item) return fallback;
+
+            return isLTR
+                ? (item.name || item.crop || fallback)
+                : (item.nameInArrabic || item.crop || item.name || fallback);
+        };
+        const getStockLegendLabel = (stock) => localizedName(livestocks.find(item => item.id === stock.stockId), stock.stockType || t('farms.livestocks'));
+        const getFruitLegendLabel = (fruit) => localizedName(fruitTypes.find(item => item.id === fruit.fruidId), fruit.fruitType || t('farmCodingDetails.fruitTrees'));
+        const getVegetableLegendLabel = (veg) => localizedName(vegetableTypes.find(item => item.id === veg.vegetableId), veg.vegetableType || t('farmCodingDetails.vegetables'));
+        const getFodderLegendLabel = (fodder) => localizedName(fodderTypes.find(item => item.id === fodder.fodderId), fodder.fodderType || t('farmCodingDetails.fieldCropsFodderLabel'));
+        const getGreenhouseLegendLabel = (greenhouse) => localizedName(greenhouseCropTypes.find(item => item.id === greenhouse.cropId), greenhouse.crop || t('farmCodingDetails.greenhouse'));
+
+        return [
+            ...formData.livestocks.filter(hasPolygonCoordinates).map(stock => ({
+                ...areaPolygonStyles.livestock,
+                label: getStockLegendLabel(stock),
+                coordinates: stock.coordinates,
+            })),
+            ...formData.crops.fruits.filter(hasPolygonCoordinates).map(fruit => ({
+                ...areaPolygonStyles.fruit,
+                label: getFruitLegendLabel(fruit),
+                coordinates: fruit.coordinates,
+            })),
+            ...formData.crops.vegetables.filter(hasPolygonCoordinates).map(veg => ({
+                ...areaPolygonStyles.vegetable,
+                label: getVegetableLegendLabel(veg),
+                coordinates: veg.coordinates,
+            })),
+            ...formData.crops.fieldCropsFodder.filter(hasPolygonCoordinates).map(fodder => ({
+                ...areaPolygonStyles.fodder,
+                label: getFodderLegendLabel(fodder),
+                coordinates: fodder.coordinates,
+            })),
+            ...formData.crops.greenhouses.filter(hasPolygonCoordinates).map(greenhouse => ({
+                ...areaPolygonStyles.greenhouse,
+                label: getGreenhouseLegendLabel(greenhouse),
+                coordinates: greenhouse.coordinates,
+            })),
+        ];
+    }, [fodderTypes, formData.crops.fieldCropsFodder, formData.crops.fruits, formData.crops.greenhouses, formData.crops.vegetables, formData.livestocks, fruitTypes, greenhouseCropTypes, isLTR, livestocks, t, vegetableTypes]);
 
     return (
         <div className="min-h-0 h-full bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 p-0 md:p-6">
