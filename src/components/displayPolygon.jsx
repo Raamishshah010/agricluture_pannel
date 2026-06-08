@@ -3,6 +3,23 @@ import { useState, useEffect, useRef } from 'react';
 import { MapPin } from 'lucide-react';
 import useGoogleMaps from '../hooks/useGoogleMaps'; // Import the custom hook
 import { useTranslation } from '../hooks/useTranslation';
+import { GOOGLE_MAPS_MAP_ID } from '../config/googleMaps';
+
+const setMarkerMap = (marker, map) => {
+  if (!marker) return;
+
+  marker.map = map;
+};
+
+const createAdvancedMarker = ({ map, position, title }) => {
+  if (!window.google?.maps?.marker?.AdvancedMarkerElement) return null;
+
+  return new window.google.maps.marker.AdvancedMarkerElement({
+    map,
+    position,
+    title,
+  });
+};
 
 const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-[600px]" }) => {
   const t = useTranslation();
@@ -21,6 +38,7 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
     const googleMap = new window.google.maps.Map(mapRef.current, {
       center: validCoordinates,
       zoom: 20,
+      mapId: GOOGLE_MAPS_MAP_ID,
       mapTypeId: 'satellite', // Set satellite view by default
       mapTypeControl: true,
       streetViewControl: false,
@@ -36,7 +54,7 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
         polygonRef.current = null;
       }
       if (markerRef.current) {
-        markerRef.current.setMap(null);
+        setMarkerMap(markerRef.current, null);
         markerRef.current = null;
       }
     };
@@ -50,7 +68,7 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
       polygonRef.current = null;
     }
     if (markerRef.current) {
-      markerRef.current.setMap(null);
+      setMarkerMap(markerRef.current, null);
       markerRef.current = null;
     }
 
@@ -87,9 +105,9 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
       }
     } else {
       // If no polygon, show center marker
-      const marker = new window.google.maps.Marker({
+      const marker = createAdvancedMarker({
         position: validCoordinates,
-        map: map,
+        map,
         title: 'Location',
       });
       markerRef.current = marker;

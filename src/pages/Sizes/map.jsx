@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapPin, Loader } from 'lucide-react';
+import { Loader } from 'lucide-react';
+import { MarkerClusterer, SuperClusterAlgorithm } from '@googlemaps/markerclusterer';
 import useTranslation from '../../hooks/useTranslation';
+import useGoogleMaps from '../../hooks/useGoogleMaps';
+import { GOOGLE_MAPS_MAP_ID } from '../../config/googleMaps';
 
   const GoogleMapWithClustering = ({ farms, onFarmClick }) => {
   const t = useTranslation();
@@ -8,18 +11,26 @@ import useTranslation from '../../hooks/useTranslation';
   const [map, setMap] = useState(null);
   const markersRef = useRef([]);
   const markerClustererRef = useRef(null);
+  const { apiLoaded, error } = useGoogleMaps(false);
+
+  const setMarkerMap = (marker, nextMap) => {
+    if (!marker) return;
+
+    marker.map = nextMap;
+  };
 
   // Initialize map
   useEffect(() => {
-    if (mapRef.current && !map) {
+    if (apiLoaded && mapRef.current && !map && window.google?.maps) {
       const googleMap = new window.google.maps.Map(mapRef.current, {
         center: { lat: 25.403027, lng: 55.523542 }, // Center of UAE
         zoom: 9,
+        mapId: GOOGLE_MAPS_MAP_ID,
         mapTypeId: 'hybrid',
       });
       setMap(googleMap);
     }
-  }, [map]);
+  }, [apiLoaded, map]);
 
   const ranges = [
     { id: 'from0To500', label: t('sizes.ranges.from0To500'), min: 0, max: 500 },
@@ -41,10 +52,10 @@ import useTranslation from '../../hooks/useTranslation';
 
   // Add markers and clustering
   useEffect(() => {
-    if (!map || !window.google || !farms || farms.length === 0) return;
+    if (!map || !window.google?.maps?.marker || !farms || farms.length === 0) return;
 
     // Clear existing markers
-    markersRef.current.forEach(marker => marker.setMap(null));
+    markersRef.current.forEach(marker => setMarkerMap(marker, null));
     markersRef.current = [];
 
     // Clear existing clusterer
@@ -73,18 +84,18 @@ import useTranslation from '../../hooks/useTranslation';
       // Get color for this range
       const color = rangeColors[matchedRange.id] || '#10B981';
 
+      const pin = new window.google.maps.marker.PinElement({
+        background: color,
+        borderColor: color,
+        glyphColor: '#ffffff',
+        scale: 1,
+      });
+
       // Create marker WITHOUT map property (clusterer will handle it)
-      const marker = new window.google.maps.Marker({
+      const marker = new window.google.maps.marker.AdvancedMarkerElement({
         position: { lat, lng },
         title: farm.farmName,
-        icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 10,
-          fillColor: color,
-          fillOpacity: 0.9,
-          strokeColor: color,
-          strokeWeight: 2,
-        }
+        content: pin.element,
       });
     
       // Info window content
@@ -129,7 +140,7 @@ import useTranslation from '../../hooks/useTranslation';
     
       // Add click event for info window + button
       marker.addListener('click', () => {
-        infoWindow.open(map, marker);
+        infoWindow.open({ map, anchor: marker });
         
         setTimeout(() => {
           const button = document.getElementById(`view-farm-${farm.id}`);
@@ -148,52 +159,15 @@ import useTranslation from '../../hooks/useTranslation';
 
     markersRef.current = markers;
 
-    // Initialize MarkerClusterer
-    const initializeClusterer = () => {
-      if (window.markerClusterer && markers.length > 0) {
-        markerClustererRef.current = new window.markerClusterer.MarkerClusterer({
-          map,
-          markers,
-          algorithm: new window.markerClusterer.SuperClusterAlgorithm({ 
-            radius: 150, // Increased radius for better clustering
-            maxZoom: 16  // Clusters will break apart at zoom level 16
-          }),
-        });
-        console.log('Clusterer initialized with', markers.length, 'markers');
-      }
-    };
-
-    if (window.markerClusterer) {
-      initializeClusterer();
-    } else {
-      // Check if script is already being loaded
-      const existingScript = document.querySelector('script[src*="markerclusterer"]');
-      
-      if (!existingScript) {
-        // Load MarkerClusterer library
-        const script = document.createElement('script');
-        script.src = 'https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js';
-        script.async = true;
-        script.onload = () => {
-          console.log('MarkerClusterer library loaded');
-          initializeClusterer();
-        };
-        script.onerror = () => {
-          console.error('Failed to load MarkerClusterer library');
-        };
-        document.head.appendChild(script);
-      } else {
-        // Script exists, wait for it to load
-        const checkClusterer = setInterval(() => {
-          if (window.markerClusterer) {
-            clearInterval(checkClusterer);
-            initializeClusterer();
-          }
-        }, 100);
-        
-        // Timeout after 5 seconds
-        setTimeout(() => clearInterval(checkClusterer), 5000);
-      }
+    if (markers.length > 0) {
+      markerClustererRef.current = new MarkerClusterer({
+        map,
+        markers,
+        algorithm: new SuperClusterAlgorithm({ 
+          radius: 150, // Increased radius for better clustering
+          maxZoom: 16  // Clusters will break apart at zoom level 16
+        }),
+      });
     }
 
     return () => {
@@ -203,6 +177,22 @@ import useTranslation from '../../hooks/useTranslation';
       }
     };
   }, [map, farms, onFarmClick]);
+
+  if (error) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center text-red-600">
+        {error.message}
+      </div>
+    );
+  }
+
+  if (!apiLoaded) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Loader className="animate-spin text-green-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-screen flex flex-col bg-gray-100">

@@ -5,10 +5,13 @@ import App from './App.jsx'
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import 'react-responsive-modal/styles.css';
+import GoogleMapsProvider from './providers/GoogleMapsProvider.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
-    <ToastContainer />
+    <GoogleMapsProvider>
+      <App />
+      <ToastContainer />
+    </GoogleMapsProvider>
   </StrictMode>,
 )

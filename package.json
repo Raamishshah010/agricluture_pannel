@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@googlemaps/markerclusterer": "^2.6.2",
     "@tailwindcss/vite": "^4.1.11",
+    "@vis.gl/react-google-maps": "^1.8.3",
     "arabic-persian-reshaper": "^1.0.1",
     "axios": "^1.12.2",
     "jspdf": "^3.0.4",

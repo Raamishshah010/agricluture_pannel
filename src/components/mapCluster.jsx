@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader } from 'lucide-react';
+import { MarkerClusterer, SuperClusterAlgorithm } from '@googlemaps/markerclusterer';
 import { useTranslation } from '../hooks/useTranslation';
 import useGoogleMaps from '../hooks/useGoogleMaps';
+import { GOOGLE_MAPS_MAP_ID } from '../config/googleMaps';
 
 const GoogleMapWithClustering = ({ farms = [], onFarmClick }) => {
     const t = useTranslation();
@@ -13,7 +15,13 @@ const GoogleMapWithClustering = ({ farms = [], onFarmClick }) => {
 
     const { apiLoaded, error } = useGoogleMaps(false);
 
-    const isDev = process.env.NODE_ENV !== 'production';
+    const isDev = import.meta.env.DEV;
+
+    const setMarkerMap = (marker, nextMap) => {
+        if (!marker) return;
+
+        marker.map = nextMap;
+    };
 
     /* =========================================================
        🔢 STRING → NUMBER (ULTRA ROBUST)
@@ -42,7 +50,7 @@ const GoogleMapWithClustering = ({ farms = [], onFarmClick }) => {
             s = s.replace(/,+$/, '');
 
             // Remove invalid chars except digits, dot, minus
-            s = s.replace(/[^\d.\-]/g, '');
+            s = s.replace(/[^\d.-]/g, '');
 
             // ✅ FIX: multiple dots → keep first only
             const parts = s.split('.');
@@ -156,6 +164,7 @@ const GoogleMapWithClustering = ({ farms = [], onFarmClick }) => {
         const googleMap = new window.google.maps.Map(mapRef.current, {
             center: { lat: 25.403027, lng: 55.523542 },
             zoom: 8,
+            mapId: GOOGLE_MAPS_MAP_ID,
             mapTypeId: 'hybrid',
         });
 
@@ -169,7 +178,7 @@ const GoogleMapWithClustering = ({ farms = [], onFarmClick }) => {
         if (!apiLoaded || !map || !farms.length) return;
 
         // Cleanup old markers
-        markersRef.current.forEach(m => m.setMap(null));
+        markersRef.current.forEach(m => setMarkerMap(m, null));
         markersRef.current = [];
 
         if (clustererRef.current) {
@@ -194,17 +203,18 @@ const GoogleMapWithClustering = ({ farms = [], onFarmClick }) => {
 
             const { lat, lng } = parsed;
 
-            const marker = new window.google.maps.Marker({
+            const pin = new window.google.maps.marker.PinElement({
+                background: '#10b981',
+                borderColor: '#059669',
+                glyphColor: '#ffffff',
+                scale: 0.9,
+            });
+
+            const marker = new window.google.maps.marker.AdvancedMarkerElement({
+                map,
                 position: { lat, lng },
                 title: farm.farmName,
-                icon: {
-                    path: window.google.maps.SymbolPath.CIRCLE,
-                    scale: 9,
-                    fillColor: '#10b981',
-                    fillOpacity: 0.9,
-                    strokeColor: '#059669',
-                    strokeWeight: 2,
-                }
+                content: pin.element,
             });
 
             bounds.extend({ lat, lng });
@@ -226,7 +236,7 @@ const GoogleMapWithClustering = ({ farms = [], onFarmClick }) => {
             });
 
             marker.addListener('click', () => {
-                infoWindow.open(map, marker);
+                infoWindow.open({ map, anchor: marker });
 
                 setTimeout(() => {
                     const btn = document.getElementById(`farm-${farm.id}`);
@@ -243,26 +253,14 @@ const GoogleMapWithClustering = ({ farms = [], onFarmClick }) => {
             map.fitBounds(bounds);
         }
 
-        const initClusterer = () => {
-            clustererRef.current = new window.markerClusterer.MarkerClusterer({
-                map,
-                markers,
-                algorithm: new window.markerClusterer.SuperClusterAlgorithm({
-                    radius: 140,
-                    maxZoom: 16,
-                }),
-            });
-        };
-
-        if (window.markerClusterer) {
-            initClusterer();
-        } else {
-            const script = document.createElement('script');
-            script.src = 'https://unpkg.com/@googlemaps/markerclusterer/dist/index.min.js';
-            script.async = true;
-            script.onload = initClusterer;
-            document.head.appendChild(script);
-        }
+        clustererRef.current = new MarkerClusterer({
+            map,
+            markers,
+            algorithm: new SuperClusterAlgorithm({
+                radius: 140,
+                maxZoom: 16,
+            }),
+        });
 
         return () => {
             clustererRef.current?.clearMarkers();

@@ -2,16 +2,35 @@ import { useState, useEffect, useRef } from 'react';
 import { Trash2, Edit3, X, MapPin } from 'lucide-react';
 import useGoogleMaps from '../hooks/useGoogleMaps';
 import { useTranslation } from '../hooks/useTranslation';
+import { GOOGLE_MAPS_MAP_ID } from '../config/googleMaps';
+
+const setMarkerMap = (marker, map) => {
+  if (!marker) return;
+
+  marker.map = map;
+};
+
+const createAdvancedMarker = ({ map, position, title }) => {
+  if (!window.google?.maps?.marker?.AdvancedMarkerElement) return null;
+
+  return new window.google.maps.marker.AdvancedMarkerElement({
+    map,
+    position,
+    title,
+  });
+};
 
 const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
   const t = useTranslation();
   const [map, setMap] = useState(null);
-  const [drawingManager, setDrawingManager] = useState(null);
   const [polygons, setPolygons] = useState([]);
   const [marker, setMarker] = useState(null);
   const [isDrawingMode, setIsDrawingMode] = useState(false);
+  const [draftPath, setDraftPath] = useState([]);
   const mapRef = useRef(null);
   const previewPolygonsRef = useRef([]);
+  const draftPolygonRef = useRef(null);
+  const drawingClickListenerRef = useRef(null);
   const { apiLoaded } = useGoogleMaps(true);
   
   const validCoordinates = (coordinates &&
@@ -21,87 +40,63 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
     : coordinates;
 
   useEffect(() => {
-    if (!apiLoaded || !mapRef.current || map || !window.google?.maps?.drawing) return;
+    if (!apiLoaded || !mapRef.current || map || !window.google?.maps?.marker) return;
 
     const googleMap = new window.google.maps.Map(mapRef.current, {
       center: validCoordinates,
       zoom: 20,
+      mapId: GOOGLE_MAPS_MAP_ID,
       mapTypeId: 'hybrid',
       mapTypeControl: true,
       streetViewControl: true,
     });
 
-    const defaultMarker = new window.google.maps.Marker({
+    const defaultMarker = createAdvancedMarker({
       position: validCoordinates,
       map: googleMap,
       title: 'Location',
     });
 
-    const drawingMgr = new window.google.maps.drawing.DrawingManager({
-      drawingMode: null,
-      drawingControl: false,
-      polygonOptions: {
+    setMap(googleMap);
+    setMarker(defaultMarker);
+  }, [apiLoaded]);
+
+  useEffect(() => {
+    if (!map || !isDrawingMode || !window.google?.maps) return;
+
+    if (!draftPolygonRef.current) {
+      draftPolygonRef.current = new window.google.maps.Polygon({
+        paths: [],
         fillColor: '#3B82F6',
         fillOpacity: 0.3,
         strokeWeight: 2,
         strokeColor: '#2563EB',
         editable: true,
         draggable: true,
-      },
-    });
-
-    drawingMgr.setMap(googleMap);
-
-    window.google.maps.event.addListener(drawingMgr, 'polygoncomplete', (polygon) => {
-      const id = Date.now();
-
-      const getCoordinates = () => {
-        return polygon.getPath().getArray().map(coord => ({
-          lat: coord.lat(),
-          lng: coord.lng(),
-        }));
-      };
-
-      const newPolygon = {
-        id,
-        polygon,
-        coordinates: getCoordinates(),
-      };
-
-      setPolygons([newPolygon]);
-      setIsDrawingMode(false);
-      drawingMgr.setDrawingMode(null);
-
-      if (defaultMarker) {
-        defaultMarker.setMap(null);
-      }
-
-      // // Hide preview polygons when drawing new one
-      // previewPolygonsRef.current.forEach(previewPoly => {
-      //   if (previewPoly) {
-      //     previewPoly.setMap(null);
-      //   }
-      // });
-      // previewPolygonsRef.current = [];
-
-      // Update coordinates when polygon is edited
-      window.google.maps.event.addListener(polygon.getPath(), 'set_at', () => {
-        setPolygons(prev => prev.map(p =>
-          p.id === id ? { ...p, coordinates: getCoordinates() } : p
-        ));
+        map,
       });
+    }
 
-      window.google.maps.event.addListener(polygon.getPath(), 'insert_at', () => {
-        setPolygons(prev => prev.map(p =>
-          p.id === id ? { ...p, coordinates: getCoordinates() } : p
-        ));
+    drawingClickListenerRef.current = map.addListener('click', (event) => {
+      if (!event.latLng || !draftPolygonRef.current) return;
+
+      const nextPoint = {
+        lat: event.latLng.lat(),
+        lng: event.latLng.lng(),
+      };
+
+      setDraftPath(prev => {
+        const nextPath = [...prev, nextPoint];
+        draftPolygonRef.current.setPath(nextPath);
+        return nextPath;
       });
     });
 
-    setMap(googleMap);
-    setMarker(defaultMarker);
-    setDrawingManager(drawingMgr);
-  }, [apiLoaded]);
+    return () => {
+      drawingClickListenerRef.current?.remove();
+      drawingClickListenerRef.current = null;
+    };
+  }, [map, isDrawingMode]);
 
   useEffect(() => {
     if (!map || !window.google?.maps) return;
@@ -113,7 +108,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
     previewPolygonsRef.current = [];
     if (!coords) {
       if (marker && map) {
-        marker.setMap(map);
+        setMarkerMap(marker, map);
       }
       return;
     }
@@ -123,7 +118,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
     if (Array.isArray(coords)) {
       if (coords.length === 0) {
         if (marker && map) {
-          marker.setMap(map);
+          setMarkerMap(marker, map);
         }
         return;
       }
@@ -184,7 +179,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
 
     if (hasValidPolygon) {
       if (marker) {
-        marker.setMap(null);
+        setMarkerMap(marker, null);
       }
 
       try {
@@ -194,22 +189,63 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
       }
     } else {
       if (marker && map) {
-        marker.setMap(map);
+        setMarkerMap(marker, map);
       }
     }
   }, [map, coords]);
 
   const startDrawing = () => {
-    if (drawingManager && window.google?.maps?.drawing) {
+    if (map && window.google?.maps) {
+      if (draftPolygonRef.current) {
+        draftPolygonRef.current.setMap(null);
+        draftPolygonRef.current = null;
+      }
+
+      setDraftPath([]);
       setIsDrawingMode(true);
-      drawingManager.setDrawingMode(window.google.maps.drawing.OverlayType.POLYGON);
     }
   };
 
   const stopDrawing = () => {
-    if (drawingManager && window.google?.maps?.drawing) {
-      setIsDrawingMode(false);
-      drawingManager.setDrawingMode(null);
+    if (draftPolygonRef.current) {
+      draftPolygonRef.current.setMap(null);
+      draftPolygonRef.current = null;
+    }
+
+    setDraftPath([]);
+    setIsDrawingMode(false);
+  };
+
+  const finishDrawing = () => {
+    if (!draftPolygonRef.current || draftPath.length < 3) return;
+
+    const id = Date.now();
+    const polygon = draftPolygonRef.current;
+
+    const getCoordinates = () => {
+      return polygon.getPath().getArray().map(coord => ({
+        lat: coord.lat(),
+        lng: coord.lng(),
+      }));
+    };
+
+    const updatePolygonCoordinates = () => {
+      setPolygons(prev => prev.map(p =>
+        p.id === id ? { ...p, coordinates: getCoordinates() } : p
+      ));
+    };
+
+    window.google.maps.event.addListener(polygon.getPath(), 'set_at', updatePolygonCoordinates);
+    window.google.maps.event.addListener(polygon.getPath(), 'insert_at', updatePolygonCoordinates);
+    window.google.maps.event.addListener(polygon.getPath(), 'remove_at', updatePolygonCoordinates);
+
+    setPolygons([{ id, polygon, coordinates: getCoordinates() }]);
+    setDraftPath([]);
+    setIsDrawingMode(false);
+    draftPolygonRef.current = null;
+
+    if (marker) {
+      setMarkerMap(marker, null);
     }
   };
 
@@ -220,6 +256,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
       }
     });
     setPolygons([]);
+    stopDrawing();
 
     // previewPolygonsRef.current.forEach(previewPoly => {
     //   if (previewPoly) {
@@ -271,13 +308,23 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
                 {t('common.components.drawPolygon')}
               </button>
             ) : (
-              <button
-                onClick={stopDrawing}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
-              >
-                <X size={18} />
-                {t('common.components.cancelDrawing')}
-              </button>
+              <>
+                <button
+                  onClick={finishDrawing}
+                  disabled={draftPath.length < 3}
+                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                >
+                  <MapPin size={18} />
+                  {t('common.components.saveArea')}
+                </button>
+                <button
+                  onClick={stopDrawing}
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+                >
+                  <X size={18} />
+                  {t('common.components.cancelDrawing')}
+                </button>
+              </>
             )}
             {(polygons.length > 0 || previewPolygonsRef.current.length > 0) && (
               <>
