@@ -21,6 +21,15 @@ import {
 import useTranslation from '../../hooks/useTranslation';
 import { toast } from 'react-toastify';
 
+const hasPolygonCoordinates = (item) => Array.isArray(item?.coordinates) && item.coordinates.length > 0;
+const areaPolygonStyles = {
+    livestock: { fillColor: '#10B981', strokeColor: '#059669' },
+    fruit: { fillColor: '#EC4899', strokeColor: '#DB2777' },
+    vegetable: { fillColor: '#84CC16', strokeColor: '#65A30D' },
+    fodder: { fillColor: '#F59E0B', strokeColor: '#D97706' },
+    greenhouse: { fillColor: '#3B82F6', strokeColor: '#2563EB' },
+};
+
 export const FarmUpdateForm = React.memo(({ farm, onSave, onCancel }) => {
     const t = useTranslation();
     const {
@@ -507,6 +516,28 @@ export const FarmUpdateForm = React.memo(({ farm, onSave, onCancel }) => {
         const stocks = formData.livestocks.filter(it => it.coordinates).map(it => it.coordinates);
         return [mapData, ...fruits, ...vegetables, ...fodders, ...greenhouses, ...stocks]
     }, [farm.mapData, formData.crops.fieldCropsFodder, formData.crops.fruits, formData.crops.greenhouses, formData.crops.vegetables, formData.livestocks, formData.mapData]);
+    const registeredAreaPolygons = useMemo(() => [
+        ...formData.livestocks.filter(hasPolygonCoordinates).map(stock => ({
+            ...areaPolygonStyles.livestock,
+            coordinates: stock.coordinates,
+        })),
+        ...formData.crops.fruits.filter(hasPolygonCoordinates).map(fruit => ({
+            ...areaPolygonStyles.fruit,
+            coordinates: fruit.coordinates,
+        })),
+        ...formData.crops.vegetables.filter(hasPolygonCoordinates).map(veg => ({
+            ...areaPolygonStyles.vegetable,
+            coordinates: veg.coordinates,
+        })),
+        ...formData.crops.fieldCropsFodder.filter(hasPolygonCoordinates).map(fodder => ({
+            ...areaPolygonStyles.fodder,
+            coordinates: fodder.coordinates,
+        })),
+        ...formData.crops.greenhouses.filter(hasPolygonCoordinates).map(greenhouse => ({
+            ...areaPolygonStyles.greenhouse,
+            coordinates: greenhouse.coordinates,
+        })),
+    ], [formData.crops.fieldCropsFodder, formData.crops.fruits, formData.crops.greenhouses, formData.crops.vegetables, formData.livestocks]);
 
     return (
         <div className="min-h-0 h-full bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 p-0 md:p-6">
@@ -726,8 +757,15 @@ export const FarmUpdateForm = React.memo(({ farm, onSave, onCancel }) => {
                         {
                             !!formData.mapData.length && (
                                 <PolygonDisplayComponent
-                                    coordinates={farm.coordinates || { lat: 23.4241, lng: 53.8478 }}
+                                    coordinates={formData.coordinates || farm.coordinates || { lat: 23.4241, lng: 53.8478 }}
                                     polygonCoordinates={formData.mapData}
+                                    polygonStyle={{
+                                        fillColor: '#EF4444',
+                                        fillOpacity: 0.18,
+                                        strokeColor: '#DC2626',
+                                        strokeWeight: 4,
+                                    }}
+                                    additionalPolygons={registeredAreaPolygons}
                                 />
                             )
                         }
