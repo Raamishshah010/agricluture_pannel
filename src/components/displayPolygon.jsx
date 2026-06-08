@@ -21,11 +21,29 @@ const createAdvancedMarker = ({ map, position, title }) => {
   });
 };
 
-const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-[600px]" }) => {
+const normalizePolygonCoordinates = (coordinates = []) => {
+  if (!Array.isArray(coordinates)) return [];
+
+  return coordinates
+    .map(loc => ({
+      lng: Number(loc?.lng ?? loc?.longitude),
+      lat: Number(loc?.lat ?? loc?.latitude)
+    }))
+    .filter(loc => !Number.isNaN(loc.lat) && !Number.isNaN(loc.lng));
+};
+
+const PolygonDisplayComponent = ({
+  coordinates,
+  polygonCoordinates,
+  additionalPolygons = [],
+  polygonStyle = {},
+  height = "h-[600px]"
+}) => {
   const t = useTranslation();
   const [map, setMap] = useState(null);
   const mapRef = useRef(null);
   const polygonRef = useRef(null);
+  const additionalPolygonRefs = useRef([]);
   const markerRef = useRef(null);
 
   const { apiLoaded } = useGoogleMaps(false);
@@ -53,6 +71,8 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
         polygonRef.current.setMap(null);
         polygonRef.current = null;
       }
+      additionalPolygonRefs.current.forEach(polygon => polygon.setMap(null));
+      additionalPolygonRefs.current = [];
       if (markerRef.current) {
         setMarkerMap(markerRef.current, null);
         markerRef.current = null;
@@ -67,41 +87,66 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
       polygonRef.current.setMap(null);
       polygonRef.current = null;
     }
+    additionalPolygonRefs.current.forEach(polygon => polygon.setMap(null));
+    additionalPolygonRefs.current = [];
     if (markerRef.current) {
       setMarkerMap(markerRef.current, null);
       markerRef.current = null;
     }
 
-    if (polygonCoordinates && polygonCoordinates.length > 0) {
-      const validPolygonCoords = polygonCoordinates.map(loc => ({
-        lng: Number(loc.lng),
-        lat: Number(loc.lat)
-      }));
+    const validPolygonCoords = normalizePolygonCoordinates(polygonCoordinates);
+    const validAdditionalPolygons = additionalPolygons
+      .map(item => ({
+        ...item,
+        coordinates: normalizePolygonCoordinates(item.coordinates)
+      }))
+      .filter(item => item.coordinates.length > 0);
+
+    if (validPolygonCoords.length > 0 || validAdditionalPolygons.length > 0) {
+      const bounds = new window.google.maps.LatLngBounds();
 
       if (validPolygonCoords.length > 0) {
         const polygon = new window.google.maps.Polygon({
           paths: validPolygonCoords,
-          fillColor: '#3B82F6',
-          fillOpacity: 0.35,
-          strokeWeight: 2,
-          strokeColor: '#2563EB',
+          fillColor: polygonStyle.fillColor || '#3B82F6',
+          fillOpacity: polygonStyle.fillOpacity ?? 0.35,
+          strokeWeight: polygonStyle.strokeWeight ?? 2,
+          strokeColor: polygonStyle.strokeColor || '#2563EB',
           editable: false,
           draggable: false,
+          clickable: false,
+          map,
         });
-
-        polygon.setMap(map);
         polygonRef.current = polygon;
 
-        // Fit map bounds to polygon
-        try {
-          const bounds = new window.google.maps.LatLngBounds();
-          validPolygonCoords.forEach(coord => {
-            bounds.extend(new window.google.maps.LatLng(coord.lat, coord.lng));
-          });
-          map.fitBounds(bounds);
-        } catch (error) {
-          console.error('Error fitting bounds:', error);
-        }
+        validPolygonCoords.forEach(coord => {
+          bounds.extend(new window.google.maps.LatLng(coord.lat, coord.lng));
+        });
+      }
+
+      validAdditionalPolygons.forEach((item) => {
+        const polygon = new window.google.maps.Polygon({
+          paths: item.coordinates,
+          fillColor: item.fillColor || '#10B981',
+          fillOpacity: item.fillOpacity ?? 0.28,
+          strokeWeight: item.strokeWeight ?? 3,
+          strokeColor: item.strokeColor || '#059669',
+          editable: false,
+          draggable: false,
+          clickable: false,
+          map,
+        });
+
+        additionalPolygonRefs.current.push(polygon);
+        item.coordinates.forEach(coord => {
+          bounds.extend(new window.google.maps.LatLng(coord.lat, coord.lng));
+        });
+      });
+
+      try {
+        map.fitBounds(bounds, { padding: 40 });
+      } catch (error) {
+        console.error('Error fitting bounds:', error);
       }
     } else {
       // If no polygon, show center marker
@@ -112,7 +157,7 @@ const PolygonDisplayComponent = ({ coordinates, polygonCoordinates, height = "h-
       });
       markerRef.current = marker;
     }
-  }, [map, polygonCoordinates, validCoordinates]);
+  }, [map, polygonCoordinates, additionalPolygons, polygonStyle, validCoordinates]);
 
   if (!apiLoaded) {
     return (

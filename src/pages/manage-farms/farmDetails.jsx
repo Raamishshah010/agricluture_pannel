@@ -143,6 +143,37 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         { label: t('farmCodingDetails.size'), value: `${Math.round(farm.size)} ha` },
     ];
 
+    const hasPolygonCoordinates = (item) => Array.isArray(item?.coordinates) && item.coordinates.length > 0;
+    const areaPolygonStyles = {
+        livestock: { fillColor: '#10B981', strokeColor: '#059669' },
+        fruit: { fillColor: '#EC4899', strokeColor: '#DB2777' },
+        vegetable: { fillColor: '#84CC16', strokeColor: '#65A30D' },
+        fodder: { fillColor: '#F59E0B', strokeColor: '#D97706' },
+        greenhouse: { fillColor: '#3B82F6', strokeColor: '#2563EB' },
+    };
+    const registeredAreaPolygons = [
+        ...(farm.livestocks || []).filter(hasPolygonCoordinates).map(stock => ({
+            ...areaPolygonStyles.livestock,
+            coordinates: stock.coordinates,
+        })),
+        ...(farm.crops?.fruits || []).filter(hasPolygonCoordinates).map(fruit => ({
+            ...areaPolygonStyles.fruit,
+            coordinates: fruit.coordinates,
+        })),
+        ...(farm.crops?.vegetables || []).filter(hasPolygonCoordinates).map(veg => ({
+            ...areaPolygonStyles.vegetable,
+            coordinates: veg.coordinates,
+        })),
+        ...(farm.crops?.fieldCropsFodder || []).filter(hasPolygonCoordinates).map(fodder => ({
+            ...areaPolygonStyles.fodder,
+            coordinates: fodder.coordinates,
+        })),
+        ...(farm.crops?.greenhouses || []).filter(hasPolygonCoordinates).map(greenhouse => ({
+            ...areaPolygonStyles.greenhouse,
+            coordinates: greenhouse.coordinates,
+        })),
+    ];
+
     // Download as PDF
     const downloadPDF = () => {
         const doc = new jsPDF();
@@ -876,6 +907,13 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                         <PolygonDisplayComponent
                             coordinates={farm.coordinates || { lat: 23.4241, lng: 53.8478 }}
                             polygonCoordinates={farm.mapData}
+                            polygonStyle={{
+                                fillColor: '#EF4444',
+                                fillOpacity: 0.18,
+                                strokeColor: '#DC2626',
+                                strokeWeight: 4,
+                            }}
+                            additionalPolygons={registeredAreaPolygons}
                         />
                     )
                 }
