@@ -949,6 +949,15 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                         <div className="space-y-1 text-sm">
                                             <p><span className="font-semibold">{t('farms.numberOfAnimals')}:</span> {stock.numberOfAnimals}</p>
                                         </div>
+                                        {
+                                            !!stock.coordinates?.length && (
+                                                <PolygonDisplayComponent
+                                                    height="h-[200px]"
+                                                    coordinates={farm.coordinates || { lat: 23.4241, lng: 53.8478 }}
+                                                    polygonCoordinates={stock.coordinates}
+                                                />
+                                            )
+                                        }
                                     </div>
                                 ))}
                             </div>
