@@ -73,6 +73,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
         strokeColor: '#2563EB',
         editable: true,
         draggable: true,
+        clickable: false,
         map,
       });
     }
@@ -166,6 +167,7 @@ const PolygonMapSelector = ({ handleCoordinates, coords, coordinates }) => {
           strokeColor: color.stroke,
           editable: false,
           draggable: false,
+          clickable: false,
         });
 
         previewPolygon.setMap(map);
