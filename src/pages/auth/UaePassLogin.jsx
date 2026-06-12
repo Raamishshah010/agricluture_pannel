@@ -387,7 +387,7 @@ export const UaePassLogin = () => {
             </span>
           </button>
           <div className="hidden text-sm text-slate-300">
-            {t('auth.redirectUri')} <span className="text-slate-50">{API_BASE_URL}/api/ue-pass/callback</span>
+            {t('auth.redirectUri')} <span className="text-slate-50">{API_BASE_URL}/api/uae-pass/callback</span>
           </div>
         </div>
 
