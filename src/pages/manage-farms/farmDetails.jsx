@@ -139,7 +139,34 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         if (status === 'pending') return t('status.pending');
         return getDisplayValue(item?.status);
     };
-    const assignedCoderName = coder ? getCoderName(coder) : t('common.nA');
+    const assignedCoderName = coder ? getCoderName(coder) : 'Unassigned';
+    const getPersonName = (person) => getLocalizedPersonName(person, lang) || getDisplayValue(person?.name || person?.email);
+    const ownerEmiratesId = getDisplayValue(farm.owner?.emirateId || farm.owner?.emiratesID || farm.owner?.emiratesId || farm.emiratesID);
+    const ownerAgriculturalId = getDisplayValue(farm.owner?.agriculturalId || farm.owner?.agricultureID || farm.owner?.agricultureId || farm.agricultureId);
+    const ownerAccountNumber = getDisplayValue(farm.owner?.accountNumber || farm.owner?.accountNo || farm.accountNo);
+    const ownerPhoneNumber = getDisplayValue(farm.owner?.mobile || farm.owner?.phoneNumber || farm.phoneNumber);
+    const holderEmiratesId = getDisplayValue(farm.holder?.emirateId || farm.holder?.emiratesID || farm.holder?.emiratesId);
+    const holderAgriculturalId = getDisplayValue(farm.holder?.agriculturalId || farm.holder?.agricultureID || farm.holder?.agricultureId);
+    const holderAccountNumber = getDisplayValue(farm.holder?.accountNumber || farm.holder?.accountNo);
+    const holderPhoneNumber = getDisplayValue(farm.holder?.mobile || farm.holder?.phoneNumber);
+    const agriculturalIdLabel = t('farmers.agriculturalId');
+    const ownerInfoRows = [
+        [t('farmCodingDetails.name'), getPersonName(farm.owner)],
+        [t('farmCodingDetails.emiratesID'), ownerEmiratesId],
+        [agriculturalIdLabel, ownerAgriculturalId],
+        [t('farmCodingDetails.accountNumber'), ownerAccountNumber],
+        [t('farmCodingDetails.phoneNumber'), ownerPhoneNumber],
+        [t('farmCodingDetails.email'), getDisplayValue(farm.owner?.email)],
+        [t('farmCodingDetails.coderInformation'), assignedCoderName],
+    ];
+    const holderInfoRows = [
+        [t('farmCodingDetails.name'), getPersonName(farm.holder)],
+        [t('farmCodingDetails.emiratesID'), holderEmiratesId],
+        [agriculturalIdLabel, holderAgriculturalId],
+        [t('farmCodingDetails.accountNumber'), holderAccountNumber],
+        [t('farmCodingDetails.phoneNumber'), holderPhoneNumber],
+        [t('farmCodingDetails.email'), getDisplayValue(farm.holder?.email)],
+    ];
     const locationName = isLTR ? farm.location?.name : farm.location?.nameInArrabic;
     const regionName = isLTR ? farm.region?.name : farm.region?.nameInArrabic;
     const emirateName = isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic;
@@ -241,16 +268,10 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         doc.text(t('farmCodingDetails.ownerInformation'), 20, yPosition);
         yPosition += 10;
 
-        const ownerInfo = [
-            [t('farmCodingDetails.name'), farm.owner?.name || t('common.nA')],
-            [t('farmCodingDetails.email'), farm.owner?.email || t('common.nA')],
-            [t('farmCodingDetails.emailVerified'), farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')],
-        ];
-
         autoTable(doc, {
             startY: yPosition,
             head: [[t('farmCodingDetails.field'), t('farmCodingDetails.value')]],
-            body: ownerInfo,
+            body: ownerInfoRows,
             theme: 'grid',
             styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
             headStyles: { fillColor: [34, 197, 94], halign: 'center' },
@@ -268,17 +289,10 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             doc.text(t('farmCodingDetails.holderInformation'), 20, yPosition);
             yPosition += 10;
 
-            const holderInfo = [
-                [t('farmCodingDetails.name'), farm.holder?.name || t('common.nA')],
-                [t('farmCodingDetails.email'), farm.holder?.email || t('common.nA')],
-                [t('farmCodingDetails.emailVerified'), farm.holder?.isEmailVerified ? t('common.yes') : t('common.no')],
-                [t('farmCodingDetails.phoneNumber'), farm.holder?.phoneNumber || t('common.nA')],
-            ];
-
             autoTable(doc, {
                 startY: yPosition,
                 head: [[t('farmCodingDetails.field'), t('farmCodingDetails.value')]],
-                body: holderInfo,
+                body: holderInfoRows,
                 theme: 'grid',
                 styles: { font: 'Amiri', fontSize: 10, halign: 'center' },
                 headStyles: { fillColor: [34, 197, 94], halign: 'center' },
@@ -528,9 +542,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         // Owner Information Sheet
         const ownerData = [
             [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
-            [t('farmCodingDetails.name'), farm.owner?.name || t('common.nA')],
-            [t('farmCodingDetails.email'), farm.owner?.email || t('common.nA')],
-            [t('farmCodingDetails.emailVerified'), farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')],
+            ...ownerInfoRows,
         ];
         const ownerSheet = XLSX.utils.aoa_to_sheet(ownerData);
         XLSX.utils.book_append_sheet(workbook, ownerSheet, t('farmCodingDetails.ownerInformation'));
@@ -539,10 +551,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         if (farm.holder) {
             const holderData = [
                 [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
-                [t('farmCodingDetails.name'), farm.holder?.name || t('common.nA')],
-                [t('farmCodingDetails.email'), farm.holder?.email || t('common.nA')],
-                [t('farmCodingDetails.emailVerified'), farm.holder?.isEmailVerified ? t('common.yes') : t('common.no')],
-                [t('farmCodingDetails.phoneNumber'), farm.holder?.phoneNumber || t('common.nA')],
+                ...holderInfoRows,
             ];
             const holderSheet = XLSX.utils.aoa_to_sheet(holderData);
             XLSX.utils.book_append_sheet(workbook, holderSheet, t('farmCodingDetails.holderInformation'));
@@ -811,7 +820,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                     {farm.status}
                                 </span>
                             </div>
-                            <h1 className="max-w-3xl text-4xl font-black tracking-tight md:text-5xl" dir="rtl">#{farm.farmNo || farm.farmSerial || farm.id}</h1>
+                            {/* <h1 className="max-w-3xl text-4xl font-black tracking-tight md:text-5xl" dir="rtl">#{farm.farmNo || farm.farmSerial || farm.id}</h1> */}
                             <p className="mt-4 max-w-2xl text-sm leading-6 text-white/85 md:text-base">
                                 {farm.notes || t('common.nA')}
                             </p>
@@ -855,24 +864,25 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 {/* Owner & Holder Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <InfoCard icon={User} title={t('farmCodingDetails.ownerInformation')} gradient="from-blue-50 to-cyan-50">
-                        <InfoRow label={t('farmCodingDetails.name')} value={farm.owner?.name} />
-                        <InfoRow label={t('farmCodingDetails.email')} value={farm.owner?.email} />
-                        <InfoRow
-                            label={t('farmCodingDetails.emailVerified')}
-                            value={farm.owner?.isEmailVerified ? t('common.yes') : t('common.no')}
-                            valueClass={farm.owner?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
-                        />
+                        {ownerInfoRows.map(([label, value]) => (
+                            <InfoRow
+                                key={label}
+                                label={label}
+                                value={value}
+                                valueClass={label === t('farmCodingDetails.emailVerified') ? (farm.owner?.isEmailVerified ? 'text-green-600' : 'text-red-600') : ''}
+                            />
+                        ))}
                     </InfoCard>
 
                     <InfoCard icon={Users} title={t('farmCodingDetails.holderInformation')} gradient="from-purple-50 to-pink-50">
-                        <InfoRow label={t('farmCodingDetails.name')} value={farm.holder?.name} />
-                        <InfoRow label={t('farmCodingDetails.email')} value={farm.holder?.email} />
-                        <InfoRow
-                            label={t('farmCodingDetails.emailVerified')}
-                            value={farm.holder?.isEmailVerified ? t('common.yes') : t('common.no')}
-                            valueClass={farm.holder?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
-                        />
-                        <InfoRow label={t('farmCodingDetails.phoneNumber')} value={farm.holder?.phoneNumber || t('common.nA')} />
+                        {holderInfoRows.map(([label, value]) => (
+                            <InfoRow
+                                key={label}
+                                label={label}
+                                value={value}
+                                valueClass={label === t('farmCodingDetails.emailVerified') ? (farm.holder?.isEmailVerified ? 'text-green-600' : 'text-red-600') : ''}
+                            />
+                        ))}
                     </InfoCard>
                     {
                         coder && (
