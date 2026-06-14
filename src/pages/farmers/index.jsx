@@ -216,6 +216,25 @@ export default function Index(props) {
     }
   };
 
+  const handleFarmDetail = async (item) => {
+    const farmId = item?.id;
+    if (!farmId) {
+      toast.error('Failed to load farm details');
+      return;
+    }
+
+    try {
+      setFarmsLoading(true);
+      const res = await farmService.getfarmById(farmId);
+      setSelectedFarm(res.data || item);
+      setActiveTab("farm-details");
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message);
+    } finally {
+      setFarmsLoading(false);
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return t('common.nA');
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -646,12 +665,17 @@ const downloadPDF = async () => {
       loading={farmsLoading}
       farmerName={getFarmerName(selectedFarmer)}
       handleBack={() => setActiveTab("farmers")}
-      handleDetail={(item) => {
-        setSelectedFarm(item);
-        setActiveTab("farm-details");
-      }}
+      handleDetail={handleFarmDetail}
     />
-  ) : (
+  ) : selectedFarm ? (
     <FarmDetails farm={selectedFarm} handleBack={() => setActiveTab("farms")} />
+  ) : (
+    <Farms
+      list={farms}
+      loading={farmsLoading}
+      farmerName={getFarmerName(selectedFarmer)}
+      handleBack={() => setActiveTab("farmers")}
+      handleDetail={handleFarmDetail}
+    />
   );
 }

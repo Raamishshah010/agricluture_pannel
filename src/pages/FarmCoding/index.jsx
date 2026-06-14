@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import useStore from '../../store/store';
 import Pagination from '../../components/pagination';
 import service from '../../services/farmService';
+import farmerService from '../../services/farmerService';
 import { toast } from 'react-toastify';
 import FarmDetails from './details';
 import Modal from 'react-responsive-modal';
@@ -10,6 +11,7 @@ import useTranslation from '../../hooks/useTranslation';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
+import { getLocalizedPersonName } from '../../utils/localizedName';
 
 import { amiriFontBase64 } from "../../assets/AmiriFont";
 
@@ -17,9 +19,10 @@ import { amiriFontBase64 } from "../../assets/AmiriFont";
 const FarmCodingRequest = () => {
   const t = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [selectedStatus, setSelectedStatus] = useState('Assigned');
   const [activeTab, setActiveTab] = useState('farm-requests');
   const [selectedFarm, setSelectedFarm] = useState(null);
+  const [selectedFarmCoderName, setSelectedFarmCoderName] = useState('Unassigned');
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedFarmForStatus, setSelectedFarmForStatus] = useState(null);
   const [newStatus, setNewStatus] = useState('active');
@@ -27,12 +30,41 @@ const FarmCodingRequest = () => {
   const [query, setQuery] = useState('');
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
   const { farms, setFarms, emirates, centers, farmers, locations, language } = useStore((state) => state);
+  const [coders, setCoders] = useState([]);
   const [emirate, setEmirate] = useState(null);
   const [center, setCenter] = useState(null);
   const [location, setLocation] = useState(null);
   const [selectedCoder, setSelectedCoder] = useState(null);
   
   const isArabic = language === 'ar';
+  const nA = t('common.nA');
+
+  const normalizeCoderOption = (coder) => {
+    const displayName = getLocalizedPersonName(coder, language) || coder?.email || coder?.mobile || nA;
+    return {
+      ...coder,
+      name: displayName,
+      nameInArabic: coder?.fullnameAR || coder?.nameInArabic || coder?.nameInArrabic || displayName,
+    };
+  };
+
+  const getCoderForFarm = (farmId) => coders.find((coder) => Array.isArray(coder.farms) && coder.farms.includes(farmId));
+  const getCoderName = (farmId) => {
+    const coder = getCoderForFarm(farmId);
+    return coder ? (getLocalizedPersonName(coder, language) || coder.email || nA) : 'Unassigned';
+  };
+  const getPersonName = (person) => getLocalizedPersonName(person, language) || person?.name || person?.email || nA;
+  const getOwnerName = (farm) => {
+    if (farm?.owner && typeof farm.owner === 'object') return getPersonName(farm.owner);
+    const owner = farmers.find((farmer) => farmer.id === farm?.owner);
+    return owner ? getPersonName(owner) : nA;
+  };
+  const getLocationName = (value) => {
+    if (!value) return nA;
+    const item = typeof value === 'object' ? value : locations.find((locationItem) => locationItem.id === value);
+    if (!item) return String(value);
+    return language === 'ar' ? (item.nameInArabic || item.nameInArrabic || item.name || nA) : (item.name || nA);
+  };
 
   // Helper function to translate status labels
   const getStatusLabel = (status) => {
@@ -55,8 +87,10 @@ const FarmCodingRequest = () => {
       Active: 'active',
       Pending: 'pending',
       Assigned: 'assigned',
+      'In Progress': 'active',
       Drafts: 'drafts',
       Rejected: 'rejected',
+      Completed: 'completed',
     };
 
     const tabKey = tabKeyMap[status] || status;
@@ -66,6 +100,26 @@ const FarmCodingRequest = () => {
   React.useEffect(() => {
     setCurrentPage(1);
   }, [selectedStatus]);
+
+  React.useEffect(() => {
+    let isMounted = true;
+
+    const fetchCoders = async () => {
+      try {
+        const res = await farmerService.getCoders();
+        const coderList = Array.isArray(res?.data?.coders) ? res.data.coders : [];
+        if (isMounted) setCoders(coderList.map(normalizeCoderOption));
+      } catch (err) {
+        toast.error(err.response?.data?.message || err.message);
+      }
+    };
+
+    fetchCoders();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [language]);
 
   // Filter centers based on selected emirate
   const filteredCenters = useMemo(() => {
@@ -148,7 +202,11 @@ const FarmCodingRequest = () => {
       case "Pending":
         return isAssigned && status === "pending";
       case "Assigned":
-        return isAssigned && status === "assigned";
+        return true;
+      case "In Progress":
+        return isAssigned && status === "active";
+      case "Completed":
+        return isAssigned && ['completed', 'approved'].includes(String(status || '').toLowerCase());
       case "Drafts":
         return !isAssigned;
       case "Rejected":
@@ -176,8 +234,8 @@ const FarmCodingRequest = () => {
         (!location || farm.location === location.id);
 
       // Filter by selected coder
-      const matchesCoder = !selectedCoder || 
-        (selectedCoder.farms && selectedCoder.farms.includes(farm.id));
+      const matchesCoder = !selectedCoder ||
+        (Array.isArray(selectedCoder.farms) && selectedCoder.farms.includes(farm.id));
 
       return matchesSearch && matchesFilters && matchesCoder;
     });
@@ -187,29 +245,20 @@ const FarmCodingRequest = () => {
   const endIndex = startIndex + itemsPerPage;
   const currentRequests = filteredFarms.slice(startIndex, endIndex);
 
-  const getStatusCounts = () => {
-    const counts = {
-      All: farms.length,
-      Active: farms.filter(r => (r.isAssigned && r.status === 'active')).length,
-      Pending: farms.filter(r => (r.isAssigned && r.status === 'pending')).length,
-      Assigned: farms.filter(r => (r.isAssigned && r.status === 'assigned')).length,
-      Drafts: farms.filter(r => !(r.isAssigned)).length,
-      Rejected: farms.filter(r => (r.isAssigned && r.status === 'suspended')).length
-    };
-    return counts;
-  };
+  const getStatusCounts = () => ({
+    Assigned: farms.length,
+    'In Progress': farms.filter((farm) => farm.isAssigned && farm.status === 'active').length,
+    Pending: farms.filter((farm) => farm.isAssigned && farm.status === 'pending').length,
+    Completed: farms.filter((farm) => farm.isAssigned && ['completed', 'approved'].includes(String(farm.status || '').toLowerCase())).length,
+  });
 
   const statusCounts = getStatusCounts();
-
-  const getCoderName = (farmId) => {
-    const coder = farmers.find(f => f.farms?.includes(farmId));
-    return coder ? coder.name : t('common.components.farmCoding.nA');
-  };
 
   const handleDetail = async (item) => {
     try {
       const res = await service.getfarmById(item.id);
       setSelectedFarm(res.data);
+      setSelectedFarmCoderName(getCoderName(item.id));
       setActiveTab('farm-details');
     } catch (err) {
       toast.error(err.response?.data?.message || err.message);
@@ -275,9 +324,9 @@ const FarmCodingRequest = () => {
   const prepareDataForExport = () => {
     const dataToExport = getDataBasedOnTab();
     return dataToExport.map(farm => ({
-      [t('common.components.farmCoding.farmName')]: farm.farmName || '',
-      [t('common.components.farmCoding.agricultureId')]: farm.agricultureId || '',
-      [t('common.components.farmCoding.farmSerial')]: farm.farmSerial || '',
+      ['Farmer Name']: getOwnerName(farm),
+      ['Farm Number']: farm.farmNo || farm.farmSerial || '',
+      ['Location']: getLocationName(farm.location),
       [t('common.components.farmCoding.coder')]: getCoderName(farm.id),
       [t('common.components.farmCoding.statusHeader')]: getStatus(farm.status, farm.isAssigned)
     }));
@@ -551,7 +600,7 @@ const FarmCodingRequest = () => {
               </div>
               <div className="flex-1 min-w-[200px]">
                 <Dropdown
-                  options={farmers}
+                  options={coders}
                   value={selectedCoder}
                   onChange={setSelectedCoder}
                   placeholder={t('common.components.farmCoding.selectCoder')}
@@ -565,7 +614,7 @@ const FarmCodingRequest = () => {
                   setLocation(null);
                   setSelectedCoder(null);
                   setQuery('');
-                  setSelectedStatus('All');
+                  setSelectedStatus('Assigned');
                 }}
               >
                 <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -584,13 +633,13 @@ const FarmCodingRequest = () => {
               <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                 <tr>
                   <th className="text-left py-4 px-6 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t('common.components.farmCoding.farmName')}
+                    Farmer Name
                   </th>
                   <th className="text-left py-4 px-6 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t('common.components.farmCoding.agricultureId')}
+                    Farm Number
                   </th>
                   <th className="text-left py-4 px-6 text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t('common.components.farmCoding.farmSerial')}
+                    Location
                   </th>
                   <th className="text-left py-4 px-6 text-xs font-bold text-gray-600 uppercase tracking-wider">
                     {t('common.components.farmCoding.coder')}
@@ -607,13 +656,13 @@ const FarmCodingRequest = () => {
                 {currentRequests.map((request) => (
                   <tr key={request.id} className="hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-6">
-                      <div className="font-medium text-gray-900">{request.farmName}</div>
+                      <div className="font-medium text-gray-900">{getOwnerName(request)}</div>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="text-sm text-gray-600">{request.agricultureId}</div>
+                      <div className="text-sm text-gray-600">{request.farmNo || request.farmSerial || nA}</div>
                     </td>
                     <td className="py-4 px-6">
-                      <div className="text-sm text-gray-600">{request.farmSerial}</div>
+                      <div className="text-sm text-gray-600">{getLocationName(request.location)}</div>
                     </td>
                     <td className="py-4 px-6">
                       <div className="text-sm text-gray-600">{getCoderName(request.id)}</div>
@@ -734,9 +783,11 @@ const FarmCodingRequest = () => {
   ) : (
     <FarmDetails
       farm={selectedFarm}
+      coderName={selectedFarmCoderName}
       handleBack={() => {
         setActiveTab('farm-requests');
         setSelectedFarm(null);
+        setSelectedFarmCoderName('Unassigned');
       }}
     />
   );

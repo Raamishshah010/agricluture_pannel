@@ -5,10 +5,12 @@ import {
   buildFarmsCsvContent,
   buildFarmsExportRows,
   calculateFieldCropAreaTotal,
+  calculateFruitAreaTotal,
   calculateFruitProduction,
   calculateGreenhouseArea,
   calculateGreenhouseProduction,
   calculateRowProduction,
+  calculateVegetableAreaTotal,
   findFarmerByEmiratesId,
   getDisplayFarmStatus,
   shouldResetManageFarmsSession,
@@ -130,6 +132,33 @@ test('calculateFieldCropAreaTotal sums fruit, vegetable, and fodder areas safely
   });
 
   assert.equal(total, 22.34);
+});
+
+test('calculateVegetableAreaTotal sums only vegetable areas safely', () => {
+  const total = calculateVegetableAreaTotal({
+    fruits: [{ area: 100 }],
+    vegetables: [
+      { area: 4 },
+      { area: '6.5' },
+      { area: null },
+      { area: -2 },
+    ],
+  });
+
+  assert.equal(total, 10.5);
+});
+
+test('calculateFruitAreaTotal sums only fruit areas safely', () => {
+  const total = calculateFruitAreaTotal({
+    fruits: [
+      { area: 10 },
+      { area: '2.25' },
+      { area: undefined },
+    ],
+    vegetables: [{ area: 50 }],
+  });
+
+  assert.equal(total, 12.25);
 });
 
 test('calculateFruitProduction uses fruit-bearing trees and production value', () => {

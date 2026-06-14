@@ -2,6 +2,7 @@ import React from 'react';
 import { MapPin, User, Droplet, Sprout, Calendar, FileText, Map, CheckCircle, XCircle, ArrowLeft, Users, TreePine, Home } from 'lucide-react';
 import useStore from '../../store/store';
 import useTranslation from '../../hooks/useTranslation';
+import { calculateFruitAreaTotal, calculateVegetableAreaTotal } from '../../utils';
 
 const FarmDetails = ({ farm, handleBack }) => {
     const {
@@ -14,6 +15,19 @@ const FarmDetails = ({ farm, handleBack }) => {
     } = useStore((state) => state);
     const isLTR = lang.includes('en');
     const t = useTranslation();
+    const nA = t('common.nA');
+    const localizedName = (item) => {
+        if (!item) return nA;
+        if (typeof item !== 'object') return String(item);
+        return isLTR
+            ? (item.name || item.fullnameEN || item.email || nA)
+            : (item.nameInArabic || item.nameInArrabic || item.fullnameAR || item.name || item.fullnameEN || item.email || nA);
+    };
+    const listNames = (items = []) => (Array.isArray(items) && items.length ? items.map(localizedName).join(', ') : nA);
+    const formatArea = (value) => `${value || 0} m²`;
+    const updatedByText = farm.updatedBy
+        ? [farm.updatedBy.name, farm.updatedBy.email].filter(Boolean).join(' - ')
+        : nA;
 
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
@@ -132,7 +146,7 @@ const FarmDetails = ({ farm, handleBack }) => {
                 {/* Owner & Holder Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <InfoCard icon={User} title={isLTR ? "Owner Information" : "معلومات المالك"} gradient="from-blue-50 to-cyan-50">
-                        <InfoRow label={isLTR ? "Name" : "اسم"} value={farm.owner?.name} />
+                        <InfoRow label={isLTR ? "Name" : "اسم"} value={localizedName(farm.owner)} />
                         <InfoRow label={isLTR ? "Emirates ID" : "الهوية الإماراتية"} value={farm.emiratesID} />
                         <InfoRow label={isLTR ? "Email" : "بريد إلكتروني"} value={farm.owner?.email} />
                         <InfoRow
@@ -141,10 +155,12 @@ const FarmDetails = ({ farm, handleBack }) => {
                             valueClass={farm.owner?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                         />
                         <InfoRow label={isLTR ? "Phone Number" : "رقم التليفون"} value={farm.phoneNumber} />
+                        <InfoRow label={isLTR ? "Agricultural ID" : "الرقم الزراعي"} value={farm.owner?.agriculturalId || farm.owner?.agricultureID} />
+                        <InfoRow label={isLTR ? "Account Number" : "رقم الحساب"} value={farm.owner?.accountNumber || farm.accountNo} />
                     </InfoCard>
 
                     <InfoCard icon={Users} title={isLTR ? "Holder Information" : "معلومات الحامل"} gradient="from-purple-50 to-pink-50">
-                        <InfoRow label={isLTR ? "Name" : "اسم"} value={farm.holder?.name} />
+                        <InfoRow label={isLTR ? "Name" : "اسم"} value={localizedName(farm.holder)} />
                         <InfoRow label={isLTR ? "Email" : "بريد إلكتروني"} value={farm.holder?.email} />
                         <InfoRow
                             label={isLTR ? "Email Verified" : "تم التحقق من البريد الإلكتروني"}
@@ -152,6 +168,9 @@ const FarmDetails = ({ farm, handleBack }) => {
                             valueClass={farm.holder?.isEmailVerified ? 'text-green-600' : 'text-red-600'}
                         />
                         <InfoRow label={isLTR ? "Phone Number" : "رقم التليفون"} value={farm.holder?.phoneNumber || 'N/A'} />
+                        <InfoRow label={isLTR ? "Emirates ID" : "الهوية الإماراتية"} value={farm.holder?.emirateId || farm.holder?.emiratesID} />
+                        <InfoRow label={isLTR ? "Agricultural ID" : "الرقم الزراعي"} value={farm.holder?.agriculturalId || farm.holder?.agricultureID} />
+                        <InfoRow label={isLTR ? "Account Number" : "رقم الحساب"} value={farm.holder?.accountNumber} />
                     </InfoCard>
                 </div>
 
@@ -181,8 +200,8 @@ const FarmDetails = ({ farm, handleBack }) => {
                         <InfoRow label={isLTR ? "Farm Serial" : "مسلسل المزرعة"} value={farm.farmSerial} />
                         <InfoRow label={isLTR ? `Account No` : `رقم الحساب`} value={farm.accountNo} />
                         <InfoRow label={t('size')} value={`${Math.round(farm.size)} ha`} />
-                        <InfoRow label={isLTR ? `Possession Style` : `أسلوب الاستحواذ`} value={isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic} />
-                        <InfoRow label={isLTR ? `Farming System` : `نظام الزراعة`} value={farm.farmingSystem?.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ')} />
+                        <InfoRow label={isLTR ? `Possession Style` : `أسلوب الاستحواذ`} value={localizedName(farm.possessionStyle)} />
+                        <InfoRow label={isLTR ? `Farming System` : `نظام الزراعة`} value={listNames(farm.farmingSystem)} />
                     </InfoCard>
                 </div>
                 <InfoCard icon={Sprout} title={isLTR ? "Land Use Distribution" : "توزيع استخدامات الأراضي"} gradient="from-teal-50 to-cyan-50">
@@ -190,11 +209,12 @@ const FarmDetails = ({ farm, handleBack }) => {
                         <div>
                             <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>
                                 {isLTR ? "Arable Land" : "أرض صالحة للزراعة"}</h4>
-                            <InfoRow label={isLTR ? `Vegetables (Open)` : `الخضروات (مفتوحة)`} value={`${farm.landUse?.arrableLand?.vegetablesOpen} m²`} />
-                            <InfoRow label={isLTR ? `Fruit & Palm Trees (Open)` : `أشجار الفاكهة والنخيل (مفتوح)`} value={`${farm.landUse?.arrableLand?.fruitPalmTreesOpen} m²`} />
-                            <InfoRow label={isLTR ? `Field Crops & Fodder` : 'المحاصيل الحقلية والأعلاف'} value={`${farm.landUse?.arrableLand?.fieldCropsFodder} m²`} />
-                            <InfoRow label={isLTR ? `Left for Rest` : `غادر للراحة`} value={`${Math.round(farm.landUse?.arrableLand?.leftForRest)} m²`} />
-                            <InfoRow label={isLTR ? `Nurseries` : `مشاتل`} value={`${farm.landUse?.arrableLand?.nurseries} m²`} />
+                            <InfoRow label={isLTR ? `Vegetables (Open)` : `الخضروات (مفتوحة)`} value={formatArea(farm.landUse?.arrableLand?.vegetablesOpen)} />
+                            <InfoRow label={isLTR ? `Fruit & Palm Trees (Open)` : `أشجار الفاكهة والنخيل (مفتوح)`} value={formatArea(farm.landUse?.arrableLand?.fruitPalmTreesOpen)} />
+                            <InfoRow label={isLTR ? `Field Crops & Fodder` : 'المحاصيل الحقلية والأعلاف'} value={formatArea(farm.landUse?.arrableLand?.fieldCropsFodder)} />
+                            <InfoRow label={isLTR ? `Ornamental Trees` : `أشجار الزينة`} value={formatArea(farm.landUse?.arrableLand?.ornamentalTrees)} />
+                            <InfoRow label={isLTR ? `Left for Rest` : `غادر للراحة`} value={formatArea(Math.round(farm.landUse?.arrableLand?.leftForRest || 0))} />
+                            <InfoRow label={isLTR ? `Nurseries` : `مشاتل`} value={formatArea(farm.landUse?.arrableLand?.nurseries)} />
                         </div>
                         <div>
                             <h4 className={`font-bold text-orange-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>
@@ -211,9 +231,9 @@ const FarmDetails = ({ farm, handleBack }) => {
                             <div key={idx} className="bg-white/70 rounded-lg p-3 border border-blue-200">
                                 {
                                     isLTR ? (
-                                        <p className="font-semibold text-blue-900">{system.name}</p>
+                                        <p className="font-semibold text-blue-900">{localizedName(system)}</p>
                                     ) : (
-                                        <p className="text-sm text-gray-600" dir="rtl">{system.nameInArrabic}</p>
+                                        <p className="text-sm text-gray-600" dir="rtl">{localizedName(system)}</p>
                                     )
                                 }
                             </div>
@@ -225,10 +245,10 @@ const FarmDetails = ({ farm, handleBack }) => {
                             <div key={idx} className="bg-white/70 rounded-lg p-3 border border-cyan-200">
                                 {
                                     isLTR ? (
-                                        <p className="font-semibold text-cyan-900">{source.name}</p>
+                                        <p className="font-semibold text-cyan-900">{localizedName(source)}</p>
 
                                     ) : (
-                                        <p className="text-sm text-gray-600" dir="rtl">{source.nameInArrabic}</p>
+                                        <p className="text-sm text-gray-600" dir="rtl">{localizedName(source)}</p>
                                     )
                                 }
                             </div>
@@ -243,6 +263,11 @@ const FarmDetails = ({ farm, handleBack }) => {
                     <div className={`${isLTR ? "justify-start" : "justify-end"} flex items-center gap-3 mb-5`}>
                         <TreePine className="w-6 h-6 text-green-600" />
                         <h3 className="text-xl font-bold text-gray-800">{isLTR ? "Crops & Production" : "المحاصيل والإنتاج"}</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <InfoRow label={isLTR ? "Total Vegetable Area" : "إجمالي مساحة الخضروات"} value={formatArea(calculateVegetableAreaTotal(farm.crops))} />
+                        <InfoRow label={isLTR ? "Total Fruit Area" : "إجمالي مساحة الفاكهة"} value={formatArea(calculateFruitAreaTotal(farm.crops))} />
                     </div>
 
                     {/* Fruits */}

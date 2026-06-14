@@ -297,6 +297,16 @@ export function calculateFieldCropAreaTotal(crops = {}) {
     return roundToTwo(rows.reduce((sum, row) => sum + safeToNumber(row?.area), 0));
 }
 
+export function calculateVegetableAreaTotal(crops = {}) {
+    const rows = Array.isArray(crops?.vegetables) ? crops.vegetables : [];
+    return roundToTwo(rows.reduce((sum, row) => sum + safeToNumber(row?.area), 0));
+}
+
+export function calculateFruitAreaTotal(crops = {}) {
+    const rows = Array.isArray(crops?.fruits) ? crops.fruits : [];
+    return roundToTwo(rows.reduce((sum, row) => sum + safeToNumber(row?.area), 0));
+}
+
 export function calculateRowProduction(row, type) {
     return roundToTwo(safeToNumber(row?.area) * safeToNumber(type?.productionValue));
 }

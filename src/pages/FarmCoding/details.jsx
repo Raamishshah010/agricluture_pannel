@@ -3,8 +3,9 @@ import { MapPin, User, Droplet, Sprout, Calendar, FileText, Map, CheckCircle, XC
 import useStore from '../../store/store';
 import PolygonDisplayComponent from '../../components/displayPolygon';
 import useTranslation from '../../hooks/useTranslation';
+import { calculateFruitAreaTotal, calculateVegetableAreaTotal } from '../../utils';
 
-const FarmDetails = ({ farm, handleBack }) => {
+const FarmDetails = ({ farm, handleBack, coderName }) => {
     const t = useTranslation();
     const {
         fruitTypes,
@@ -104,6 +105,20 @@ const FarmDetails = ({ farm, handleBack }) => {
     };
 
     const isLTR = lang.includes('en');
+    const nA = t('common.nA');
+    const localizedName = (item) => {
+        if (!item) return nA;
+        if (typeof item !== 'object') return String(item);
+        return isLTR
+            ? (item.name || item.fullnameEN || item.email || nA)
+            : (item.nameInArabic || item.nameInArrabic || item.fullnameAR || item.name || item.fullnameEN || item.email || nA);
+    };
+    const personName = (person) => localizedName(person);
+    const listNames = (items = []) => (Array.isArray(items) && items.length ? items.map(localizedName).join(', ') : nA);
+    const formatArea = (value) => `${value || 0} m²`;
+    const updatedByText = farm.updatedBy
+        ? [farm.updatedBy.name, farm.updatedBy.email].filter(Boolean).join(' - ')
+        : nA;
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-emerald-50 p-0 md:p-6">
@@ -174,7 +189,7 @@ const FarmDetails = ({ farm, handleBack }) => {
                 {/* Owner & Holder Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <InfoCard icon={User} title={isLTR ? t('farmCodingDetails.ownerInformation') : t('farmCodingDetails.ownerInformation')} gradient="from-blue-50 to-cyan-50">
-                        <InfoRow label={isLTR ? "Name" : "اسم"} value={farm.owner?.name} />
+                        <InfoRow label={isLTR ? "Name" : "اسم"} value={personName(farm.owner)} />
                         <InfoRow
                             label={isLTR ? "Emirates ID" : "الهوية الإماراتية"}
                             value={
@@ -184,6 +199,9 @@ const FarmDetails = ({ farm, handleBack }) => {
                             valueClass={farm.updatingData && farm.updatingData.emiratesID ? 'text-orange-600 font-semibold' : ''}
                         />
                         <InfoRow label={isLTR ? "Email" : "بريد إلكتروني"} value={farm.owner?.email} />
+                        <InfoRow label={isLTR ? "Agricultural ID" : "الرقم الزراعي"} value={farm.owner?.agriculturalId || farm.owner?.agricultureID} />
+                        <InfoRow label={isLTR ? "Account Number" : "رقم الحساب"} value={farm.owner?.accountNumber || farm.accountNo} />
+                        <InfoRow label={isLTR ? "Coder" : "المبرمج"} value={coderName || 'Unassigned'} />
                         <InfoRow
                             label={isLTR ? "Email Verified" : "تم التحقق من البريد الإلكتروني"}
                             value={farm.owner?.isEmailVerified ? 'Yes ✓' : 'No ✗'}
@@ -201,8 +219,11 @@ const FarmDetails = ({ farm, handleBack }) => {
                     </InfoCard>
 
                     <InfoCard icon={Users} title={isLTR ? t('farmCodingDetails.holderInformation') : t('farmCodingDetails.holderInformation')} gradient="from-purple-50 to-pink-50">
-                        <InfoRow label={isLTR ? "Name" : "اسم"} value={farm.holder?.name} />
+                        <InfoRow label={isLTR ? "Name" : "اسم"} value={personName(farm.holder)} />
                         <InfoRow label={isLTR ? "Email" : "بريد إلكتروني"} value={farm.holder?.email} />
+                        <InfoRow label={isLTR ? "Emirates ID" : "الهوية الإماراتية"} value={farm.holder?.emirateId || farm.holder?.emiratesID} />
+                        <InfoRow label={isLTR ? "Agricultural ID" : "الرقم الزراعي"} value={farm.holder?.agriculturalId || farm.holder?.agricultureID} />
+                        <InfoRow label={isLTR ? "Account Number" : "رقم الحساب"} value={farm.holder?.accountNumber} />
                         <InfoRow
                             label={isLTR ? "Email Verified" : "تم التحقق من البريد الإلكتروني"}
                             value={farm.holder?.isEmailVerified ? 'Yes ✓' : 'No ✗'}
@@ -291,11 +312,11 @@ const FarmDetails = ({ farm, handleBack }) => {
                             value={
                                 farm.updatingData && farm.updatingData.possessionStyle ?
                                 <span className="text-orange-600 font-semibold">{isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic} → <span className="text-green-600 font-semibold">{isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic}</span></span> :
-                                (isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic)
+                                localizedName(farm.possessionStyle)
                             }
                             valueClass={farm.updatingData && farm.updatingData.possessionStyle ? 'text-orange-600 font-semibold' : ''}
                         />
-                        <InfoRow label={isLTR ? `Farming System` : `نظام الزراعة`} value={farm.farmingSystem?.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ')} />
+                        <InfoRow label={isLTR ? `Farming System` : `نظام الزراعة`} value={listNames(farm.farmingSystem)} />
                     </InfoCard>
                 </div>
                 {
@@ -311,11 +332,12 @@ const FarmDetails = ({ farm, handleBack }) => {
                         <div>
                             <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>
                                 {isLTR ? "Arable Land" : "أرض صالحة للزراعة"}</h4>
-                            <InfoRow label={isLTR ? `Vegetables (Open)` : `الخضروات (مفتوحة)`} value={`${farm.landUse?.arrableLand?.vegetablesOpen} m²`} />
-                            <InfoRow label={isLTR ? `Fruit & Palm Trees (Open)` : `أشجار الفاكهة والنخيل (مفتوح)`} value={`${farm.landUse?.arrableLand?.fruitPalmTreesOpen} m²`} />
-                            <InfoRow label={isLTR ? `Field Crops & Fodder` : 'المحاصيل الحقلية والأعلاف'} value={`${farm.landUse?.arrableLand?.fieldCropsFodder} m²`} />
-                            <InfoRow label={isLTR ? `Left for Rest` : `غادر للراحة`} value={`${Math.round(farm.landUse?.arrableLand?.leftForRest)} m²`} />
-                            <InfoRow label={isLTR ? `Nurseries` : `مشاتل`} value={`${farm.landUse?.arrableLand?.nurseries} m²`} />
+                            <InfoRow label={isLTR ? `Vegetables (Open)` : `الخضروات (مفتوحة)`} value={formatArea(farm.landUse?.arrableLand?.vegetablesOpen)} />
+                            <InfoRow label={isLTR ? `Fruit & Palm Trees (Open)` : `أشجار الفاكهة والنخيل (مفتوح)`} value={formatArea(farm.landUse?.arrableLand?.fruitPalmTreesOpen)} />
+                            <InfoRow label={isLTR ? `Field Crops & Fodder` : 'المحاصيل الحقلية والأعلاف'} value={formatArea(farm.landUse?.arrableLand?.fieldCropsFodder)} />
+                            <InfoRow label={isLTR ? `Ornamental Trees` : `أشجار الزينة`} value={formatArea(farm.landUse?.arrableLand?.ornamentalTrees)} />
+                            <InfoRow label={isLTR ? `Left for Rest` : `غادر للراحة`} value={formatArea(Math.round(farm.landUse?.arrableLand?.leftForRest || 0))} />
+                            <InfoRow label={isLTR ? `Nurseries` : `مشاتل`} value={formatArea(farm.landUse?.arrableLand?.nurseries)} />
                         </div>
                         <div>
                             <h4 className={`font-bold text-orange-700 mb-3 text-lg ${isLTR ? "text-start" : "text-end"}`}>
@@ -332,9 +354,9 @@ const FarmDetails = ({ farm, handleBack }) => {
                             <div key={idx} className="bg-white/70 rounded-lg p-3 border border-blue-200">
                                 {
                                     isLTR ? (
-                                        <p className="font-semibold text-blue-900">{system.name}</p>
+                                <p className="font-semibold text-blue-900">{localizedName(system)}</p>
                                     ) : (
-                                        <p className="text-sm text-gray-600" dir="rtl">{system.nameInArrabic}</p>
+                                        <p className="text-sm text-gray-600" dir="rtl">{localizedName(system)}</p>
                                     )
                                 }
                             </div>
@@ -346,10 +368,10 @@ const FarmDetails = ({ farm, handleBack }) => {
                             <div key={idx} className="bg-white/70 rounded-lg p-3 border border-cyan-200">
                                 {
                                     isLTR ? (
-                                        <p className="font-semibold text-cyan-900">{source.name}</p>
+                                        <p className="font-semibold text-cyan-900">{localizedName(source)}</p>
 
                                     ) : (
-                                        <p className="text-sm text-gray-600" dir="rtl">{source.nameInArrabic}</p>
+                                        <p className="text-sm text-gray-600" dir="rtl">{localizedName(source)}</p>
                                     )
                                 }
                             </div>
@@ -364,6 +386,10 @@ const FarmDetails = ({ farm, handleBack }) => {
                     <div className={`${isLTR ? "justify-start" : "justify-end"} flex items-center gap-3 mb-5`}>
                         <TreePine className="w-6 h-6 text-green-600" />
                         <h3 className="text-xl font-bold text-gray-800">{isLTR ? t('farmCodingDetails.cropsProduction') : t('farmCodingDetails.cropsProduction')}</h3>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <InfoRow label={isLTR ? "Total Vegetable Area" : "إجمالي مساحة الخضروات"} value={formatArea(calculateVegetableAreaTotal(farm.crops))} />
+                        <InfoRow label={isLTR ? "Total Fruit Area" : "إجمالي مساحة الفاكهة"} value={formatArea(calculateFruitAreaTotal(farm.crops))} />
                     </div>
 
                     {/* Fruits */}
@@ -536,6 +562,7 @@ const FarmDetails = ({ farm, handleBack }) => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <InfoCard icon={FileText} title={isLTR ? t('farmCodingDetails.additionalInformation') : t('farmCodingDetails.additionalInformation')} gradient="from-gray-50 to-slate-50">
                         <InfoRow label={isLTR ? t('farmCodingDetails.notes') : t('farmCodingDetails.notes')} value={farm.notes} />
+                        <InfoRow label={isLTR ? "Livestock" : "الثروة الحيوانية"} value={listNames(farm.livestocks)} />
                         <InfoRow label={isLTR ? t('farmCodingDetails.numberOfGreenhouses') : t('farmCodingDetails.numberOfGreenhouses')} value={farm.crops.greenhouses?.length || 'None'} />
                         <InfoRow label={isLTR ? t('farmCodingDetails.destinationMachines') : t('farmCodingDetails.destinationMachines')} value={farm.numberOfDestinationMachines} />
                         {farm.updatingData && Object.keys(farm.updatingData).length > 0 && (
@@ -616,6 +643,7 @@ const FarmDetails = ({ farm, handleBack }) => {
                     <InfoCard icon={Calendar} title={isLTR ? t('farmCodingDetails.timestamps') : t('farmCodingDetails.timestamps')} gradient="from-indigo-50 to-purple-50">
                         <InfoRow label={isLTR ? t('farmCodingDetails.createdAt') : t('farmCodingDetails.createdAt')} value={formatDate(farm.createdAt)} />
                         <InfoRow label={isLTR ? t('farmCodingDetails.updatedAt') : t('farmCodingDetails.updatedAt')} value={formatDate(farm.updatedAt)} />
+                        <InfoRow label={isLTR ? "Latest Update By" : "آخر تحديث بواسطة"} value={updatedByText} />
                     </InfoCard>
                 </div>
             </div>

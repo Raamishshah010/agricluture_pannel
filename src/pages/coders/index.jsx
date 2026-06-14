@@ -9,6 +9,7 @@ import {
   ChevronDown,
   CheckCircle2,
   XCircle,
+  MapPin,
 } from "lucide-react";
 import service from "../../services/farmerService";
 import { toast } from "react-toastify";
@@ -41,9 +42,10 @@ export default function Coders() {
     agriculturalId: "",
     email: "",
     mobile: "",
+    location: "",
     image: "",
   });
-  const { farms, language } = useStore((st) => st);
+  const { farms, language, locations } = useStore((st) => st);
   const getCoderName = (coder) => getLocalizedPersonName(coder, language) || t("common.nA");
 
   const getDisplayValue = (value) => {
@@ -57,6 +59,14 @@ export default function Coders() {
   const getCoderEmail = (coder) => getDisplayValue(coder?.email);
   const getCoderAccountNumber = (coder) => getDisplayValue(coder?.accountNumber);
   const getCoderAgriculturalId = (coder) => getDisplayValue(coder?.agriculturalId || coder?.agricultureID);
+  const getLocationName = (value) => {
+    if (!value) return t("common.nA");
+    const location = typeof value === "object" ? value : locations.find((item) => item.id === value);
+    if (!location) return String(value);
+    return language === "ar"
+      ? (location.nameInArabic || location.nameInArrabic || location.name || t("common.nA"))
+      : (location.name || t("common.nA"));
+  };
   const getCoderFarmCount = (coder) => Array.isArray(coder?.farms) ? coder.farms.length : 0;
 
   const formatDate = (dateString) => {
@@ -121,6 +131,7 @@ export default function Coders() {
       accountNumber: "",
       agriculturalId: "",
       mobile: "",
+      location: "",
       image: "",
     });
     setIsModalOpen(true);
@@ -135,6 +146,7 @@ export default function Coders() {
       accountNumber: coder.accountNumber || "",
       agriculturalId: coder.agriculturalId || coder.agricultureID || "",
       mobile: coder.mobile || coder.phoneNumber || "",
+      location: coder.location || "",
       image: coder.image || "",
     });
     setIsModalOpen(true);
@@ -202,7 +214,8 @@ export default function Coders() {
     if (
       !formData.fullnameEN ||
       !formData.email ||
-      !formData.mobile
+      !formData.mobile ||
+      !formData.location
     ) {
       toast.error(t("coders.fillRequiredFields"));
       return;
@@ -217,6 +230,7 @@ export default function Coders() {
       fd.append("accountNumber", formData.accountNumber);
       fd.append("agriculturalId", formData.agriculturalId);
       fd.append("mobile", formData.mobile);
+      fd.append("location", formData.location);
       if (!editingItem) {
         fd.append("autoApprove", "true");
       }
@@ -345,6 +359,7 @@ const downloadPDF = () => {
         t('coders.accountNumber'),
         t('coders.agriculturalId'),
         t('coders.phoneNumber'),
+        'Location',
         t('coders.email'),
         t('coders.approvalStatus'),
         t('coders.createdAt')
@@ -356,6 +371,7 @@ const downloadPDF = () => {
         coder.accountNumber || t('common.nA'),
         coder.agriculturalId || coder.agricultureID || t('common.nA'),
         getCoderMobile(coder),
+        getLocationName(coder.location),
         coder.email,
         getApprovalLabel(getNormalizedApprovalStatus(coder)),
         formatDate(coder.createdAt)
@@ -420,6 +436,7 @@ const downloadPDF = () => {
         [t("coders.accountNumber")]: coder.accountNumber || t('common.nA'),
         [t("coders.agriculturalId")]: coder.agriculturalId || coder.agricultureID || t('common.nA'),
         [t("coders.phoneNumber")]: getCoderMobile(coder),
+        ['Location']: getLocationName(coder.location),
         [t("coders.email")]: coder.email,
         [t("coders.approvalStatus")]: getApprovalLabel(getNormalizedApprovalStatus(coder)),
         [t("coders.createdAt")]: formatDate(coder.createdAt),
@@ -441,6 +458,7 @@ const downloadPDF = () => {
       t("coders.accountNumber"),
       t("coders.agriculturalId"),
       t("coders.phoneNumber"),
+      "Location",
       t("coders.email"),
       t("coders.approvalStatus"),
       t("coders.createdAt"),
@@ -452,6 +470,7 @@ const downloadPDF = () => {
       coder.accountNumber || t("common.nA"),
       coder.agriculturalId || coder.agricultureID || t("common.nA"),
       getCoderMobile(coder),
+      getLocationName(coder.location),
       coder.email,
       getApprovalLabel(getNormalizedApprovalStatus(coder)),
       formatDate(coder.createdAt),
@@ -656,6 +675,9 @@ const downloadPDF = () => {
                     {t("coders.phoneNumber")}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                    Location
+                  </th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     {t("coders.email")}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
@@ -693,6 +715,11 @@ const downloadPDF = () => {
                     <td className="px-6 py-4">
                       <span className="text-sm text-gray-600">
                         {getCoderMobile(coder)}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-sm text-gray-600">
+                        {getLocationName(coder.location)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -996,6 +1023,31 @@ const downloadPDF = () => {
                   </div>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Location
+                    <span className="text-red-500 ml-1">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <MapPin className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <select
+                      name="location"
+                      value={formData.location}
+                      onChange={handleInputChange}
+                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-white"
+                    >
+                      <option value="">Select Location</option>
+                      {locations.map((location) => (
+                        <option key={location.id} value={location.id}>
+                          {getLocationName(location)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
               </div>
 
               {/* Modal Footer */}
@@ -1104,6 +1156,10 @@ const downloadPDF = () => {
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.phoneNumber")}</label>
                       <p className="text-gray-900 font-medium">{getCoderMobile(selectedCoder)}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Location</label>
+                      <p className="text-gray-900 font-medium">{getLocationName(selectedCoder.location)}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.createdAt")}</label>
