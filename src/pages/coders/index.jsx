@@ -10,6 +10,8 @@ import {
   CheckCircle2,
   XCircle,
   MapPin,
+  Link2,
+  Copy,
 } from "lucide-react";
 import service from "../../services/farmerService";
 import { toast } from "react-toastify";
@@ -35,6 +37,11 @@ export default function Coders() {
   const [selectedCoder, setSelectedCoder] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState({});
+  const [inviteLocation, setInviteLocation] = useState("");
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteData, setInviteData] = useState(null);
+  const [inviteError, setInviteError] = useState("");
+  const [copyMessage, setCopyMessage] = useState("");
   const [formData, setFormData] = useState({
     fullnameEN: "",
     emirateId: "",
@@ -252,6 +259,44 @@ export default function Coders() {
     } catch (error) {
       setLoading(false);
       toast.error(error.response?.data?.message || error.message);
+    }
+  };
+
+  const generateInviteLink = async () => {
+    if (!inviteLocation) {
+      toast.error("Select a location for the coder invite");
+      return;
+    }
+
+    try {
+      setInviteLoading(true);
+      setInviteError("");
+      setCopyMessage("");
+      const response = await service.createCoderInviteLink({
+        location: inviteLocation,
+        expiresInDays: 7,
+      });
+      if (!response?.success) {
+        throw new Error(response?.message || "Unable to generate coder invite link");
+      }
+      setInviteData(response);
+    } catch (error) {
+      setInviteData(null);
+      setInviteError(error?.response?.data?.message || error.message || "Unable to generate coder invite link");
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const copyInviteLink = async () => {
+    if (!inviteData?.inviteUrl) return;
+
+    try {
+      await navigator.clipboard.writeText(inviteData.inviteUrl);
+      setCopyMessage("Invite link copied");
+    } catch (error) {
+      setCopyMessage("");
+      setInviteError("Unable to copy invite link");
     }
   };
 
@@ -504,6 +549,33 @@ const downloadPDF = () => {
             </div>
 
             <div className="flex flex-wrap gap-3">
+              <select
+                value={inviteLocation}
+                onChange={(e) => {
+                  setInviteLocation(e.target.value);
+                  setInviteData(null);
+                  setInviteError("");
+                  setCopyMessage("");
+                }}
+                className="min-w-[220px] rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-700 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+              >
+                <option value="">Select coder location</option>
+                {locations.map((location) => (
+                  <option key={location.id} value={location.id}>
+                    {getLocationName(location)}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={generateInviteLink}
+                disabled={inviteLoading || !inviteLocation}
+                className="bg-white text-emerald-700 border border-emerald-200 px-5 py-2.5 rounded-xl hover:bg-emerald-50 transition-all duration-200 flex items-center gap-2 shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Link2 size={20} />
+                <span className="font-medium">{inviteLoading ? "Generating..." : "Generate coder invite"}</span>
+              </button>
+
               {/* Download Dropdown */}
               <div className="relative">
                   <button
@@ -629,6 +701,43 @@ const downloadPDF = () => {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-6">
+        {inviteError && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {inviteError}
+          </div>
+        )}
+
+        {inviteData?.inviteUrl && (
+          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm">
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-emerald-900">Coder invite link ready</p>
+                <p className="text-xs text-emerald-800">
+                  Location: <span className="font-semibold">{getLocationName(inviteData.location)}</span>
+                </p>
+                <p className="text-sm text-emerald-900">
+                  Verification code: <span className="font-semibold">{inviteData.inviteCode}</span>
+                </p>
+                <p className="break-all text-sm text-emerald-900">{inviteData.inviteUrl}</p>
+                {inviteData.expiresAt && (
+                  <p className="text-xs text-emerald-700">
+                    Expires at: {new Date(inviteData.expiresAt).toLocaleString()}
+                  </p>
+                )}
+              </div>
+
+              <button
+                onClick={copyInviteLink}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+              >
+                <Copy className="h-4 w-4" />
+                Copy link
+              </button>
+            </div>
+            {copyMessage && <p className="mt-3 text-sm text-emerald-800">{copyMessage}</p>}
+          </div>
+        )}
+
         {/* Stats Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-center gap-4">

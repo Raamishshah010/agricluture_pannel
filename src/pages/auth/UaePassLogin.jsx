@@ -158,6 +158,18 @@ export const UaePassLogin = () => {
         console.warn('Failed to forward to testing UAE Pass page', e);
       }
 
+      try {
+        const isCoderRegistration = window.sessionStorage.getItem('coderRegistration');
+        if (isCoderRegistration === 'true' && parsed.environment === 'staging') {
+          window.sessionStorage.removeItem('coderRegistration');
+          const forwardUrl = `${window.location.origin}/ue-pass-coder-registration?payload=${encodeURIComponent(payload)}`;
+          window.location.replace(forwardUrl);
+          return;
+        }
+      } catch (e) {
+        console.warn('Failed to forward to coder registration page', e);
+      }
+
       // If a staging-admin flow started, forward the payload to the staging admin page
       try {
         const isStagingAdmin = window.sessionStorage.getItem('stagingAdmin');

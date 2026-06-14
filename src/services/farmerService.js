@@ -95,6 +95,14 @@ export const farmerService = {
         });
         return response.data;
     },
+    createCoderInviteLink: async (payload = {}) => {
+        const response = await apiClient.post('/api/farmer/coder-invite-link', payload);
+        return response.data;
+    },
+    createCoderFromUaePass: async (payload) => {
+        const response = await apiClient.post('/api/farmer/coder/create-from-uaepass', payload);
+        return response.data;
+    },
     addFarmer: async (payload) => {
         const response = await apiClient.post('/api/farmer/register', payload, {
             headers: {
