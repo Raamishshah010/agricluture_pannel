@@ -783,7 +783,8 @@
       "createdAt": "Created At",
       "actions": "Actions",
       "viewDetails": "View Details",
-      "totalFarms": "Total farms"
+      "totalFarms": "Total farms",
+      "noDataFound": "No farms found for this farmer."
     },
     "farmers": {
       "add": "Add",

@@ -36,6 +36,7 @@ export default function Coders() {
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [selectedCoder, setSelectedCoder] = useState(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [coderFarmsDetails, setCoderFarmsDetails] = useState({});
   const [actionLoading, setActionLoading] = useState({});
   const [inviteLocation, setInviteLocation] = useState("");
   const [inviteLoading, setInviteLoading] = useState(false);
@@ -164,9 +165,37 @@ export default function Coders() {
     setEditingItem(null);
   };
 
-  const openCoderDetails = (coder) => {
+  const openCoderDetails = async (coder) => {
     setSelectedCoder(coder);
     setIsDetailsModalOpen(true);
+    setCoderFarmsDetails({});
+
+    if (Array.isArray(coder.farms) && coder.farms.length > 0) {
+      try {
+        const promises = coder.farms.map(async (farmId) => {
+          try {
+            const cached = farms.find((f) => f.id === farmId);
+            if (cached) return { farmId, details: cached };
+
+            const res = await farmService.getfarmById(farmId);
+            return { farmId, details: res.data };
+          } catch (err) {
+            console.error(`Failed to fetch farm ${farmId}:`, err);
+            return { farmId, details: null };
+          }
+        });
+        const results = await Promise.all(promises);
+        const detailsMap = {};
+        results.forEach((res) => {
+          if (res.details) {
+            detailsMap[res.farmId] = res.details;
+          }
+        });
+        setCoderFarmsDetails(detailsMap);
+      } catch (err) {
+        console.error("Failed to fetch coder farms:", err);
+      }
+    }
   };
 
   const closeDetailsModal = () => {
@@ -222,6 +251,7 @@ export default function Coders() {
       !formData.fullnameEN ||
       !formData.email ||
       !formData.mobile ||
+      !formData.emirateId ||
       !formData.location
     ) {
       toast.error(t("coders.fillRequiredFields"));
@@ -1011,6 +1041,7 @@ const downloadPDF = () => {
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     {t("coders.employeeId")}
+                    <span className="text-red-500 ml-1">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1299,39 +1330,49 @@ const downloadPDF = () => {
                     {t("coders.relatedFarms")}
                   </h3>
                   {selectedCoder.farms?.length > 0 ? (
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {selectedCoder.farms.map((assignedFarmId) => {
-                        const farm = getAssignedFarm(assignedFarmId);
+                        const farm = coderFarmsDetails[assignedFarmId] || getAssignedFarm(assignedFarmId);
+                        const farmOwnerName = farm?.owner ? (getLocalizedPersonName(farm.owner, language) || farm.owner.fullnameEN || farm.owner.name) : t('common.nA');
+                        const farmLocationName = farm?.location ? (language === 'ar' ? farm.location.nameInArabic || farm.location.nameInArrabic || farm.location.name : farm.location.name) : t('common.nA');
+
                         return (
-                          <div key={assignedFarmId} className="bg-white rounded-lg p-4 border border-gray-200">
-                            <div className="flex justify-between items-start gap-4">
-                              <div>
-                                <h4 className="font-medium text-gray-900">
-                                  {farm?.farmName || farm?.name || assignedFarmId}
+                          <div key={assignedFarmId} className="bg-white rounded-xl p-4 border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+                            <div>
+                              <div className="flex justify-between items-start gap-2 mb-2">
+                                <h4 className="font-bold text-gray-900 text-base">
+                                  {farm?.farmNo ? `${t('farmCodingDetails.farmNo') || 'Farm No'}: ${farm.farmNo}` : (farm?.farmName || farm?.name || assignedFarmId)}
                                 </h4>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  {t("coders.farmLocation")}: {farm?.location?.name || farm?.location || t('common.nA')}
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${farm?.status === 'active' || farm?.activeStatus ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                                  {farm?.status || (farm?.activeStatus ? t('farmCodingDetails.active') : t('farmCodingDetails.inactive')) || t("coders.active")}
+                                </span>
+                              </div>
+
+                              <div className="space-y-1 text-sm text-gray-600">
+                                <p>
+                                  <span className="font-semibold">{t('farmCodingDetails.ownerInformation') || 'Owner'}:</span> {farmOwnerName}
                                 </p>
-                                <p className="text-sm text-gray-600">
-                                  {t("coders.farmSize")}: {farm?.size || t('common.nA')}
+                                <p>
+                                  <span className="font-semibold">{t('farmCodingDetails.location') || 'Location'}:</span> {farmLocationName}
+                                </p>
+                                <p>
+                                  <span className="font-semibold">{t('farmCodingDetails.size') || 'Size'}:</span> {farm?.size ? `${Math.round(farm.size)} ha` : t('common.nA')}
                                 </p>
                               </div>
-                              <div className="flex flex-col items-end gap-2">
-                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-100 text-xs font-medium text-emerald-800">
-                                  {farm?.status || t("coders.active")}
-                                </span>
-                                <span className="text-xs text-gray-500 break-all">
-                                  {assignedFarmId}
-                                </span>
-                                <button
-                                  type="button"
-                                  onClick={() => handleViewFarm(assignedFarmId)}
-                                  className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100"
-                                >
-                                  <Eye size={14} />
-                                  {t("common.components.viewDetails")}
-                                </button>
-                              </div>
+                            </div>
+
+                            <div className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center">
+                              <span className="text-xs text-gray-400 font-mono">
+                                ID: {assignedFarmId.substring(0, 8)}...
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleViewFarm(farm || assignedFarmId)}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition-colors hover:bg-emerald-100 cursor-pointer"
+                              >
+                                <Eye size={14} />
+                                {t("common.components.viewDetails") || "View Details"}
+                              </button>
                             </div>
                           </div>
                         );

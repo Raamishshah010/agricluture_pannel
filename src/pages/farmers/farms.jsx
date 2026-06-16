@@ -59,7 +59,7 @@ export default function Farmers({ list, farmerName = '', handleBack, handleDetai
                                 {!loading && list.length === 0 && (
                                     <tr>
                                         <td colSpan={4} className="px-6 py-10 text-center text-sm text-gray-500">
-                                            {t('farmers.farmers.noDataFound')}
+                                            {t('farmers.farms.noDataFound') || 'No farms found for this farmer.'}
                                         </td>
                                     </tr>
                                 )}

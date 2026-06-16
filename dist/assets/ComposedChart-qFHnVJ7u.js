@@ -1,0 +1,1 @@
+import{r as a}from"./index-OvgNyII-.js";import{aM as o,aL as t}from"./PieChart-DIxAu_lG.js";var p=["axis"],l=a.forwardRef((r,e)=>a.createElement(o,{chartName:"ComposedChart",defaultTooltipEventType:"axis",validateTooltipEventTypes:p,tooltipPayloadSearcher:t,categoricalChartProps:r,ref:e}));export{l as C};

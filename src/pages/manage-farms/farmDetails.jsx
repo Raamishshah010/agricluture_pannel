@@ -22,6 +22,9 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
         livestocks,
         crops,
         cropTypes,
+        possessions,
+        waterSources: storeWaterSources,
+        irrigationSystems: storeIrrigationSystems,
         language: lang
     } = useStore((state) => state);
 
@@ -111,7 +114,9 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     // Helper to get localized possession style name
     const getPossessionStyleName = () => {
         if (!farm.possessionStyle) return t('common.nA');
-        return isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic;
+        const style = possessions.find(p => p.id === farm.possessionStyle || p.id === farm.possessionStyle?.id);
+        if (!style) return typeof farm.possessionStyle === 'object' ? (isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic) : t('common.nA');
+        return isLTR ? style.name : style.nameInArrabic;
     };
 
     // Helper to get localized farming system names
@@ -121,7 +126,32 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     };
 
     const isLTR = lang.includes('en');
-    const coder = farmers.find(f => f.farms?.includes(farm.id));
+    const coder = farmers.find(f => f.isCoder && f.farms?.includes(farm.id));
+
+    const getIrrigationSystemNames = () => {
+        if (!farm.irrigationSystem || farm.irrigationSystem.length === 0) return t('common.nA');
+        return farm.irrigationSystem.map(id => {
+            const item = storeIrrigationSystems.find(is => is.id === id || is.id === id?.id);
+            if (!item) return typeof id === 'object' ? (isLTR ? id.name : id.nameInArrabic) : id;
+            return isLTR ? item.name : item.nameInArrabic;
+        }).join(', ');
+    };
+
+    const getWaterSourceNames = () => {
+        if (!farm.waterSources || farm.waterSources.length === 0) return t('common.nA');
+        return farm.waterSources.map(id => {
+            const item = storeWaterSources.find(ws => ws.id === id || ws.id === id?.id);
+            if (!item) return typeof id === 'object' ? (isLTR ? id.name : id.nameInArrabic) : id;
+            return isLTR ? item.name : item.nameInArrabic;
+        }).join(', ');
+    };
+
+    const calculatedVegetableArea = (farm.crops?.vegetables || []).reduce((acc, curr) => acc + (parseFloat(curr.area) || 0), 0);
+    const calculatedFruitArea = (farm.crops?.fruits || []).reduce((acc, curr) => acc + (parseFloat(curr.area) || 0), 0);
+
+    const updatedByText = farm.updatedBy
+        ? [farm.updatedBy.name, farm.updatedBy.email].filter(Boolean).join(' - ')
+        : t('common.nA');
     const getDisplayValue = (value) => {
         if (value === null || value === undefined || value === '') {
             return t('common.nA');
@@ -820,9 +850,11 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                     {farm.status}
                                 </span>
                             </div>
-                            {/* <h1 className="max-w-3xl text-4xl font-black tracking-tight md:text-5xl" dir="rtl">#{farm.farmNo || farm.farmSerial || farm.id}</h1> */}
-                            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/85 md:text-base">
-                                {farm.notes || t('common.nA')}
+                            <h1 className="max-w-3xl text-4xl font-black tracking-tight md:text-5xl" dir="rtl">
+                                {getPersonName(farm.owner)}
+                            </h1>
+                            <p className="mt-2 text-lg text-white/80">
+                                {t('farmCodingDetails.farmNo') || 'Farm No'}: #{farm.farmNo || farm.farmSerial || t('common.nA')}
                             </p>
                             <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                                 {quickFacts.map((item) => (
@@ -862,38 +894,48 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 </div>
 
                 {/* Owner & Holder Information */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div className="grid grid-cols-1 gap-6 mb-6">
                     <InfoCard icon={User} title={t('farmCodingDetails.ownerInformation')} gradient="from-blue-50 to-cyan-50">
-                        {ownerInfoRows.map(([label, value]) => (
-                            <InfoRow
-                                key={label}
-                                label={label}
-                                value={value}
-                                valueClass={label === t('farmCodingDetails.emailVerified') ? (farm.owner?.isEmailVerified ? 'text-green-600' : 'text-red-600') : ''}
-                            />
-                        ))}
-                    </InfoCard>
+                        {ownerInfoRows.map(([label, value]) => {
+                            if (label === t('farmCodingDetails.coderInformation')) return null;
+                            return (
+                                <InfoRow
+                                    key={label}
+                                    label={label}
+                                    value={value}
+                                    valueClass={label === t('farmCodingDetails.emailVerified') ? (farm.owner?.isEmailVerified ? 'text-green-600' : 'text-red-600') : ''}
+                                />
+                            );
+                        })}
 
-                    <InfoCard icon={Users} title={t('farmCodingDetails.holderInformation')} gradient="from-purple-50 to-pink-50">
-                        {holderInfoRows.map(([label, value]) => (
-                            <InfoRow
-                                key={label}
-                                label={label}
-                                value={value}
-                                valueClass={label === t('farmCodingDetails.emailVerified') ? (farm.holder?.isEmailVerified ? 'text-green-600' : 'text-red-600') : ''}
-                            />
-                        ))}
-                    </InfoCard>
-                    {
-                        coder && (
-                            <InfoCard icon={Users} title={t('farmCodingDetails.coderInformation')} gradient="from-purple-50 to-pink-50">
-                                <InfoRow label={t('farmCodingDetails.name')} value={getCoderName(coder)} />
+                        {farm.holder && (
+                            <>
+                                <div className="border-t border-slate-200 my-4 pt-4">
+                                    <h4 className="text-sm font-bold text-slate-700 mb-2">{t('farmCodingDetails.holderInformation')}</h4>
+                                </div>
+                                {holderInfoRows.map(([label, value]) => (
+                                    <InfoRow
+                                        key={label}
+                                        label={label}
+                                        value={value}
+                                        valueClass={label === t('farmCodingDetails.emailVerified') ? (farm.holder?.isEmailVerified ? 'text-green-600' : 'text-red-600') : ''}
+                                    />
+                                ))}
+                            </>
+                        )}
+
+                        <div className="border-t border-slate-200 my-4 pt-4">
+                            <h4 className="text-sm font-bold text-slate-700 mb-2">{t('farmCodingDetails.coderInformation')}</h4>
+                        </div>
+                        <InfoRow label={t('farmCodingDetails.name')} value={assignedCoderName} />
+                        {coder && (
+                            <>
                                 <InfoRow label={t('farmCodingDetails.email')} value={getCoderEmail(coder)} />
                                 <InfoRow label={t('farmCodingDetails.phoneNumber')} value={getCoderMobile(coder)} />
                                 <InfoRow label={t('farmCodingDetails.emiratesID')} value={getDisplayValue(coder?.emirateId)} />
-                            </InfoCard>
-                        )
-                    }
+                            </>
+                        )}
+                    </InfoCard>
                 </div>
 
                 {/* Location Information */}
@@ -921,8 +963,12 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                     <InfoCard icon={Home} title={t('farmCodingDetails.farmProperties')} gradient="from-green-50 to-lime-50">
                         <InfoRow label={t('farmCodingDetails.farmSerial')} value={farm.farmSerial} />
                         <InfoRow label={t('farmCodingDetails.size')} value={`${Math.round(farm.size)} ha`} />
-                        <InfoRow label={t('farmCodingDetails.possessionStyle')} value={isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic} />
+                        <InfoRow label={t('farmCodingDetails.possessionStyle')} value={getPossessionStyleName()} />
                         <InfoRow label={t('farmCodingDetails.farmingSystem')} value={farm.farmingSystem?.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ')} />
+                        <InfoRow label={t('farmCodingDetails.irrigationSystems') || 'Irrigation System'} value={getIrrigationSystemNames()} />
+                        <InfoRow label={t('farmCodingDetails.waterSources') || 'Water Sources'} value={getWaterSourceNames()} />
+                        <InfoRow label={t('farmCodingDetails.productionWells') || 'Production Wells'} value={farm.numberOfProductionWells} />
+                        <InfoRow label={t('farmCodingDetails.workers') || 'Number of Workers'} value={farm.noOfWorkers || 0} />
                     </InfoCard>
                 </div>
                 {
@@ -945,18 +991,23 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                         <div>
                             <h4 className={`font-bold text-green-700 mb-3 text-lg ${isLTR ? "text-start" : "text-start"}`}>
                                 {t('farmCodingDetails.arableLand')}</h4>
-                            <InfoRow label={t('farmCodingDetails.vegetablesOpen')} value={`${farm.landUse?.arrableLand?.vegetablesOpen} m²`} />
-                            <InfoRow label={t('farmCodingDetails.fruitPalmTreesOpen')} value={`${farm.landUse?.arrableLand?.fruitPalmTreesOpen} m²`} />
-                            <InfoRow label={t('farmCodingDetails.fieldCropsFodder')} value={`${farm.landUse?.arrableLand?.fieldCropsFodder} m²`} />
-                            <InfoRow label={t('farmCodingDetails.leftForRest')} value={`${Math.round(farm.landUse?.arrableLand?.leftForRest)} m²`} />
-                            <InfoRow label={t('farmCodingDetails.nurseries')} value={`${farm.landUse?.arrableLand?.nurseries} m²`} />
+                            <InfoRow label={t('farmCodingDetails.vegetablesOpen')} value={`${calculatedVegetableArea} m²`} />
+                            <InfoRow label={t('farmCodingDetails.fruitPalmTreesOpen')} value={`${calculatedFruitArea} m²`} />
+                            <InfoRow label={t('farmCodingDetails.fieldCropsFodder')} value={`${farm.landUse?.arrableLand?.fieldCropsFodder || 0} m²`} />
+                            <InfoRow label={t('farmCodingDetails.ornamentalTrees') || 'Ornamental Trees'} value={`${farm.landUse?.arrableLand?.ornamentalTrees || 0} m²`} />
+                            <InfoRow label={t('farmCodingDetails.leftForRest')} value={`${Math.round(farm.landUse?.arrableLand?.leftForRest || 0)} m²`} />
+                            <InfoRow label={t('farmCodingDetails.nurseries')} value={`${farm.landUse?.arrableLand?.nurseries || 0} m²`} />
                         </div>
                         <div>
                             <h4 className={`font-bold text-orange-700 mb-3 text-lg ${isLTR ? "text-start" : "text-start"}`}>
                                 {t('farmCodingDetails.nonArableLand')}</h4>
-                            <InfoRow label={t('farmCodingDetails.buildingsRoads')} value={`${farm.landUse?.nonArrableLand?.buildingsRoads} m²`} />
-                            <InfoRow label={t('farmCodingDetails.windbreaks')} value={`${farm.landUse?.nonArrableLand?.windbreaks} m²`} />
-                            <InfoRow label={t('farmCodingDetails.barrenLand')} value={`${farm.landUse?.nonArrableLand?.barrenLand} m²`} />
+                            <InfoRow label={t('farmCodingDetails.buildingsRoads')} value={`${farm.landUse?.nonArrableLand?.buildingsRoads || 0} m²`} />
+                            <InfoRow label={t('farmCodingDetails.windbreaks')} value={`${farm.landUse?.nonArrableLand?.windbreaks || 0} m²`} />
+                            <InfoRow label={t('farmCodingDetails.barrenLand')} value={`${farm.landUse?.nonArrableLand?.barrenLand || 0} m²`} />
+                            <div className="border-t border-slate-200 my-4 pt-4">
+                                <h4 className="text-sm font-bold text-slate-700 mb-2">{t('farms.livestocks') || 'Livestock'}</h4>
+                            </div>
+                            <InfoRow label={t('farms.livestocks') || 'Livestock'} value={farm.livestocks?.map(l => `${stockType(l)} (${l.numberOfAnimals})`).join(', ') || t('common.nA')} />
                         </div>
                     </div>
                 </InfoCard>
@@ -1199,15 +1250,14 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
                 {/* Additional Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <InfoCard icon={FileText} title={t('farmCodingDetails.additionalInformation')} gradient="from-gray-50 to-slate-50">
-                        <InfoRow label={t('farmCodingDetails.notes')} value={farm.notes} />
-                        <InfoRow label={t('farmCodingDetails.numberOfGreenhouses')} value={farm.crops.greenhouses?.length || t('common.nA')} />
-                        <InfoRow label={t('farmCodingDetails.destinationMachines')} value={farm.numberOfDestinationMachines} />
+                    <InfoCard icon={FileText} title={t('farmCodingDetails.notes') || 'Notes'} gradient="from-gray-50 to-slate-50">
+                        <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line px-3 py-2 bg-slate-50 rounded-2xl border border-slate-100">{farm.notes || t('common.nA')}</p>
                     </InfoCard>
 
                     <InfoCard icon={Calendar} title={t('farmCodingDetails.timestamps')} gradient="from-indigo-50 to-purple-50">
                         <InfoRow label={t('farmCodingDetails.createdAt')} value={formatDate(farm.createdAt)} />
                         <InfoRow label={t('farmCodingDetails.updatedAt')} value={formatDate(farm.updatedAt)} />
+                        <InfoRow label={isLTR ? "Latest Update By" : "آخر تحديث بواسطة"} value={updatedByText} />
                     </InfoCard>
                 </div>
             </div>
