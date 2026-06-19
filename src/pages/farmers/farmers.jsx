@@ -96,7 +96,8 @@ export default function Farmers({
         if (
             !formData.fullnameEN ||
             !formData.email ||
-            !formData.mobile
+            !formData.mobile ||
+            !formData.emirateId
         ) {
             toast.error(t('farmers.farmers.requiredFields'));
             return;
@@ -360,12 +361,9 @@ export default function Farmers({
                     </button>
                 </div>
                 <div className="overflow-x-auto">
-                    <table className="w-full min-w-[1120px] table-auto">
+                    <table className="w-full min-w-[900px] table-auto">
                         <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                             <tr>
-                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-20 whitespace-nowrap">
-                                    {t('farmers.farmers.image')}
-                                </th>
                                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider whitespace-nowrap">
                                     {t('farmers.farmers.name')}
                                 </th>
@@ -374,9 +372,6 @@ export default function Farmers({
                                 </th>
                                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40 whitespace-nowrap">
                                     {t('farmers.farmers.emirateId')}
-                                </th>
-                                <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-32 whitespace-nowrap">
-                                    {t('farmers.farmers.createdAt')}
                                 </th>
                                 <th className="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase tracking-wider w-40 whitespace-nowrap">
                                     {t('farmers.farmers.approvalStatus')}
@@ -394,34 +389,10 @@ export default function Farmers({
 
                                 return (
                                     <tr key={farmer.id} className="hover:bg-gray-50 transition-colors">
-                                        <td className="px-4 py-3">
-                                            <div className="w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-sm">
-                                                {farmer.image ? (
-                                                    <img
-                                                        src={farmer.image}
-                                                        alt={getFarmerName(farmer)}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                                                        <span className="text-white font-bold text-base">
-                                                            {getFarmerName(farmer).charAt(0).toUpperCase()}
-                                                        </span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </td>
                                         <td className="px-4 py-3 align-top">
                                             <div className="font-semibold text-gray-900 text-sm break-words max-w-[260px]">{getFarmerName(farmer)}</div>
                                             <div className="text-xs text-gray-500 break-all max-w-[260px]">{farmer.email}</div>
-                                            <div className="mt-2 flex flex-wrap gap-2">
-                                                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${farmer.isCoder
-                                                    ? 'bg-violet-50 text-violet-700 border-violet-200'
-                                                    : 'bg-gray-100 text-gray-600 border-gray-200'
-                                                    }`}>
-                                                    {t('farmers.farmers.coder')}: {farmer.isCoder ? t('common.yes') : t('common.no')}
-                                                </span>
-                                            </div>
+
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
@@ -437,14 +408,6 @@ export default function Farmers({
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                                                 </svg>
                                                 {farmer.emirateId}
-                                            </span>
-                                        </td>
-                                        <td className="px-4 py-3">
-                                            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-100 text-xs font-medium text-gray-700 whitespace-nowrap">
-                                                <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                                </svg>
-                                                {formatDate(farmer.createdAt)}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3">
@@ -581,6 +544,7 @@ export default function Farmers({
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                                         {t('farmers.farmers.employeeId')}
+                                        <span className="text-red-500 ml-1">*</span>
                                     </label>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

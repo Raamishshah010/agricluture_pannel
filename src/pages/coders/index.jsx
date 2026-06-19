@@ -582,6 +582,38 @@ const downloadPDF = () => {
     toast.success(t("coders.downloadSuccess"));
   };
 
+  const getCoderFarmsStatusCounts = (coder) => {
+    const assignedFarms = coder?.farms || [];
+    let assigned = assignedFarms.length;
+    let inProgress = 0;
+    let pending = 0;
+    let completed = 0;
+
+    assignedFarms.forEach((farmId) => {
+      const farm = coderFarmsDetails[farmId] || farms.find((f) => f.id === farmId);
+      if (farm) {
+        const status = String(farm.status || '').toLowerCase();
+        if (status === 'active') {
+          inProgress++;
+        } else if (status === 'pending') {
+          pending++;
+        } else if (['completed', 'approved'].includes(status)) {
+          completed++;
+        }
+      }
+    });
+
+    return { assigned, inProgress, pending, completed };
+  };
+
+  const detailCounts = selectedCoder ? getCoderFarmsStatusCounts(selectedCoder) : { assigned: 0, inProgress: 0, pending: 0, completed: 0 };
+  const detailLabels = {
+    assigned: language === 'ar' ? 'مُسند' : 'Assigned',
+    inProgress: language === 'ar' ? 'نشط' : 'In Progress',
+    pending: language === 'ar' ? 'معلق' : 'Pending',
+    completed: language === 'ar' ? 'مكتمل' : 'Completed',
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header Section */}
@@ -1295,6 +1327,26 @@ const downloadPDF = () => {
 
                 {/* Related Farms */}
                 <div className="bg-gray-50 rounded-xl p-6">
+                  {/* Status Counts Banner */}
+                  <div className="bg-emerald-600 rounded-xl p-4 flex flex-wrap gap-4 mb-6 shadow-md justify-between items-center">
+                    <div className="bg-white text-gray-900 rounded-2xl px-4 py-2 text-center flex flex-col items-center justify-center min-w-[110px] shadow-sm flex-1">
+                      <span className="text-sm font-semibold text-gray-600">{detailLabels.assigned}</span>
+                      <span className="text-xl font-bold text-gray-900 mt-0.5">{detailCounts.assigned}</span>
+                    </div>
+                    <div className="bg-white text-gray-900 rounded-2xl px-4 py-2 text-center flex flex-col items-center justify-center min-w-[110px] shadow-sm flex-1">
+                      <span className="text-sm font-semibold text-gray-600">{detailLabels.inProgress}</span>
+                      <span className="text-xl font-bold text-gray-900 mt-0.5">{detailCounts.inProgress}</span>
+                    </div>
+                    <div className="bg-white text-gray-900 rounded-2xl px-4 py-2 text-center flex flex-col items-center justify-center min-w-[110px] shadow-sm flex-1">
+                      <span className="text-sm font-semibold text-gray-600">{detailLabels.pending}</span>
+                      <span className="text-xl font-bold text-gray-900 mt-0.5">{detailCounts.pending}</span>
+                    </div>
+                    <div className="bg-white text-gray-900 rounded-2xl px-4 py-2 text-center flex flex-col items-center justify-center min-w-[110px] shadow-sm flex-1">
+                      <span className="text-sm font-semibold text-gray-600">{detailLabels.completed}</span>
+                      <span className="text-xl font-bold text-gray-900 mt-0.5">{detailCounts.completed}</span>
+                    </div>
+                  </div>
+
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">
                     {t("coders.relatedFarms")}
                   </h3>
