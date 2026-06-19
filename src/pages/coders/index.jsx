@@ -25,6 +25,7 @@ import { amiriFontBase64 } from "../../assets/AmiriFont";
 import Loader from "../../components/Loader";
 import farmService from "../../services/farmService";
 import { getLocalizedPersonName } from "../../utils/localizedName";
+import Dropdown from "../../components/dropdownWithSearch";
 
 export default function Coders() {
   const t = useTranslation();
@@ -53,7 +54,7 @@ export default function Coders() {
     location: "",
     image: "",
   });
-  const { farms, language, locations } = useStore((st) => st);
+  const { farms, language, locations, dashboardLoading } = useStore((st) => st);
   const getCoderName = (coder) => getLocalizedPersonName(coder, language) || t("common.nA");
 
   const getDisplayValue = (value) => {
@@ -69,8 +70,24 @@ export default function Coders() {
   const getCoderAgriculturalId = (coder) => getDisplayValue(coder?.agriculturalId || coder?.agricultureID);
   const getLocationName = (value) => {
     if (!value) return t("common.nA");
-    const location = typeof value === "object" ? value : locations.find((item) => item.id === value);
-    if (!location) return String(value);
+    const valStr = String(typeof value === "object" ? (value.id || value._id || "") : value).trim();
+    if (!valStr) return t("common.nA");
+    if (dashboardLoading?.masterData && locations.length === 0) {
+      return t("common.loading") || "Loading...";
+    }
+    const locationObj = locations.find(
+      (item) => String(item.id || item._id || "").trim() === valStr
+    );
+    const location = typeof value === "object" ? value : locationObj;
+    if (!location) {
+      if (typeof value === "object" && (value.name || value.nameInArabic || value.nameInArrabic)) {
+        const loc = value;
+        return language === "ar"
+          ? (loc.nameInArabic || loc.nameInArrabic || loc.name || t("common.nA"))
+          : (loc.name || t("common.nA"));
+      }
+      return valStr;
+    }
     return language === "ar"
       ? (location.nameInArabic || location.nameInArrabic || location.name || t("common.nA"))
       : (location.name || t("common.nA"));
@@ -819,12 +836,6 @@ const downloadPDF = () => {
                   <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
                     {t("coders.email")}
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t("coders.approvalStatus")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t("coders.createdAt")}
-                  </th>
                   <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">
                     {t("coders.actions")}
                   </th>
@@ -837,13 +848,8 @@ const downloadPDF = () => {
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white font-bold shadow-md">
-                          {getCoderName(coder).charAt(0).toUpperCase()}
-                        </div>
-                        <div className="font-semibold text-gray-900">
-                          {getCoderName(coder)}
-                        </div>
+                      <div className="font-semibold text-gray-900">
+                        {getCoderName(coder)}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -864,31 +870,6 @@ const downloadPDF = () => {
                     <td className="px-6 py-4">
                       <span className="text-sm text-gray-600">
                         {coder.email}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border whitespace-nowrap ${getApprovalBadgeClasses(getNormalizedApprovalStatus(coder))}`}
-                      >
-                        {getApprovalLabel(getNormalizedApprovalStatus(coder))}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-xs font-medium text-gray-700">
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        {formatDate(coder.createdAt)}
                       </span>
                     </td>
                     <td className="px-6 py-4">
@@ -1168,24 +1149,19 @@ const downloadPDF = () => {
                     Location
                     <span className="text-red-500 ml-1">*</span>
                   </label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <MapPin className="w-5 h-5 text-gray-400" />
-                    </div>
-                    <select
-                      name="location"
-                      value={formData.location}
-                      onChange={handleInputChange}
-                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all bg-white"
-                    >
-                      <option value="">Select Location</option>
-                      {locations.map((location) => (
-                        <option key={location.id} value={location.id}>
-                          {getLocationName(location)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <Dropdown
+                    options={locations}
+                    value={locations.find((l) => l.id === formData.location) || null}
+                    onChange={(item) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        location: item ? item.id : "",
+                      }))
+                    }
+                    placeholder={dashboardLoading?.masterData ? t("common.loading") : "Select Location"}
+                    disabled={dashboardLoading?.masterData}
+                    classes="w-full"
+                  />
                 </div>
 
               </div>
@@ -1281,14 +1257,7 @@ const downloadPDF = () => {
                       <label className="text-sm font-medium text-gray-600">{t("coders.emirateId")}</label>
                       <p className="text-gray-900 font-medium">{getDisplayValue(selectedCoder.emirateId)}</p>
                     </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">{t("coders.accountNumber")}</label>
-                      <p className="text-gray-900 font-medium">{getCoderAccountNumber(selectedCoder)}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">{t("coders.agriculturalId")}</label>
-                      <p className="text-gray-900 font-medium">{getCoderAgriculturalId(selectedCoder)}</p>
-                    </div>
+
                     <div>
                       <label className="text-sm font-medium text-gray-600">{t("coders.email")}</label>
                       <p className="text-gray-900 font-medium">{getCoderEmail(selectedCoder)}</p>

@@ -542,6 +542,7 @@
         "assigned": "Assigned",
         "drafts": "Drafts",
         "rejected": "Rejected",
+        "completed": "Completed",
         "searchByFarmName": "Search by Farm Name, Agriculture ID",
         "selectEmirate": "Select Emirate",
         "selectCenter": "Select Center",
