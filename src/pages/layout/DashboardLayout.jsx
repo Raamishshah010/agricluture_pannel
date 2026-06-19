@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useState, useEffect } from 'react';
+import React, { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { ChevronDown, ChevronRight, BarChart3, MapPin, Layers, Wheat, TrendingUp, HelpCircle, User, Globe, X, Maximize2, Search, Bell, TrendingUpDown, Grid2X2Plus, List, Newspaper, Users, Flag, ListMusic, ShieldHalf, Footprints, ArrowUp01, Ship, SunSnow, AudioWaveform, Dam, House, LogOut, Sticker, BarChart2, UserCheck } from 'lucide-react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLocation } from 'react-router-dom';
@@ -140,6 +140,7 @@ const DashboardLayout = () => {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const mainContentRef = useRef(null);
 
   const isRTL = language.includes('ar');
   const directionClass = isRTL ? 'rtl' : 'ltr';
@@ -214,6 +215,13 @@ const DashboardLayout = () => {
   });
 
   const [selectedPage, setSelectedPage] = useState('overview');
+
+  useEffect(() => {
+    if (mainContentRef.current) {
+      mainContentRef.current.scrollTop = 0;
+      mainContentRef.current.scrollLeft = 0;
+    }
+  }, [selectedPage]);
 
   const toggleSection = (section) => {
     setExpandedSections(prev => ({
@@ -575,7 +583,7 @@ const DashboardLayout = () => {
           </div>
         </header>
         <Suspense fallback={<div className="flex-1 flex items-center justify-center bg-gray-50"><Loader message={t('common.loading')} /></div>}>
-          <div className="flex-1 bg-gray-50 overflow-auto">
+          <div ref={mainContentRef} className="flex-1 bg-gray-50 overflow-auto">
             {renderDashboardPage(selectedPage, farmsNumber)}
           </div>
         </Suspense>

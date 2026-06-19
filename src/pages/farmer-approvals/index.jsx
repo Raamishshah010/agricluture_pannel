@@ -35,6 +35,19 @@ export default function FarmerApprovals() {
 
   useEffect(() => {
     fetchPendingApprovals();
+    const handleScroll = () => {
+      window.scrollTo(0, 0);
+      const scrollContainers = document.querySelectorAll(
+        ".overflow-y-auto, .overflow-auto, [style*='overflow-y: auto'], [style*='overflow: auto'], [style*='overflow-y: scroll'], [style*='overflow: scroll']"
+      );
+      scrollContainers.forEach((container) => {
+        container.scrollTop = 0;
+        container.scrollLeft = 0;
+      });
+    };
+    handleScroll();
+    const timer = setTimeout(handleScroll, 50);
+    return () => clearTimeout(timer);
   }, [activeTab]);
 
   const filteredList = useMemo(() => {

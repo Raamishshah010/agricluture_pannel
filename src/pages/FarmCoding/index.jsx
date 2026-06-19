@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import useStore from '../../store/store';
 import Pagination from '../../components/pagination';
 import service from '../../services/farmService';
@@ -21,6 +21,22 @@ const FarmCodingRequest = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState('Assigned');
   const [activeTab, setActiveTab] = useState('farm-requests');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      window.scrollTo(0, 0);
+      const scrollContainers = document.querySelectorAll(
+        ".overflow-y-auto, .overflow-auto, [style*='overflow-y: auto'], [style*='overflow: auto'], [style*='overflow-y: scroll'], [style*='overflow: scroll']"
+      );
+      scrollContainers.forEach((container) => {
+        container.scrollTop = 0;
+        container.scrollLeft = 0;
+      });
+    };
+    handleScroll();
+    const timer = setTimeout(handleScroll, 50);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
   const [selectedFarm, setSelectedFarm] = useState(null);
   const [selectedFarmCoderName, setSelectedFarmCoderName] = useState('Unassigned');
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import "./App.css";
 import { LoginPage } from "./pages/auth/LoginPage";
 import DashboardLayout from "./pages/layout/DashboardLayout.jsx";
@@ -92,8 +92,39 @@ function App() {
 
     void Promise.allSettled([loadCurrentAdmin(), loadMasterData(), loadFarms(), loadFarmers()]);
   }, [adminToken, setCrops, setFarms, setFarmers, setDashboardLoading, setDashboardError, setAdminToken, setAdmin]);
+
+  const ScrollToTop = () => {
+    const { pathname } = useLocation();
+    useEffect(() => {
+      const handleScroll = () => {
+        window.scrollTo(0, 0);
+        const scrollContainers = document.querySelectorAll(
+          ".overflow-y-auto, .overflow-auto, [style*='overflow-y: auto'], [style*='overflow: auto'], [style*='overflow-y: scroll'], [style*='overflow: scroll']"
+        );
+        scrollContainers.forEach((container) => {
+          container.scrollTop = 0;
+          container.scrollLeft = 0;
+        });
+      };
+
+      // Run immediately
+      handleScroll();
+
+      // Run after a short delay to account for lazy-loaded/Suspense components mounting
+      const timer = setTimeout(handleScroll, 50);
+      const timer2 = setTimeout(handleScroll, 150);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(timer2);
+      };
+    }, [pathname]);
+    return null;
+  };
+
   return (
     <Router>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<UaePassLogin />} />
         <Route path="/login" element={<LoginPage />} />

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   Download,
   MapPin,
@@ -80,6 +80,22 @@ const Emirates = () => {
   const [irrigationSystem, setIrrigationSystem] = useState(null);
   
   const [activeTab, setActiveTab] = useState("emirates");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      window.scrollTo(0, 0);
+      const scrollContainers = document.querySelectorAll(
+        ".overflow-y-auto, .overflow-auto, [style*='overflow-y: auto'], [style*='overflow: auto'], [style*='overflow-y: scroll'], [style*='overflow: scroll']"
+      );
+      scrollContainers.forEach((container) => {
+        container.scrollTop = 0;
+        container.scrollLeft = 0;
+      });
+    };
+    handleScroll();
+    const timer = setTimeout(handleScroll, 50);
+    return () => clearTimeout(timer);
+  }, [activeTab]);
   const [selectedFarm, setSelectedFarm] = useState(null);
   const t = useTranslation();
 
