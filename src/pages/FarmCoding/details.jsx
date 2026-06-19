@@ -108,7 +108,18 @@ const FarmDetails = ({ farm, handleBack, coderName }) => {
     const nA = t('common.nA');
     const localizedName = (item) => {
         if (!item) return nA;
-        if (typeof item !== 'object') return String(item);
+        if (typeof item !== 'object') {
+            const strItem = String(item);
+            const fallbackObj = {
+                "9fbddf50-5a8d-4afe-9cf0-531099e8ee7d": { name: "Ownership", nameInArrabic: "ملك" },
+                "acdfc56-41ce-498a-a9a4-f34b168e0062": { name: "Lease", nameInArrabic: "إيجار" },
+                "a119b18e-c4e6-4557-b76c-902e2a368f62": { name: "Other", nameInArrabic: "أخرى" }
+            }[strItem];
+            if (fallbackObj) {
+                return isLTR ? fallbackObj.name : fallbackObj.nameInArrabic;
+            }
+            return strItem;
+        }
         return isLTR
             ? (item.name || item.fullnameEN || item.email || nA)
             : (item.nameInArabic || item.nameInArrabic || item.fullnameAR || item.name || item.fullnameEN || item.email || nA);
@@ -236,15 +247,7 @@ const FarmDetails = ({ farm, handleBack, coderName }) => {
                 {/* Location Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <InfoCard icon={MapPin} title={isLTR ? t('farmCodingDetails.locationDetails') : t('farmCodingDetails.locationDetails')} gradient="from-amber-50 to-orange-50">
-                        <InfoRow
-                            label={isLTR ? "Location" : "موقع"}
-                            value={
-                                farm.updatingData && farm.updatingData.region ?
-                                <span className="text-orange-600 font-semibold">{isLTR ? farm.location?.name : farm.location?.nameInArrabic} → <span className="text-green-600 font-semibold">{isLTR ? farm.region?.name : farm.region?.nameInArrabic}</span></span> :
-                                (isLTR ? farm.location?.name : farm.location?.nameInArrabic)
-                            }
-                            valueClass={farm.updatingData && farm.updatingData.region ? 'text-orange-600 font-semibold' : ''}
-                        />
+                  
                         <InfoRow
                             label={isLTR ? "Region" : "منطقة"}
                             value={
@@ -271,6 +274,16 @@ const FarmDetails = ({ farm, handleBack, coderName }) => {
                                 (isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic)
                             }
                             valueClass={farm.updatingData && farm.updatingData.serviceCenter ? 'text-orange-600 font-semibold' : ''}
+                        />
+
+                              <InfoRow
+                            label={isLTR ? "Location" : "موقع"}
+                            value={
+                                farm.updatingData && farm.updatingData.region ?
+                                <span className="text-orange-600 font-semibold">{isLTR ? farm.location?.name : farm.location?.nameInArrabic} → <span className="text-green-600 font-semibold">{isLTR ? farm.region?.name : farm.region?.nameInArrabic}</span></span> :
+                                (isLTR ? farm.location?.name : farm.location?.nameInArrabic)
+                            }
+                            valueClass={farm.updatingData && farm.updatingData.region ? 'text-orange-600 font-semibold' : ''}
                         />
                         <InfoRow
                             label={isLTR ? "Coordinates" : "الإحداثيات"}

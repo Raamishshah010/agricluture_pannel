@@ -18,7 +18,18 @@ const FarmDetails = ({ farm, handleBack }) => {
     const nA = t('common.nA');
     const localizedName = (item) => {
         if (!item) return nA;
-        if (typeof item !== 'object') return String(item);
+        if (typeof item !== 'object') {
+            const strItem = String(item);
+            const fallbackObj = {
+                "9fbddf50-5a8d-4afe-9cf0-531099e8ee7d": { name: "Ownership", nameInArrabic: "ملك" },
+                "acdfc56-41ce-498a-a9a4-f34b168e0062": { name: "Lease", nameInArrabic: "إيجار" },
+                "a119b18e-c4e6-4557-b76c-902e2a368f62": { name: "Other", nameInArrabic: "أخرى" }
+            }[strItem];
+            if (fallbackObj) {
+                return isLTR ? fallbackObj.name : fallbackObj.nameInArrabic;
+            }
+            return strItem;
+        }
         return isLTR
             ? (item.name || item.fullnameEN || item.email || nA)
             : (item.nameInArabic || item.nameInArrabic || item.fullnameAR || item.name || item.fullnameEN || item.email || nA);
@@ -177,10 +188,10 @@ const FarmDetails = ({ farm, handleBack }) => {
                 {/* Location Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <InfoCard icon={MapPin} title={isLTR ? "Location Details" : "تفاصيل الموقع"} gradient="from-amber-50 to-orange-50">
-                        <InfoRow label={isLTR ? "Location" : "موقع"} value={isLTR ? farm.location?.name : farm.location?.nameInArrabic} />
                         <InfoRow label={isLTR ? "Region" : "منطقة"} value={isLTR ? farm.region?.name : farm.region?.nameInArrabic} />
                         <InfoRow label={isLTR ? "Emirate" : "الإمارة"} value={isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic} />
                         <InfoRow label={isLTR ? "Service Center" : "مركز الخدمة"} value={isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic} />
+                        <InfoRow label={isLTR ? "Location" : "موقع"} value={isLTR ? farm.location?.name : farm.location?.nameInArrabic} />
                         <InfoRow
                             label={isLTR ? "Coordinates" : "الإحداثيات"}
                             value={`${farm.coordinates?.lat.toFixed(6)}, ${farm.coordinates?.lng.toFixed(6)}`}

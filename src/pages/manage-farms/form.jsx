@@ -88,7 +88,7 @@ export const FarmUpdateForm = React.memo(({ farm, onSave, onCancel }) => {
         waterSources: farm.waterSources || [],
         irrigationSystem: farm.irrigationSystem || [],
         farmingSystem: farm.farmingSystem || [],
-        possessionStyle: farm.possessionStyle || '',
+        possessionStyle: (typeof farm.possessionStyle === 'object' ? farm.possessionStyle?.id : farm.possessionStyle) || '',
         numberOfDestinationMachines: farm.numberOfDestinationMachines || 0,
 
 

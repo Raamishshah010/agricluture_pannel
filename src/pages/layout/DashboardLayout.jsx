@@ -384,8 +384,8 @@ const DashboardLayout = () => {
                       setFarmsNumber(generateOTP());
                     }
                   }}
-                  className={`w-full cursor-pointer flex items-center justify-between px-2 md:px-3 py-2 text-xs md:text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors
-                    ${selectedPage === item.id ? 'bg-green-600 text-white' : 'text-gray-600'}
+                  className={`w-full cursor-pointer flex items-center justify-between px-2 md:px-3 py-2 text-xs md:text-sm font-medium rounded-lg transition-colors
+                    ${selectedPage === item.id ? 'bg-green-600 text-white hover:bg-green-700' : 'text-gray-600 hover:bg-gray-100'}
                     ${sidebarCollapsed ? 'justify-center' : ''}
                   `}
                 >
@@ -407,7 +407,7 @@ const DashboardLayout = () => {
                         onClick={() => { navigate(`/dashboard/${slug(subItem.id)}`); setSelectedPage(subItem.id); }}
                         className={`w-full flex cursor-pointer items-center px-2 md:px-3 py-2 text-xs md:text-sm rounded-lg transition-colors 
                           ${isRTL ? 'space-x-reverse space-x-2 md:space-x-3' : 'space-x-2 md:space-x-3'}
-                          ${selectedPage === subItem.id ? 'bg-green-600 text-white' : 'text-gray-600 hover:bg-gray-100'}
+                          ${selectedPage === subItem.id ? 'bg-green-600 text-white hover:bg-green-700' : 'text-gray-600 hover:bg-gray-100'}
                         `}
                       >
                         <subItem.icon className="w-4 h-4" />
@@ -433,9 +433,9 @@ const DashboardLayout = () => {
                   <button
                     onClick={() => menuClickedHandler(item)}
                     className={`w-full flex cursor-pointer items-center justify-between px-2 md:px-3 py-2 text-xs md:text-sm rounded-lg transition-colors
-                      ${selectedPage === item.id ? 'bg-green-600 text-white' : 'text-gray-600 hover:bg-gray-100'}
-                      ${sidebarCollapsed ? 'justify-center' : ''}
-                    `}
+                    ${selectedPage === item.id ? 'bg-green-600 text-white hover:bg-green-700' : 'text-gray-600 hover:bg-gray-100'}
+                    ${sidebarCollapsed ? 'justify-center' : ''}
+                  `}
                   >
                     <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : `${isRTL ? 'space-x-reverse' : ''} space-x-2 md:space-x-3`}`}>
                       <item.icon className="w-4 h-4" />
@@ -455,7 +455,7 @@ const DashboardLayout = () => {
                           onClick={() => { navigate(`/dashboard/${slug(subItem.id)}`); setSelectedPage(subItem.id); }}
                           className={`w-full flex cursor-pointer items-center px-2 md:px-3 py-2 text-xs md:text-sm rounded-lg transition-colors
                             ${isRTL ? 'space-x-reverse space-x-2 md:space-x-3' : 'space-x-2 md:space-x-3'}
-                            ${selectedPage === subItem.id ? 'bg-green-600 text-white' : 'text-gray-600 hover:bg-gray-100'}
+                            ${selectedPage === subItem.id ? 'bg-green-600 text-white hover:bg-green-700' : 'text-gray-600 hover:bg-gray-100'}
                           `}
                         >
                           <subItem.icon className="w-4 h-4" />

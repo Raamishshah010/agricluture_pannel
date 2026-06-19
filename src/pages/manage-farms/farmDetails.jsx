@@ -113,10 +113,32 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
     // Helper to get localized possession style name
     const getPossessionStyleName = () => {
-        if (!farm.possessionStyle) return t('common.nA');
-        const style = possessions.find(p => p.id === farm.possessionStyle || p.id === farm.possessionStyle?.id);
-        if (!style) return typeof farm.possessionStyle === 'object' ? (isLTR ? farm.possessionStyle?.name : farm.possessionStyle?.nameInArrabic) : t('common.nA');
-        return isLTR ? style.name : style.nameInArrabic;
+        const item = farm.possessionStyle;
+        if (!item) return t('common.nA');
+
+        let styleObj = null;
+        if (typeof item === 'string') {
+            styleObj = possessions?.find(p => p.id === item);
+            if (!styleObj) {
+                styleObj = {
+                    "9fbddf50-5a8d-4afe-9cf0-531099e8ee7d": { name: "Ownership", nameInArrabic: "ملك" },
+                    "acdfc56-41ce-498a-a9a4-f34b168e0062": { name: "Lease", nameInArrabic: "إيجار" },
+                    "a119b18e-c4e6-4557-b76c-902e2a368f62": { name: "Other", nameInArrabic: "أخرى" }
+                }[item];
+            }
+        } else if (typeof item === 'object') {
+            styleObj = item;
+        }
+
+        if (styleObj && typeof styleObj === 'object') {
+            if (isLTR) {
+                return styleObj.name || styleObj.nameEn || styleObj.englishName || t('common.nA');
+            } else {
+                return styleObj.nameInArrabic || styleObj.nameInArabic || styleObj.name || t('common.nA');
+            }
+        }
+
+        return typeof item === 'string' ? item : t('common.nA');
     };
 
     // Helper to get localized farming system names
@@ -148,6 +170,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
 
     const calculatedVegetableArea = (farm.crops?.vegetables || []).reduce((acc, curr) => acc + (parseFloat(curr.area) || 0), 0);
     const calculatedFruitArea = (farm.crops?.fruits || []).reduce((acc, curr) => acc + (parseFloat(curr.area) || 0), 0);
+    const calculatedFodderArea = (farm.crops?.fieldCropsFodder || []).reduce((acc, curr) => acc + (parseFloat(curr.area) || 0), 0);
 
     const updatedByText = farm.updatedBy
         ? [farm.updatedBy.name, farm.updatedBy.email].filter(Boolean).join(' - ')
@@ -203,9 +226,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
     const serviceCenterName = isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic;
 
     const quickFacts = [
-        { label: t('farmCodingDetails.farmNo'), value: farm.farmNo || t('common.nA') },
         { label: t('farmCodingDetails.farmSerial'), value: farm.farmSerial || t('common.nA') },
-        { label: t('farmCodingDetails.size'), value: `${Math.round(farm.size)} ha` },
     ];
 
     const hasPolygonCoordinates = (item) => Array.isArray(item?.coordinates) && item.coordinates.length > 0;
@@ -372,7 +393,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
             const landUseInfo = [
                 [t('farmCodingDetails.vegetablesOpen'), `${farm.landUse?.arrableLand?.vegetablesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
                 [t('farmCodingDetails.fruitPalmTreesOpen'), `${farm.landUse?.arrableLand?.fruitPalmTreesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [t('farmCodingDetails.fieldCropsFodder'), `${farm.landUse?.arrableLand?.fieldCropsFodder || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.fieldCropsFodder'), `${calculatedFodderArea} ${isLTR ? 'm²' : 'م²'}`],
                 [t('farmCodingDetails.buildingsRoads'), `${farm.landUse?.nonArrableLand?.buildingsRoads || 0} ${isLTR ? 'm²' : 'م²'}`],
             ];
 
@@ -605,7 +626,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 [t('farmCodingDetails.field'), t('farmCodingDetails.value')],
                 [t('farmCodingDetails.vegetablesOpen'), `${farm.landUse?.arrableLand?.vegetablesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
                 [t('farmCodingDetails.fruitPalmTreesOpen'), `${farm.landUse?.arrableLand?.fruitPalmTreesOpen || 0} ${isLTR ? 'm²' : 'م²'}`],
-                [t('farmCodingDetails.fieldCropsFodder'), `${farm.landUse?.arrableLand?.fieldCropsFodder || 0} ${isLTR ? 'm²' : 'م²'}`],
+                [t('farmCodingDetails.fieldCropsFodder'), `${calculatedFodderArea} ${isLTR ? 'm²' : 'م²'}`],
                 [t('farmCodingDetails.leftForRest'), `${Math.round(farm.landUse?.arrableLand?.leftForRest || 0)} ${isLTR ? 'm²' : 'م²'}`],
                 [t('farmCodingDetails.nurseries'), `${farm.landUse?.arrableLand?.nurseries || 0} ${isLTR ? 'm²' : 'م²'}`],
                 [t('farmCodingDetails.buildingsRoads'), `${farm.landUse?.nonArrableLand?.buildingsRoads || 0} ${isLTR ? 'm²' : 'م²'}`],
@@ -853,9 +874,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                             <h1 className="max-w-3xl text-4xl font-black tracking-tight md:text-5xl" dir="rtl">
                                 {getPersonName(farm.owner)}
                             </h1>
-                            <p className="mt-2 text-lg text-white/80">
-                                {t('farmCodingDetails.farmNo') || 'Farm No'}: #{farm.farmNo || farm.farmSerial || t('common.nA')}
-                            </p>
                             <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                                 {quickFacts.map((item) => (
                                     <div key={item.label} className="rounded-2xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur">
@@ -869,12 +887,19 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                             <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur">
                                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">{t('farmCodingDetails.coderInformation')}</p>
                                 <p className="mt-2 text-2xl font-bold">{assignedCoderName}</p>
-                                <p className="mt-1 text-sm text-white/80">
-                                    {coder ? `${t('farmCodingDetails.email')}: ${getCoderEmail(coder)}` : t('common.nA')}
-                                </p>
-                                <p className="mt-1 text-sm text-white/80">
-                                    {coder ? `${t('farmCodingDetails.phoneNumber')}: ${getCoderMobile(coder)}` : t('common.nA')}
-                                </p>
+                                {coder && (
+                                    <>
+                                        <p className="mt-1 text-sm text-white/80">
+                                            {t('farmCodingDetails.email')}: {getCoderEmail(coder)}
+                                        </p>
+                                        <p className="mt-1 text-sm text-white/80">
+                                            {t('farmCodingDetails.phoneNumber')}: {getCoderMobile(coder)}
+                                        </p>
+                                        <p className="mt-1 text-sm text-white/80">
+                                            {t('farmCodingDetails.emiratesID')}: {getDisplayValue(coder?.emirateId)}
+                                        </p>
+                                    </>
+                                )}
                             </div>
                             <div className="rounded-2xl border border-white/15 bg-white/10 p-5 backdrop-blur">
                                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">{t('farmCodingDetails.locationDetails')}</p>
@@ -909,31 +934,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                         })}
 
                         {farm.holder && (
-                            <>
-                                <div className="border-t border-slate-200 my-4 pt-4">
-                                    <h4 className="text-sm font-bold text-slate-700 mb-2">{t('farmCodingDetails.holderInformation')}</h4>
-                                </div>
-                                {holderInfoRows.map(([label, value]) => (
-                                    <InfoRow
-                                        key={label}
-                                        label={label}
-                                        value={value}
-                                        valueClass={label === t('farmCodingDetails.emailVerified') ? (farm.holder?.isEmailVerified ? 'text-green-600' : 'text-red-600') : ''}
-                                    />
-                                ))}
-                            </>
-                        )}
-
-                        <div className="border-t border-slate-200 my-4 pt-4">
-                            <h4 className="text-sm font-bold text-slate-700 mb-2">{t('farmCodingDetails.coderInformation')}</h4>
-                        </div>
-                        <InfoRow label={t('farmCodingDetails.name')} value={assignedCoderName} />
-                        {coder && (
-                            <>
-                                <InfoRow label={t('farmCodingDetails.email')} value={getCoderEmail(coder)} />
-                                <InfoRow label={t('farmCodingDetails.phoneNumber')} value={getCoderMobile(coder)} />
-                                <InfoRow label={t('farmCodingDetails.emiratesID')} value={getDisplayValue(coder?.emirateId)} />
-                            </>
+                            <InfoRow label={t('farms.holder') || 'Holder'} value={getPersonName(farm.holder)} />
                         )}
                     </InfoCard>
                 </div>
@@ -941,10 +942,10 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                 {/* Location Information */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                     <InfoCard icon={MapPin} title={t('farmCodingDetails.locationDetails')} gradient="from-amber-50 to-orange-50">
-                        <InfoRow label={t('farmCodingDetails.location')} value={isLTR ? farm.location?.name : farm.location?.nameInArrabic} />
                         <InfoRow label={t('farmCodingDetails.region')} value={isLTR ? farm.region?.name : farm.region?.nameInArrabic} />
                         <InfoRow label={t('farmCodingDetails.emirate')} value={isLTR ? farm.emirate?.name : farm.emirate?.nameInArrabic} />
                         <InfoRow label={t('farmCodingDetails.serviceCenter')} value={isLTR ? farm.serviceCenter?.name : farm.serviceCenter?.nameInArrabic} />
+                        <InfoRow label={t('farmCodingDetails.location')} value={isLTR ? farm.location?.name : farm.location?.nameInArrabic} />
                         <InfoRow
                             label={t('farmCodingDetails.coordinates')}
                             value={`${farm.coordinates?.lat}, ${farm.coordinates?.lng}`}
@@ -961,7 +962,6 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                     </InfoCard>
 
                     <InfoCard icon={Home} title={t('farmCodingDetails.farmProperties')} gradient="from-green-50 to-lime-50">
-                        <InfoRow label={t('farmCodingDetails.farmSerial')} value={farm.farmSerial} />
                         <InfoRow label={t('farmCodingDetails.size')} value={`${Math.round(farm.size)} ha`} />
                         <InfoRow label={t('farmCodingDetails.possessionStyle')} value={getPossessionStyleName()} />
                         <InfoRow label={t('farmCodingDetails.farmingSystem')} value={farm.farmingSystem?.map(fs => isLTR ? fs.name : fs.nameInArrabic).join(', ')} />
@@ -993,7 +993,7 @@ const FarmDetails = ({ farm, handleBack, handleEdit }) => {
                                 {t('farmCodingDetails.arableLand')}</h4>
                             <InfoRow label={t('farmCodingDetails.vegetablesOpen')} value={`${calculatedVegetableArea} m²`} />
                             <InfoRow label={t('farmCodingDetails.fruitPalmTreesOpen')} value={`${calculatedFruitArea} m²`} />
-                            <InfoRow label={t('farmCodingDetails.fieldCropsFodder')} value={`${farm.landUse?.arrableLand?.fieldCropsFodder || 0} m²`} />
+                            <InfoRow label={t('farmCodingDetails.fieldCropsFodder')} value={`${calculatedFodderArea} m²`} />
                             <InfoRow label={t('farmCodingDetails.ornamentalTrees') || 'Ornamental Trees'} value={`${farm.landUse?.arrableLand?.ornamentalTrees || 0} m²`} />
                             <InfoRow label={t('farmCodingDetails.leftForRest')} value={`${Math.round(farm.landUse?.arrableLand?.leftForRest || 0)} m²`} />
                             <InfoRow label={t('farmCodingDetails.nurseries')} value={`${farm.landUse?.arrableLand?.nurseries || 0} m²`} />
