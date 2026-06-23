@@ -131,9 +131,9 @@ function App() {
         <Route path="/forgot" element={<ForgotPassword />} />
         <Route path="/conform" element={<Conform />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/ue-pass" element={<Navigate to="/" replace />} />
-        <Route path="/ue-pass-staging-admin" element={<UaePassStagingAdmin />} />
-        <Route path="/ue-pass-coder-registration" element={<UaePassCoderRegistration />} />
+        <Route path="/uae-pass" element={<Navigate to="/" replace />} />
+        <Route path="/uae-pass-staging-admin" element={<UaePassStagingAdmin />} />
+        <Route path="/uae-pass-coder-registration" element={<UaePassCoderRegistration />} />
         <Route path="/testing-uaepass" element={<TestingUaePass />} />
 
         <Route

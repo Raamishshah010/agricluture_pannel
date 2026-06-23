@@ -67,7 +67,7 @@ const requestAuthorizationUrl = async (environment, state, language) => {
   const params = new URLSearchParams({ environment, state });
   if (language === "ar") params.set("ui_locales", "ar");
 
-  const response = await fetch(`${API_BASE_URL}/api/ue-pass/authorize?${params.toString()}`, {
+  const response = await fetch(`${API_BASE_URL}/api/uae-pass/authorize?${params.toString()}`, {
     method: "GET",
     headers: { Accept: "application/json" },
   });

@@ -59,7 +59,7 @@ const requestAuthorizationUrl = async (environment, state, language) => {
   }
 
   const response = await fetch(
-    `${API_BASE_URL}/api/ue-pass/authorize?${params.toString()}`,
+    `${API_BASE_URL}/api/uae-pass/authorize?${params.toString()}`,
     {
       method: "GET",
       headers: {

@@ -168,7 +168,7 @@ const DashboardLayout = () => {
 
       try {
         const response = await fetch(
-          `${API_BASE_URL}/api/ue-pass/logout-url?environment=${encodeURIComponent(getUaePassEnvironment())}`,
+          `${API_BASE_URL}/api/uae-pass/logout-url?environment=${encodeURIComponent(getUaePassEnvironment())}`,
           {
             method: 'GET',
             headers: {

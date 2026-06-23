@@ -88,7 +88,7 @@ const requestAuthorizationUrl = async (environment, state, language) => {
   }
 
   const response = await fetch(
-    `${API_BASE_URL}/api/ue-pass/authorize?${params.toString()}`,
+    `${API_BASE_URL}/api/uae-pass/authorize?${params.toString()}`,
     {
       method: "GET",
       headers: {
@@ -162,7 +162,7 @@ export const UaePassLogin = () => {
         const isCoderRegistration = window.sessionStorage.getItem('coderRegistration');
         if (isCoderRegistration === 'true' && parsed.environment === 'staging') {
           window.sessionStorage.removeItem('coderRegistration');
-          const forwardUrl = `${window.location.origin}/ue-pass-coder-registration?payload=${encodeURIComponent(payload)}`;
+          const forwardUrl = `${window.location.origin}/uae-pass-coder-registration?payload=${encodeURIComponent(payload)}`;
           window.location.replace(forwardUrl);
           return;
         }
@@ -176,7 +176,7 @@ export const UaePassLogin = () => {
         if (isStagingAdmin === 'true' && parsed.environment === 'staging') {
           // clear the flag and forward the payload to the staging admin page
           window.sessionStorage.removeItem('stagingAdmin');
-          const forwardUrl = `${window.location.origin}/ue-pass-staging-admin?payload=${encodeURIComponent(payload)}`;
+          const forwardUrl = `${window.location.origin}/uae-pass-staging-admin?payload=${encodeURIComponent(payload)}`;
           window.location.replace(forwardUrl);
           return;
         }
@@ -399,7 +399,7 @@ export const UaePassLogin = () => {
             </span>
           </button>
           <div className="hidden text-sm text-slate-300">
-            {t('auth.redirectUri')} <span className="text-slate-50">{API_BASE_URL}/api/ue-pass/callback</span>
+            {t('auth.redirectUri')} <span className="text-slate-50">{API_BASE_URL}/api/uae-pass/callback</span>
           </div>
         </div>
 
