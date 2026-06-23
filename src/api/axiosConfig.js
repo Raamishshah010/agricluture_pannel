@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../utils';
 
-const AUTH_KEYS = ['adminToken', 'admin', 'token', 'user'];
+const AUTH_KEYS = ['adminToken', 'admin', 'token', 'user', 'uae-pass-state', 'uae-pass-environment', 'stagingAdmin'];
 const clearAuthStorage = () => {
   AUTH_KEYS.forEach((key) => {
     sessionStorage.removeItem(key);

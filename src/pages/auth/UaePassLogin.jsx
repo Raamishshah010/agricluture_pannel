@@ -13,7 +13,7 @@ import uaePassButtonDefaultAr from '../../assets/uae-pass-button/ar/uae-pass-but
 import uaePassButtonPressedAr from '../../assets/uae-pass-button/ar/uae-pass-button-pressed.svg';
 import uaePassButtonFocusAr from '../../assets/uae-pass-button/ar/uae-pass-button-focus.svg';
 import uaePassButtonDisabledAr from '../../assets/uae-pass-button/ar/uae-pass-button-disabled.svg';
-import { getUaePassOutcome } from './uaePassFlow';
+import { getUaePassOutcome, performUaePassLogoutAndRedirect } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
@@ -190,21 +190,15 @@ export const UaePassLogin = () => {
 
       const outcome = getUaePassOutcome(parsed, t);
       if (outcome.kind !== 'success') {
-        setLoading(false);
-        setUserData(null);
-        setStateMismatch(false);
-        setAdminToken(null);
         window.sessionStorage.removeItem('adminToken');
-        setError(outcome.statusMessage);
-        setStatusMessage('');
+        setAdminToken(null);
+        performUaePassLogoutAndRedirect(parsed.environment || selectedEnvironment);
         return;
       }
 
       const storedState = window.sessionStorage.getItem(STATE_KEY);
       if (!storedState || parsed.state !== storedState) {
-        setStateMismatch(false);
-        setError(t('auth.uaePassLoginExceptionStatus'));
-        setStatusMessage('');
+        performUaePassLogoutAndRedirect(parsed.environment || selectedEnvironment);
         return;
       }
       setStateMismatch(false);
@@ -216,8 +210,7 @@ export const UaePassLogin = () => {
       if (isBlockedUaePassUserType(receivedUser)) {
         window.sessionStorage.removeItem('adminToken');
         setAdminToken(null);
-        setError(t('auth.uaePassUnverifiedUserStatus'));
-        setStatusMessage('');
+        performUaePassLogoutAndRedirect(parsed.environment || selectedEnvironment);
         return;
       }
 
@@ -249,21 +242,17 @@ export const UaePassLogin = () => {
 
 
       } else {
-        // ensure adminToken cleared if present
         window.sessionStorage.removeItem('adminToken');
         setAdminToken(null);
-
-        // Inform the user clearly that they are not an admin
-        setError(t('auth.uaePassRegisteredUsersOnlyStatus'));
-        setStatusMessage('');
+        performUaePassLogoutAndRedirect(parsed.environment || selectedEnvironment);
+        return;
       }
 
 
     } catch (decodeError) {
       console.error('UAE-PASS:payload-decode-error', decodeError);
-      setError(t('auth.uaePassLoginExceptionStatus'));
-      setStatusMessage('');
-      setLoading(false);
+      performUaePassLogoutAndRedirect(selectedEnvironment);
+      return;
     } finally {
       const cleanUrl = `${window.location.origin}${window.location.pathname}`;
       window.history.replaceState({}, "", cleanUrl);

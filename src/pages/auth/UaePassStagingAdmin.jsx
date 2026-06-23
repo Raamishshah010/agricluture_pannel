@@ -13,7 +13,7 @@ import uaePassButtonDefaultAr from '../../assets/uae-pass-button/ar/uae-pass-but
 import uaePassButtonPressedAr from '../../assets/uae-pass-button/ar/uae-pass-button-pressed.svg';
 import uaePassButtonFocusAr from '../../assets/uae-pass-button/ar/uae-pass-button-focus.svg';
 import uaePassButtonDisabledAr from '../../assets/uae-pass-button/ar/uae-pass-button-disabled.svg';
-import { getUaePassOutcome } from './uaePassFlow';
+import { getUaePassOutcome, performUaePassLogoutAndRedirect } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
@@ -149,26 +149,21 @@ export const UaePassStagingAdmin = () => {
     if (!payload) return;
 
     (async () => {
+      let parsed;
       try {
-        const parsed = decodePayload(payload);
+        parsed = decodePayload(payload);
         console.log('UAE-PASS-STAGING:decoded-payload', parsed);
         const outcome = getUaePassOutcome(parsed, t);
         if (outcome.kind !== 'success') {
-          setLoading(false);
-          setUserData(null);
-          setStateMismatch(false);
-          setAdminToken(null);
           window.sessionStorage.removeItem('adminToken');
-          setError(outcome.statusMessage);
-          setStatusMessage('');
+          setAdminToken(null);
+          performUaePassLogoutAndRedirect(parsed.environment || 'staging');
           return;
         }
 
         const storedState = window.sessionStorage.getItem(STATE_KEY);
         if (!storedState || parsed.state !== storedState) {
-          setStateMismatch(false);
-          setError(t('auth.uaePassLoginExceptionStatus'));
-          setStatusMessage('');
+          performUaePassLogoutAndRedirect(parsed.environment || 'staging');
           return;
         }
         setStateMismatch(false);
@@ -232,10 +227,8 @@ export const UaePassStagingAdmin = () => {
         throw new Error('Admin created but no token returned');
       } catch (err) {
         console.error('UAE-PASS-STAGING:error', err);
-        setError(err?.message === UAE_PASS_INELIGIBLE_MESSAGE
-          ? t('auth.uaePassUnverifiedUserStatus')
-          : t('auth.uaePassLoginExceptionStatus'));
-        setStatusMessage('');
+        performUaePassLogoutAndRedirect(parsed?.environment || 'staging');
+        return;
       } finally {
         const cleanUrl = `${window.location.origin}${window.location.pathname}`;
         window.history.replaceState({}, "", cleanUrl);
