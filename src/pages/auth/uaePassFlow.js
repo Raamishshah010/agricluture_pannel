@@ -1,5 +1,3 @@
-import { API_BASE_URL } from "../../utils";
-
 const CANCELLED_ERRORS = new Set([
   "access_denied",
   "login_required",
@@ -122,21 +120,4 @@ export const getUaePassOutcome = (payload, t) => {
     statusMessage: t("auth.loginCompleted"),
     errorMessage: "",
   };
-};
-
-export const performUaePassLogoutAndRedirect = async (environment) => {
-  try {
-    const response = await fetch(
-      `${API_BASE_URL}/api/uae-pass/logout-url?environment=${encodeURIComponent(environment || 'staging')}`,
-      { method: 'GET', headers: { Accept: 'application/json' } }
-    );
-    const data = await response.json();
-    if (response.ok && data?.logoutUrl) {
-      window.location.assign(data.logoutUrl);
-      return;
-    }
-  } catch (e) {
-    console.warn('Failed to perform UAE Pass logout', e);
-  }
-  window.location.assign('/');
 };
