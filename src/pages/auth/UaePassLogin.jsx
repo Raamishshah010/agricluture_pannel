@@ -352,7 +352,7 @@ export const UaePassLogin = () => {
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-center">
           <button
             type="button"
-            onClick={() => handleLoginClick('staging')}
+            onClick={() => handleLoginClick(selectedEnvironment)}
             disabled={loading}
             className="group relative inline-flex w-full max-w-[264px] cursor-pointer items-center justify-center bg-transparent p-0 align-middle leading-none focus-visible:outline-none disabled:cursor-not-allowed"
             aria-label={t('auth.loginWithUaePass')}
@@ -425,3 +425,4 @@ export const UaePassLogin = () => {
     </div>
   );
 };
+
