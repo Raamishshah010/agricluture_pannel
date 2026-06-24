@@ -19,7 +19,8 @@ const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
 const TESTING_FLOW_KEY = "uae-pass-testing-flow";
 const BLOCKED_UAE_PASS_USER_TYPE = "SOP1";
-const DEFAULT_ENVIRONMENT = import.meta.env.VITE_UAE_PASS_DEFAULT_ENVIRONMENT ? "production" : "staging";
+let DEFAULT_ENVIRONMENT = "production";
+DEFAULT_ENVIRONMENT = import.meta.env.VITE_UAE_PASS_DEFAULT_ENVIRONMENT ? "production" : "staging";
 const ENVIRONMENT_OPTIONS = [
   { value: "staging", labelKey: "auth.uaePassStaging" },
   { value: "production", labelKey: "auth.uaePassProduction" },

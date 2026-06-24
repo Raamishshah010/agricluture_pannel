@@ -198,13 +198,13 @@ export default function UaePassCoderRegistration() {
     const stateValue = generateStateValue();
     if (typeof window !== "undefined") {
       window.sessionStorage.setItem(STATE_KEY, stateValue);
-      window.sessionStorage.setItem(ENVIRONMENT_KEY, 'staging');
+      window.sessionStorage.setItem(ENVIRONMENT_KEY, 'production');
       window.sessionStorage.setItem(CODER_FLOW_KEY, 'true');
     }
 
     setLoading(true);
     try {
-      const { authorizationUrl } = await requestAuthorizationUrl('staging', stateValue, language);
+      const { authorizationUrl } = await requestAuthorizationUrl('production', stateValue, language);
       window.location.assign(authorizationUrl);
     } catch {
       setError(t('auth.uaePassLoginExceptionStatus'));
