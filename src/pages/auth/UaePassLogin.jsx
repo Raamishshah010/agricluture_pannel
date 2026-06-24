@@ -19,6 +19,7 @@ const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
 const TESTING_FLOW_KEY = "uae-pass-testing-flow";
 const BLOCKED_UAE_PASS_USER_TYPE = "SOP1";
+const DEFAULT_ENVIRONMENT = import.meta.env.VITE_UAE_PASS_DEFAULT_ENVIRONMENT ? "production" : "staging";
 
 const ENVIRONMENT_OPTIONS = [
   { value: "staging", labelKey: "auth.uaePassStaging" },
@@ -120,9 +121,7 @@ export const UaePassLogin = () => {
   const [userData, setUserData] = useState(null);
   const [error, setError] = useState("");
   const [stateMismatch, setStateMismatch] = useState(false);
-  const [selectedEnvironment, setSelectedEnvironment] = useState(
-    typeof window !== "undefined" ? window.sessionStorage.getItem(ENVIRONMENT_KEY) || "staging" : "staging"
-  );
+  const [selectedEnvironment, setSelectedEnvironment] = useState(DEFAULT_ENVIRONMENT);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -352,7 +351,7 @@ export const UaePassLogin = () => {
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-center">
           <button
             type="button"
-            onClick={() => handleLoginClick(selectedEnvironment)}
+            onClick={() => handleLoginClick(selectedEnvironment || DEFAULT_ENVIRONMENT)}
             disabled={loading}
             className="group relative inline-flex w-full max-w-[264px] cursor-pointer items-center justify-center bg-transparent p-0 align-middle leading-none focus-visible:outline-none disabled:cursor-not-allowed"
             aria-label={t('auth.loginWithUaePass')}
