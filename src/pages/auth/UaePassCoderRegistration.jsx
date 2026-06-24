@@ -13,7 +13,7 @@ import uaePassButtonDefaultAr from '../../assets/uae-pass-button/ar/uae-pass-but
 import uaePassButtonPressedAr from '../../assets/uae-pass-button/ar/uae-pass-button-pressed.svg';
 import uaePassButtonFocusAr from '../../assets/uae-pass-button/ar/uae-pass-button-focus.svg';
 import uaePassButtonDisabledAr from '../../assets/uae-pass-button/ar/uae-pass-button-disabled.svg';
-import { getUaePassOutcome, performUaePassLogoutAndRedirect } from './uaePassFlow';
+import { getUaePassOutcome } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
@@ -130,13 +130,17 @@ export default function UaePassCoderRegistration() {
         const parsed = decodePayload(payload);
         const outcome = getUaePassOutcome(parsed, t);
         if (outcome.kind !== 'success') {
-          performUaePassLogoutAndRedirect(parsed.environment || 'staging');
+          setLoading(false);
+          setUserData(null);
+          setError(outcome.statusMessage);
+          setStatusMessage('');
           return;
         }
 
         const storedState = window.sessionStorage.getItem(STATE_KEY);
         if (!storedState || parsed.state !== storedState) {
-          performUaePassLogoutAndRedirect(parsed.environment || 'staging');
+          setError(t('auth.uaePassLoginExceptionStatus'));
+          setStatusMessage('');
           return;
         }
 
@@ -169,8 +173,8 @@ export default function UaePassCoderRegistration() {
         setStatusMessage('Coder registered successfully.');
         setError('');
       } catch (err) {
-        performUaePassLogoutAndRedirect('staging');
-        return;
+        setError(err?.response?.data?.message || err.message || t('auth.uaePassLoginExceptionStatus'));
+        setStatusMessage('');
       } finally {
         const cleanUrl = `${window.location.origin}${window.location.pathname}`;
         window.history.replaceState({}, "", cleanUrl);

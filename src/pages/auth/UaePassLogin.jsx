@@ -13,14 +13,13 @@ import uaePassButtonDefaultAr from '../../assets/uae-pass-button/ar/uae-pass-but
 import uaePassButtonPressedAr from '../../assets/uae-pass-button/ar/uae-pass-button-pressed.svg';
 import uaePassButtonFocusAr from '../../assets/uae-pass-button/ar/uae-pass-button-focus.svg';
 import uaePassButtonDisabledAr from '../../assets/uae-pass-button/ar/uae-pass-button-disabled.svg';
-import { getUaePassOutcome, performUaePassLogoutAndRedirect } from './uaePassFlow';
+import { getUaePassOutcome } from './uaePassFlow';
 
 const STATE_KEY = "uae-pass-state";
 const ENVIRONMENT_KEY = "uae-pass-environment";
 const TESTING_FLOW_KEY = "uae-pass-testing-flow";
 const BLOCKED_UAE_PASS_USER_TYPE = "SOP1";
 const DEFAULT_ENVIRONMENT = import.meta.env.VITE_UAE_PASS_DEFAULT_ENVIRONMENT ? "production" : "staging";
-
 const ENVIRONMENT_OPTIONS = [
   { value: "staging", labelKey: "auth.uaePassStaging" },
   { value: "production", labelKey: "auth.uaePassProduction" },
@@ -189,15 +188,21 @@ export const UaePassLogin = () => {
 
       const outcome = getUaePassOutcome(parsed, t);
       if (outcome.kind !== 'success') {
-        window.sessionStorage.removeItem('adminToken');
+        setLoading(false);
+        setUserData(null);
+        setStateMismatch(false);
         setAdminToken(null);
-        performUaePassLogoutAndRedirect(parsed.environment || selectedEnvironment);
+        window.sessionStorage.removeItem('adminToken');
+        setError(outcome.statusMessage);
+        setStatusMessage('');
         return;
       }
 
       const storedState = window.sessionStorage.getItem(STATE_KEY);
       if (!storedState || parsed.state !== storedState) {
-        performUaePassLogoutAndRedirect(parsed.environment || selectedEnvironment);
+        setStateMismatch(false);
+        setError(t('auth.uaePassLoginExceptionStatus'));
+        setStatusMessage('');
         return;
       }
       setStateMismatch(false);
@@ -209,7 +214,8 @@ export const UaePassLogin = () => {
       if (isBlockedUaePassUserType(receivedUser)) {
         window.sessionStorage.removeItem('adminToken');
         setAdminToken(null);
-        performUaePassLogoutAndRedirect(parsed.environment || selectedEnvironment);
+        setError(t('auth.uaePassUnverifiedUserStatus'));
+        setStatusMessage('');
         return;
       }
 
@@ -241,17 +247,21 @@ export const UaePassLogin = () => {
 
 
       } else {
+        // ensure adminToken cleared if present
         window.sessionStorage.removeItem('adminToken');
         setAdminToken(null);
-        performUaePassLogoutAndRedirect(parsed.environment || selectedEnvironment);
-        return;
+
+        // Inform the user clearly that they are not an admin
+        setError(t('auth.uaePassRegisteredUsersOnlyStatus'));
+        setStatusMessage('');
       }
 
 
     } catch (decodeError) {
       console.error('UAE-PASS:payload-decode-error', decodeError);
-      performUaePassLogoutAndRedirect(selectedEnvironment);
-      return;
+      setError(t('auth.uaePassLoginExceptionStatus'));
+      setStatusMessage('');
+      setLoading(false);
     } finally {
       const cleanUrl = `${window.location.origin}${window.location.pathname}`;
       window.history.replaceState({}, "", cleanUrl);
@@ -335,8 +345,7 @@ export const UaePassLogin = () => {
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setSelectedEnvironment(option.value)}
-                className={`rounded-2xl border px-4 py-3 text-left transition ${isActive
+            onClick={() => handleLoginClick(selectedEnvironment || DEFAULT_ENVIRONMENT)}                className={`rounded-2xl border px-4 py-3 text-left transition ${isActive
                     ? "border-emerald-400 bg-emerald-400/10 text-white shadow-[0_10px_35px_rgba(16,185,129,0.15)]"
                     : "border-white/10 bg-white/5 text-slate-300 hover:border-white/20 hover:bg-white/10"
                   }`}
@@ -351,8 +360,7 @@ export const UaePassLogin = () => {
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-center">
           <button
             type="button"
-            onClick={() => handleLoginClick(selectedEnvironment || DEFAULT_ENVIRONMENT)}
-            disabled={loading}
+            onClick={() => handleLoginClick(selectedEnvironment || DEFAULT_ENVIRONMENT)}            disabled={loading}
             className="group relative inline-flex w-full max-w-[264px] cursor-pointer items-center justify-center bg-transparent p-0 align-middle leading-none focus-visible:outline-none disabled:cursor-not-allowed"
             aria-label={t('auth.loginWithUaePass')}
             aria-busy={loading}
@@ -424,4 +432,3 @@ export const UaePassLogin = () => {
     </div>
   );
 };
-
