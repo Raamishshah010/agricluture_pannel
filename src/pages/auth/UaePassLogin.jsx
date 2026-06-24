@@ -1,4 +1,4 @@
-import { Globe } from "lucide-react";
+﻿import { Globe } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useTranslation from '../../hooks/useTranslation';
@@ -172,7 +172,7 @@ export const UaePassLogin = () => {
       // If a staging-admin flow started, forward the payload to the staging admin page
       try {
         const isStagingAdmin = window.sessionStorage.getItem('stagingAdmin');
-        if (isStagingAdmin === 'true' && parsed.environment === 'staging') {
+        if (isStagingAdmin === 'true' && parsed.environment === 'production') {
           // clear the flag and forward the payload to the staging admin page
           window.sessionStorage.removeItem('stagingAdmin');
           const forwardUrl = `${window.location.origin}/uae-pass-staging-admin?payload=${encodeURIComponent(payload)}`;
@@ -433,3 +433,4 @@ export const UaePassLogin = () => {
     </div>
   );
 };
+
