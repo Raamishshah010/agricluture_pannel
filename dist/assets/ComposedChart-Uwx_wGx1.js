@@ -1,0 +1,1 @@
+import{r as a}from"./index-OgmfSYuv.js";import{aM as o,aL as t}from"./PieChart-Cc8OyE3Z.js";var p=["axis"],l=a.forwardRef((r,e)=>a.createElement(o,{chartName:"ComposedChart",defaultTooltipEventType:"axis",validateTooltipEventTypes:p,tooltipPayloadSearcher:t,categoricalChartProps:r,ref:e}));export{l as C};

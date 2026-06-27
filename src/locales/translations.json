@@ -1262,7 +1262,8 @@
       "exportReport": "Export Report",
       "exporting": "Exporting...",
       "exportFailed": "Export failed"
-    },
+    }
+  },
   "privacyPolicy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last Updated",
@@ -1342,31 +1343,6 @@
         "title": "Limitation of Liability",
         "p1": "In no event will Mazraty be liable for any incidental, indirect, special, punitive, or consequential damages arising out of your use of or inability to use the platform, including without limitation loss of revenue, loss of goodwill, loss of business, loss of data, computer failure, or any other damages."
       }
-    }
-  },
-  "center": {
-      "title": "Centers Management",
-      "addCenter": "Add Center",
-      "nameArabic": "Name (Arabic)",
-      "nameEnglish": "Name (English)",
-      "emirate": "Emirate",
-      "createdAt": "Created At",
-      "actions": "Actions",
-      "editCenter": "Edit Center",
-      "addNewCenter": "Add New Center",
-      "nameArabicLabel": "Name (Arabic) *",
-      "nameArabicPlaceholder": "Enter in center name in arrabic",
-      "nameEnglishLabel": "Name (English) *",
-      "nameEnglishPlaceholder": "e.g., Dubai",
-      "emirateLabel": "Emirate",
-      "cancel": "Cancel",
-      "update": "Update",
-      "add": "Add",
-      "noItemsFound": "No items found. Add your first center to get started.",
-      "totalItems": "Total items:",
-      "deleteConfirm": "Are you sure you want to delete this center?",
-      "fillRequiredFields": "Please fill in all required fields",
-      "selectEmirate": "Select Emirate"
     }
   },
   "articles": {
