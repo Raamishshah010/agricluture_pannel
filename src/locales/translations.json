@@ -526,6 +526,7 @@
         "manageAdmins": "Manage Admins",
         "settings": "Settings",
         "helpCenter": "Help Center",
+        "privacyPolicy": "Privacy Policy",
         "appName": "Mazraty",
         "adminName": "Hussein Al Jasmi",
         "adminRole": "Administrator",
@@ -1262,7 +1263,88 @@
       "exporting": "Exporting...",
       "exportFailed": "Export failed"
     },
-    "center": {
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "lastUpdated": "Last Updated",
+    "january": "January",
+    "footer": "This Privacy Policy is effective as of 1 January 2025. By using Mazraty, you acknowledge that you have read and understood this policy.",
+    "sections": {
+      "introduction": {
+        "title": "Introduction",
+        "p1": "This agreement is made between Mazraty ('we', 'us', or 'our') and the user of our website and mobile application, be it registered or otherwise. Once you agree to these terms, you may browse and use the platform according to these terms and conditions. This introduction is an integral part of this agreement."
+      },
+      "disclaimer": {
+        "title": "Disclaimer of Warranty",
+        "p1": "In addition to the provisions of this agreement, browsing this platform shall also be subject to the federal laws of the United Arab Emirates, local laws, and international conventions to which the UAE is a party. The user shall not be entitled to use the logo of Mazraty or the contents of its platform, which are subject to intellectual property rights applicable in the UAE and international conventions, without proper consent from Mazraty.",
+        "p2": "You expressly understand and agree that your use of the platform, or any material available through it, is at your own risk. Neither Mazraty nor its employees warrant that the platform will be uninterrupted, problem-free, free of omissions, or error-free. The content and function of the platform are provided 'as is,' without warranties of any kind, either express or implied."
+      },
+      "amendment": {
+        "title": "Amendment",
+        "p1": "Mazraty may amend these terms and conditions at any time. A notice of amendments will be displayed on this page and take effect immediately upon posting. Your continued use of the platform after amendments constitutes acceptance of the changes. You should visit this page regularly to review the current terms."
+      },
+      "requiredConduct": {
+        "title": "Required Conduct",
+        "p1": "You agree to access and use the platform only for lawful purposes. By accessing the platform, you agree that you will not:",
+        "p2": "Use the platform to commit a crime or encourage others to engage in unlawful conduct;",
+        "p3": "Post or transmit any discriminatory, libelous, harassing, defamatory, obscene, or otherwise unlawful content;",
+        "p4": "Impersonate any person or entity;",
+        "p5": "Upload any content containing viruses, Trojan horses, or any code that may alter, damage, or interrupt the functionality of the platform or anyone else's hardware or software;",
+        "p6": "Upload, post, or transmit any materials you do not have a right to transmit under law or contractual relationship;",
+        "p7": "Alter, damage, or delete any content posted on the platform;",
+        "p8": "Disrupt the normal flow of communication;",
+        "p9": "Claim a relationship with or represent any organization you are not authorized to represent;",
+        "p10": "Post or transmit any unsolicited advertising or promotional materials;",
+        "p11": "Post any material that infringes upon intellectual property rights; or",
+        "p12": "Collect or store personal information about others without their consent."
+      },
+      "registration": {
+        "title": "Registration",
+        "p1": "Certain portions of the platform are limited to registered users. You agree that any information provided during registration will be complete and accurate, that you will not register under another person's identity, and that you will not adopt a username that Mazraty deems offensive."
+      },
+      "collectionAndUse": {
+        "title": "Collection and Use of Online Information",
+        "p1": "Our web server automatically collects your IP address when you visit our platform. We use your IP address to diagnose server problems and compile usage statistics. We will not share your IP address with any party outside our technical team and consultants bound by non-disclosure agreements.",
+        "p2": "Some parts of this platform may use cookies to enhance your browsing experience. A cookie is a small text file sent to your hard drive to enable our platform to recognize your computer. Cookies will not read information from your hard drive. We do not combine cookie data with personal information to identify you."
+      },
+      "protection": {
+        "title": "Protection of Personal Information",
+        "p1": "When using certain parts of the platform or signing up for services, you may be asked to provide personal information such as name, address, gender, and payment details. This information is necessary to process your requests. Under no circumstances will your payment card number be stored. If you choose not to provide this data, our ability to serve you may be limited."
+      },
+      "safeTransfer": {
+        "title": "Safe Transfer of Information",
+        "p1": "Mazraty employs electronic, physical, and legal protection measures to maintain the confidentiality of your information. Sensitive information (such as payment card numbers) is encrypted in compliance with statutory requirements."
+      },
+      "protectionPersonal": {
+        "title": "Protection of Personal Information",
+        "p1": "Your personal information is accessible only to Mazraty employees who have a legitimate need to know it. It will not be made available for public inspection without your consent. No user information will be shared, sold, or transferred to any third party without your prior consent."
+      },
+      "rightToReview": {
+        "title": "Right to Review, Amend or Correct Personal Details",
+        "p1": "Any user who provides us with personal details is entitled to review, amend, or correct those details at any time by contacting our support team."
+      },
+      "termination": {
+        "title": "Termination of Use",
+        "p1": "Mazraty may, in its sole discretion, terminate or suspend your access to the platform without prior notice for violation of these terms, applicable UAE laws, or conduct deemed harmful to others. Upon termination, you will no longer be authorized to access the platform."
+      },
+      "otherSites": {
+        "title": "Other Site Links",
+        "p1": "This privacy policy applies only to Mazraty. When you follow a link to another website, you should read that website's privacy policy. Mazraty is not responsible for any harm or loss incurred from visiting third-party websites. These links are provided for convenience only and do not constitute an endorsement."
+      },
+      "content": {
+        "title": "Content",
+        "p1": "Mazraty reserves the right to monitor content you provide but is not obligated to do so. We reserve the right to delete, move, or edit any postings that violate these terms, UAE laws, or international conventions."
+      },
+      "indemnity": {
+        "title": "Indemnity",
+        "p1": "You agree to defend and indemnify Mazraty against any claim arising from your breach of these terms. You will bear all costs resulting from such breach, including insurance, compensation, legal fees, or other expenses. Any settlement requires the explicit written consent of Mazraty."
+      },
+      "limitation": {
+        "title": "Limitation of Liability",
+        "p1": "In no event will Mazraty be liable for any incidental, indirect, special, punitive, or consequential damages arising out of your use of or inability to use the platform, including without limitation loss of revenue, loss of goodwill, loss of business, loss of data, computer failure, or any other damages."
+      }
+    }
+  },
+  "center": {
       "title": "Centers Management",
       "addCenter": "Add Center",
       "nameArabic": "Name (Arabic)",

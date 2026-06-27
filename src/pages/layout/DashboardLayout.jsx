@@ -47,6 +47,7 @@ const LiveStocks = lazy(() => import('../master-data/livestock'));
 const GreenhouseDashboard = lazy(() => import('../GreenhouseDashboard'));
 const FarmAnalytics = lazy(() => import('../farmsAnalytics'));
 const HelpCenter = lazy(() => import('../help-center'));
+const PrivacyPolicy = lazy(() => import('../privacy-policy'));
 
 const renderDashboardPage = (selectedPage, farmsNumber) => {
   switch (selectedPage) {
@@ -126,6 +127,8 @@ const renderDashboardPage = (selectedPage, farmsNumber) => {
       return <FarmAnalytics />;
     case 'help':
       return <HelpCenter />;
+    case 'privacyPolicy':
+      return <PrivacyPolicy />;
     default:
       return <Overview />;
   }
@@ -294,7 +297,8 @@ const DashboardLayout = () => {
         { id: 'manageAdmins', icon: BarChart3, label: t('common.components.dashboard.manageAdmins') },
       ]
     },
-    { id: 'help', icon: HelpCircle, label: t('common.components.dashboard.helpCenter') }
+    { id: 'help', icon: HelpCircle, label: t('common.components.dashboard.helpCenter') },
+    { id: 'privacyPolicy', icon: ShieldHalf, label: t('common.components.dashboard.privacyPolicy') }
   ];
 
   // slug helper for URL paths
