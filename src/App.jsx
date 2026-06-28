@@ -11,6 +11,7 @@ import UaePassStagingAdmin from "./pages/auth/UaePassStagingAdmin";
 import UaePassCoderRegistration from "./pages/auth/UaePassCoderRegistration";
 import TestingUaePass from "./pages/auth/TestingUaePass";
 import PrivacyPolicy from "./pages/privacy-policy";
+import NotFound from "./pages/not-found";
 import useStore from './store/store.js'
 import service from './services/adminService.js'
 import farmService from './services/farmService.js'
@@ -143,7 +144,7 @@ function App() {
           element={adminToken ? <DashboardLayout /> : <Navigate to="/" replace />}
         />
 
-        <Route path="*" element={<h2>Page not found</h2>} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
