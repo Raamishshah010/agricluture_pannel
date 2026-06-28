@@ -10,6 +10,7 @@ import { UaePassLogin } from "./pages/auth/UaePassLogin";
 import UaePassStagingAdmin from "./pages/auth/UaePassStagingAdmin";
 import UaePassCoderRegistration from "./pages/auth/UaePassCoderRegistration";
 import TestingUaePass from "./pages/auth/TestingUaePass";
+import PrivacyPolicy from "./pages/privacy-policy";
 import useStore from './store/store.js'
 import service from './services/adminService.js'
 import farmService from './services/farmService.js'
@@ -135,6 +136,7 @@ function App() {
         <Route path="/uae-pass-staging-admin" element={<UaePassStagingAdmin />} />
         <Route path="/uae-pass-coder-registration" element={<UaePassCoderRegistration />} />
         <Route path="/testing-uaepass" element={<TestingUaePass />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
         <Route
           path="/dashboard/*"
