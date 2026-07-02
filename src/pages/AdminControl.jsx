@@ -86,7 +86,7 @@ const AdminManagementFlow = () => {
   }, []);
 
   const handleEdit = (admin) => {
-    const [firstName, ...last] = admin.name.split(' ');
+    const [firstName, ...last] = getAdminName(admin).split(' ');
     setFormData({
       firstName,
       lastName: last.join(' '),

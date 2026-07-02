@@ -18,7 +18,11 @@ const cleanName = (value) => {
     return value || "";
   }
 
-  return decodeArabicMojibake(value).trim();
+  return decodeArabicMojibake(value)
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(" ");
 };
 
 const firstAvailableName = (...values) => {
