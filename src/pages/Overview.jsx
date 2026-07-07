@@ -160,55 +160,41 @@ const Overview = () => {
     setFarmingSystem(null);
   };
 
-  const StatCard = ({ title, value, change, changeType, color = 'green', icon: Icon }) => (
+  const StatCard = ({ title, value, change, color = 'green', icon: Icon }) => (
     <div 
-      className="group relative bg-white p-6 rounded-3xl border border-gray-100 hover:border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden" 
+      className="group relative bg-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-gray-100 hover:border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden" 
       dir={isLTR ? 'ltr' : 'rtl'}
     >
-      {/* Animated gradient overlay */}
-      <div className={`absolute inset-0 opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500 ${
-        color === 'green' ? 'bg-gradient-to-br from-emerald-400 via-green-500 to-teal-600' : 
-        color === 'blue' ? 'bg-gradient-to-br from-blue-400 via-cyan-500 to-sky-600' : 
-        'bg-gradient-to-br from-purple-400 via-violet-500 to-indigo-600'
-      }`}></div>
-      
-      {/* Decorative element */}
-      <div className={`absolute -top-12 -right-12 w-32 h-32 rounded-full opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-500 ${
-        color === 'green' ? 'bg-green-500' : 
-        color === 'blue' ? 'bg-blue-500' : 
-        'bg-purple-500'
-      }`}></div>
-      
       <div className="relative z-10">
-        <div className="flex items-start justify-between mb-5">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-3">
-              <div className={`w-1.5 h-1.5 rounded-full ${
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-3">
+              <div className={`w-1 h-1.5 sm:w-1.5 sm:h-1.5 rounded-full ${
                 color === 'green' ? 'bg-green-500' : 
                 color === 'blue' ? 'bg-blue-500' : 
                 'bg-purple-500'
-              } animate-pulse`}></div>
-              <h3 className="text-gray-500 text-xs font-bold uppercase tracking-wider">{title}</h3>
+              }`}></div>
+              <h3 className="text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider truncate">{title}</h3>
             </div>
-            <div className="text-3xl lg:text-4xl font-black text-gray-900 mb-2 tracking-tight">{value}</div>
+            <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-gray-900 tracking-tight">{value}</div>
           </div>
           {Icon && (
-            <div className={`p-4 rounded-2xl shadow-sm ${
+            <div className={`p-2.5 sm:p-4 rounded-xl sm:rounded-2xl shadow-sm flex-shrink-0 ${
               color === 'green' ? 'bg-gradient-to-br from-green-50 to-emerald-50 text-green-600' : 
               color === 'blue' ? 'bg-gradient-to-br from-blue-50 to-cyan-50 text-blue-600' : 
               'bg-gradient-to-br from-purple-50 to-indigo-50 text-purple-600'
-            } group-hover:scale-110 group-hover:rotate-3 transition-all duration-500`}>
-              <Icon className="w-7 h-7" strokeWidth={2.5} />
+            }`}>
+              <Icon className="w-5 h-5 sm:w-7 sm:h-7" strokeWidth={2.5} />
             </div>
           )}
         </div>
         {change && (
-          <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
+          <div className={`inline-flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-sm font-semibold mt-2 sm:mt-3 ${
             color === 'green' ? 'bg-green-50 text-green-700' : 
             color === 'blue' ? 'bg-blue-50 text-blue-700' : 
             'bg-purple-50 text-purple-700'
           }`}>
-            <TrendingUp className="w-3.5 h-3.5" />
+            <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             <span>{change}</span>
           </div>
         )}
@@ -403,30 +389,30 @@ const Overview = () => {
         </div>
 
         <div className="flex flex-col lg:flex-row min-h-[calc(100vh-140px)]">
-          <div className="flex-1 p-4 sm:p-6 lg:p-8 space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div className="h-36 rounded-3xl bg-white shadow-sm border border-gray-100" />
-              <div className="h-36 rounded-3xl bg-white shadow-sm border border-gray-100" />
+          <div className="flex-1 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5">
+              <div className="h-28 sm:h-36 rounded-2xl sm:rounded-3xl bg-white shadow-sm border border-gray-100" />
+              <div className="h-28 sm:h-36 rounded-2xl sm:rounded-3xl bg-white shadow-sm border border-gray-100" />
             </div>
-            <div className="rounded-3xl bg-white shadow-xl border border-gray-100 overflow-hidden">
-              <div className="p-5 border-b border-gray-100 bg-gray-50">
-                <div className="h-6 w-44 rounded-lg bg-gray-200" />
-                <div className="mt-2 h-4 w-64 rounded-lg bg-gray-200" />
+            <div className="rounded-2xl sm:rounded-3xl bg-white shadow-xl border border-gray-100 overflow-hidden">
+              <div className="p-3 sm:p-5 border-b border-gray-100 bg-gray-50">
+                <div className="h-5 sm:h-6 w-32 sm:w-44 rounded-lg bg-gray-200" />
+                <div className="mt-1 sm:mt-2 h-3 sm:h-4 w-40 sm:w-64 rounded-lg bg-gray-200" />
               </div>
-              <div className="p-2">
-                <div className="h-[420px] rounded-2xl bg-gray-100" />
+              <div className="p-1 sm:p-2">
+                <div className="h-[250px] sm:h-[420px] rounded-xl sm:rounded-2xl bg-gray-100" />
               </div>
             </div>
           </div>
 
-          <div className="w-full lg:w-[440px] xl:w-[500px] bg-gradient-to-b from-white/60 to-gray-50/60 backdrop-blur-xl border-l border-gray-200/70 p-5 sm:p-6 lg:p-8 space-y-6">
-            <div className="h-32 rounded-3xl bg-white/90 shadow-sm border border-gray-100" />
-            <div className="space-y-5">
-              <div className="h-8 w-56 rounded-lg bg-gray-200" />
-              <div className="space-y-4">
-                <div className="h-32 rounded-2xl bg-white shadow-sm border border-gray-100" />
-                <div className="h-32 rounded-2xl bg-white shadow-sm border border-gray-100" />
-                <div className="h-32 rounded-2xl bg-white shadow-sm border border-gray-100" />
+          <div className="w-full lg:w-[440px] xl:w-[500px] bg-gradient-to-b from-white/60 to-gray-50/60 backdrop-blur-xl border-l border-gray-200/70 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+            <div className="h-28 sm:h-32 rounded-2xl sm:rounded-3xl bg-white/90 shadow-sm border border-gray-100" />
+            <div className="space-y-3 sm:space-y-5">
+              <div className="h-6 sm:h-8 w-40 sm:w-56 rounded-lg bg-gray-200" />
+              <div className="space-y-3 sm:space-y-4">
+                <div className="h-28 sm:h-32 rounded-xl sm:rounded-2xl bg-white shadow-sm border border-gray-100" />
+                <div className="h-28 sm:h-32 rounded-xl sm:rounded-2xl bg-white shadow-sm border border-gray-100" />
+                <div className="h-28 sm:h-32 rounded-xl sm:rounded-2xl bg-white shadow-sm border border-gray-100" />
               </div>
             </div>
           </div>
@@ -439,33 +425,33 @@ const Overview = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-slate-50 to-gray-100">
       {/* Modern Header with Filters */}
       <div className="bg-white/90 backdrop-blur-2xl border-b border-gray-200/70 shadow-lg sticky top-0 z-50">
-        <div className="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <div className="max-w-[1920px] mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-5">
           {/* Header Row */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg shadow-green-500/30">
-                  <Grid3x3 className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="p-1.5 sm:p-2.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg sm:rounded-xl shadow-lg shadow-green-500/30 flex-shrink-0">
+                  <Grid3x3 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
-                <div>
-                  <h1 className="text-xl font-black text-gray-900 tracking-tight">{t("translation.dashboardOverview")}</h1>
-                  <p className="text-sm text-gray-500 font-medium">{t("translation.farmanalytics&insights")}</p>
+                <div className="min-w-0">
+                  <h1 className="text-sm sm:text-xl font-black text-gray-900 tracking-tight truncate">{t("translation.dashboardOverview")}</h1>
+                  <p className="text-[10px] sm:text-sm text-gray-500 font-medium truncate">{t("translation.farmanalytics&insights")}</p>
                 </div>
               </div>
             </div>
             
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold transition-all duration-300 ${
+              className={`flex items-center gap-1 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2.5 rounded-lg sm:rounded-xl font-semibold text-xs sm:text-sm transition-all duration-300 flex-shrink-0 ${
                 showFilters 
                   ? 'bg-green-600 text-white shadow-lg shadow-green-500/30 hover:bg-green-700' 
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              <Filter className="w-4 h-4" />
+              <Filter className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">{t('filters.filters')}</span>
               {activeFiltersCount > 0 && (
-                <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs font-bold">
+                <span className="px-1.5 sm:px-2 py-0.5 bg-white/20 rounded-full text-[10px] sm:text-xs font-bold">
                   {activeFiltersCount}
                 </span>
               )}
@@ -474,60 +460,49 @@ const Overview = () => {
 
           {/* Filters Row - Collapsible */}
           <div 
-            className={`relative transition-all duration-500 ease-in-out ${
-              showFilters ? 'max-h-96 opacity-100 mb-2' : 'max-h-0 opacity-0 overflow-hidden'
+            className={`transition-all duration-500 ease-in-out ${
+              showFilters ? 'max-h-[500px] opacity-100 mb-2' : 'max-h-0 opacity-0 overflow-hidden'
             }`}
-            style={{ zIndex: 100 }}
           >
-            <div className="flex flex-wrap gap-3 items-center pt-2 relative z-[100]">
-              <div className="relative z-[100]">
-                <Dropdown
-                  options={getLocalizedOptions(emirates)}
-                  value={emirate}
-                  onChange={handleEmirateChange}
-                  placeholder={t('overview.selectEmirate')}
-                />
-              </div>
-              <div className="relative z-[90]">
-                <Dropdown
-                  options={getLocalizedOptions(filteredCenters)}
-                  value={center}
-                  onChange={handleCenterChange}
-                  placeholder={t('overview.selectCenter')}
-                  disabled={!emirate}
-                />
-              </div>
-              <div className="relative z-[80]">
-                <Dropdown
-                  options={getLocalizedOptions(filteredLocations)}
-                  value={location}
-                  onChange={handleLocationChange}
-                  placeholder={t('overview.selectLocation')}
-                  disabled={!emirate && !center}
-                />
-              </div>
-              <div className="relative z-[70]">
-                <Dropdown
-                  options={getLocalizedOptions(filteredIrrigationSystems)}
-                  value={irrigationSystem}
-                  onChange={handleIrrigationSystemChange}
-                  placeholder={t('overview.irrigationSystem')}
-                  disabled={!emirate && !center && !location}
-                />
-              </div>
-              <div className="relative z-[60]">
-                <Dropdown
-                  options={getLocalizedOptions(filteredFarmingSystems)}
-                  value={farmingSystem}
-                  onChange={setFarmingSystem}
-                  placeholder={t('overview.farmingSystem')}
-                  disabled={!emirate && !center && !location && !irrigationSystem}
-                />
-              </div>
+            <div className="flex flex-wrap gap-2 sm:gap-3 items-center pt-2">
+              <Dropdown
+                options={getLocalizedOptions(emirates)}
+                value={emirate}
+                onChange={handleEmirateChange}
+                placeholder={t('overview.selectEmirate')}
+              />
+              <Dropdown
+                options={getLocalizedOptions(filteredCenters)}
+                value={center}
+                onChange={handleCenterChange}
+                placeholder={t('overview.selectCenter')}
+                disabled={!emirate}
+              />
+              <Dropdown
+                options={getLocalizedOptions(filteredLocations)}
+                value={location}
+                onChange={handleLocationChange}
+                placeholder={t('overview.selectLocation')}
+                disabled={!emirate && !center}
+              />
+              <Dropdown
+                options={getLocalizedOptions(filteredIrrigationSystems)}
+                value={irrigationSystem}
+                onChange={handleIrrigationSystemChange}
+                placeholder={t('overview.irrigationSystem')}
+                disabled={!emirate && !center && !location}
+              />
+              <Dropdown
+                options={getLocalizedOptions(filteredFarmingSystems)}
+                value={farmingSystem}
+                onChange={setFarmingSystem}
+                placeholder={t('overview.farmingSystem')}
+                disabled={!emirate && !center && !location && !irrigationSystem}
+              />
               
               {activeFiltersCount > 0 && (
                 <button
-                  className="group relative px-5 py-2.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold rounded-xl shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 transition-all duration-300 hover:-translate-y-0.5 z-50"
+                  className="px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold rounded-lg sm:rounded-xl shadow-lg shadow-red-500/30 text-xs sm:text-sm flex-shrink-0"
                   onClick={() => {
                     setEmirate(null);
                     setCenter(null);
@@ -536,8 +511,8 @@ const Overview = () => {
                     setIrrigationSystem(null);
                   }}
                 >
-                  <span className="flex items-center gap-2">
-                    <X className="w-4 h-4" />
+                  <span className="flex items-center gap-1 sm:gap-2">
+                    <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     {t('overview.clearAllFilter')}
                   </span>
                 </button>
@@ -550,13 +525,12 @@ const Overview = () => {
       <div className="flex flex-col lg:flex-row min-h-[calc(100vh-140px)]">
         {/* Main Content Area */}
         <div className="flex-1 relative order-2 lg:order-1">
-          <div className="p-4 sm:p-6 lg:p-8">
+          <div className="p-3 sm:p-6 lg:p-8">
             {/* Key Metrics Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-5 mb-4 sm:mb-8">
               <StatCard
                 title={t('overview.totalFarms')}
                 value={formatNumberWithUnits(transformFarms.length)}
-                // change="100% from last month"
                 changeType="increase"
                 color="green"
                 icon={MapPin}
@@ -564,7 +538,6 @@ const Overview = () => {
               <StatCard
                 title={t('overview.totalWells')}
                 value={formatNumberWithUnits(noOfWells)}
-                // change="100% from last week"
                 changeType="increase"
                 color="blue"
                 icon={Droplets}
@@ -572,19 +545,19 @@ const Overview = () => {
             </div>
 
             {/* Map Section */}
-            <div className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
-              <div className="p-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <MapPin className="w-5 h-5 text-blue-600" />
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+              <div className="p-3 sm:p-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
+                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                   </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-gray-900">{t('overview.farmLocation')}</h2>
-                    <p className="text-sm text-gray-500">{t('overview.farmLocationSub')}</p>
+                  <div className="min-w-0">
+                    <h2 className="text-sm sm:text-lg font-bold text-gray-900 truncate">{t('overview.farmLocation')}</h2>
+                    <p className="text-xs sm:text-sm text-gray-500 truncate">{t('overview.farmLocationSub')}</p>
                   </div>
                 </div>
               </div>
-              <div className="p-2">
+              <div className="p-1 sm:p-2">
                 <GoogleMapWithClustering farms={transformFarms} onFarmClick={handleFarmClick} />
               </div>
             </div>
@@ -592,7 +565,7 @@ const Overview = () => {
         </div>
 
         {/* Enhanced Sidebar */}
-        <div className="w-full lg:w-[440px] xl:w-[500px] bg-gradient-to-b from-white/60 to-gray-50/60 backdrop-blur-xl border-l border-gray-200/70 p-5 sm:p-6 lg:p-8 space-y-6 order-1 lg:order-2 overflow-y-auto max-h-screen">
+        <div className="w-full lg:w-[440px] xl:w-[500px] bg-gradient-to-b from-white/60 to-gray-50/60 backdrop-blur-xl border-l border-gray-200/70 p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 order-1 lg:order-2 overflow-y-auto max-h-screen">
           {/* Cultivated Area Card */}
           <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-sm rounded-3xl -mx-2 px-2 py-4">
             <StatCard
@@ -606,40 +579,35 @@ const Overview = () => {
           </div>
 
           {/* Categories Section */}
-          <div className="space-y-5">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-lg shadow-emerald-500/30">
-                <BarChart3 className="w-5 h-5 text-white" />
+          <div className="space-y-3 sm:space-y-5">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <div className="p-1.5 sm:p-2 bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg sm:rounded-xl shadow-lg shadow-emerald-500/30">
+                <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <h2 className="text-lg font-black text-gray-900">{t('overview.landDistribution')}</h2>
+              <h2 className="text-base sm:text-lg font-black text-gray-900">{t('overview.landDistribution')}</h2>
             </div>
 
             {categories.map((cat) => (
               <div 
                 key={cat.title} 
-                className="group relative bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition-all duration-500"
+                className="group relative bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden"
               >
-                {/* Top gradient accent */}
-                <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${cat.gradient}`}></div>
+                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${cat.gradient}`}></div>
                 
-                {/* Decorative corner gradient */}
-                <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${cat.gradient} opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-500 rounded-bl-full`}></div>
-                
-                <div className="relative p-6">
-                  <div className={`${isLTR ? 'flex-row' : 'flex-row-reverse'} flex justify-between items-center mb-4`}>
-                    <div className="flex items-center gap-3">
-                      <div className={`p-2.5 rounded-xl ${cat.iconBg} ${cat.textColor}`}>
-                        <div className="w-2 h-2 rounded-full bg-current"></div>
+                <div className="relative p-4 sm:p-6">
+                  <div className={`${isLTR ? 'flex-row' : 'flex-row-reverse'} flex justify-between items-center gap-2`}>
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                      <div className={`p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl ${cat.iconBg} ${cat.textColor} flex-shrink-0`}>
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-current"></div>
                       </div>
-                      <span className={`font-black text-lg ${cat.textColor}`}>{cat.title}</span>
+                      <span className={`font-black text-sm sm:text-lg ${cat.textColor} truncate`}>{cat.title}</span>
                     </div>
                     <button
-                      className={`p-2.5 rounded-xl ${cat.bgColor} ${cat.textColor} hover:scale-110 transition-all duration-300 shadow-sm`}
+                      className={`p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl ${cat.bgColor} ${cat.textColor} flex-shrink-0`}
                       onClick={() => handleExpand(cat.title)}
-                      aria-label={expanded[cat.title] ? "Collapse" : "Expand"}
                     >
                       <ChevronDown
-                        className="w-5 h-5"
+                        className="w-4 h-4 sm:w-5 sm:h-5"
                         style={{
                           transform: expanded[cat.title] ? "rotate(180deg)" : "none",
                           transition: "transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
@@ -655,24 +623,21 @@ const Overview = () => {
                       opacity: expanded[cat.title] ? 1 : 0,
                     }}
                   >
-                    <div className="flex flex-col gap-3 pt-4">
+                    <div className="flex flex-col gap-2 sm:gap-3 pt-3 sm:pt-4">
                       {cat.items.length > 0 ? (
                         cat.items.map((item, idx) => (
                           <div 
                             key={idx} 
-                            className={`relative ${cat.bgColor} rounded-2xl p-5 border-2 ${cat.borderColor} hover:shadow-lg hover:scale-[1.02] transition-all duration-300`}
+                            className={`relative ${cat.bgColor} rounded-xl sm:rounded-2xl p-3 sm:p-5 border ${cat.borderColor}`}
                           >
-                            {/* Mini gradient accent */}
-                            <div className={`absolute top-0 left-0 w-1 h-full bg-gradient-to-b ${cat.gradient} rounded-l-2xl`}></div>
-                            
-                            <div className="relative pl-3">
-                              <div className="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">{item.label}</div>
-                              <div className={`text-3xl font-black ${cat.textColor} tracking-tight`}>{item.value}</div>
+                            <div className="relative">
+                              <div className="text-[10px] sm:text-xs font-bold text-gray-500 mb-1 sm:mb-2 uppercase tracking-wider">{item.label}</div>
+                              <div className={`text-xl sm:text-3xl font-black ${cat.textColor} tracking-tight`}>{item.value}</div>
                             </div>
                           </div>
                         ))
                       ) : (
-                        <div className="text-sm text-gray-400 text-center py-6 italic font-medium">
+                        <div className="text-sm text-gray-400 text-center py-4 sm:py-6 italic font-medium">
                           {t('overview.noData')}
                         </div>
                       )}

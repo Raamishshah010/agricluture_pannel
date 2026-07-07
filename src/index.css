@@ -1,3 +1,87 @@
 @import "tailwindcss";
 
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
 
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  input, select, textarea, button {
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  .card-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4;
+  }
+
+  .page-container {
+    @apply px-3 sm:px-4 md:px-6 py-4 md:py-6 max-w-[1400px] mx-auto;
+  }
+
+  .page-header {
+    @apply flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6;
+  }
+
+  .page-title {
+    @apply text-xl md:text-2xl lg:text-3xl font-bold text-gray-900;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-gray-500;
+  }
+
+  .filter-row {
+    @apply flex flex-wrap gap-2 md:gap-3 items-center;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all font-medium text-sm shadow-lg shadow-emerald-200;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2.5 border border-emerald-200 text-emerald-700 rounded-xl hover:bg-emerald-50 transition-colors font-medium text-sm;
+  }
+
+  .btn-outline {
+    @apply px-4 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium text-sm;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-200;
+  }
+
+  .table-wrap {
+    @apply overflow-x-auto -mx-3 sm:mx-0;
+  }
+
+  .table-wrap table {
+    @apply min-w-[600px] md:min-w-0 w-full;
+  }
+
+  .mobile-card-list {
+    @apply grid grid-cols-1 gap-3 sm:hidden;
+  }
+
+  .desktop-table {
+    @apply hidden sm:block;
+  }
+
+  .modal-mobile {
+    @apply mx-4 max-w-lg w-full;
+  }
+
+  .action-strip {
+    @apply flex flex-wrap items-center gap-2;
+  }
+}

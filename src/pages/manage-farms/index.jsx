@@ -329,12 +329,10 @@ export default function Index(props) {
     };
 
     return activeTab.includes('farms') ? (
-        <div className="max-w-[1400px] mx-auto p-3">
-            <div className="mb-8 flex justify-between items-center">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">{t('manageFarms.title')}</h1>
-                </div>
-                <div className="flex gap-3">
+        <div className="max-w-[1400px] mx-auto p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-8">
+                <h1 className="text-xl sm:text-3xl font-bold text-gray-900">{t('manageFarms.title')}</h1>
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                     <input
                         ref={importInputRef}
                         type="file"
@@ -342,31 +340,33 @@ export default function Index(props) {
                         className="hidden"
                         onChange={handleImportCsv}
                     />
-                    <a
-                        href="/samples/farms-import-sample.csv"
-                        download
-                        className="px-4 py-2.5 border border-emerald-200 text-emerald-700 rounded-xl hover:bg-emerald-50 transition-colors font-medium"
-                    >
-                        {t('manageFarms.sampleCsv')}
-                    </a>
-                    <button
-                        onClick={() => importInputRef.current?.click()}
-                        disabled={isImporting}
-                        className="px-5 py-2.5 bg-white border border-emerald-300 text-emerald-700 rounded-xl hover:bg-emerald-50 transition-colors flex items-center gap-2 font-medium disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                        <Upload size={18} />
-                        <span>{isImporting ? t('manageFarms.importing') : t('manageFarms.importCsv')}</span>
-                    </button>
+                    <div className="hidden sm:flex items-center gap-2">
+                        <a
+                            href="/samples/farms-import-sample.csv"
+                            download
+                            className="px-3 sm:px-4 py-2 sm:py-2.5 border border-emerald-200 text-emerald-700 rounded-lg sm:rounded-xl hover:bg-emerald-50 transition-colors font-medium text-xs sm:text-sm"
+                        >
+                            {t('manageFarms.sampleCsv')}
+                        </a>
+                        <button
+                            onClick={() => importInputRef.current?.click()}
+                            disabled={isImporting}
+                            className="px-3 sm:px-5 py-2 sm:py-2.5 bg-white border border-emerald-300 text-emerald-700 rounded-lg sm:rounded-xl hover:bg-emerald-50 transition-colors flex items-center gap-1 sm:gap-2 font-medium text-xs sm:text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            <Upload size={16} />
+                            <span>{isImporting ? t('manageFarms.importing') : t('manageFarms.importCsv')}</span>
+                        </button>
+                    </div>
                     {/* Download Dropdown */}
                     <div className="relative">
                         <button
                             onClick={() => setIsDownloadOpen(!isDownloadOpen)}
-                            className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
+                            className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-lg sm:rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-1 sm:gap-2 shadow-lg shadow-emerald-200 text-xs sm:text-sm"
                         >
-                            <Download size={20} />
-                            <span className="font-medium">{t('manageFarms.download')}</span>
+                            <Download size={16} />
+                            <span className="font-medium hidden sm:inline">{t('manageFarms.download')}</span>
                             <ChevronDown
-                                size={16}
+                                size={14}
                                 className={`transition-transform duration-200 ${isDownloadOpen ? "rotate-180" : ""}`}
                             />
                         </button>
@@ -377,78 +377,48 @@ export default function Index(props) {
                                     className="fixed inset-0 z-10"
                                     onClick={() => setIsDownloadOpen(false)}
                                 />
-                                <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-2xl z-50 border border-gray-100 overflow-hidden">
+                                <div className="absolute right-0 mt-2 w-48 sm:w-52 bg-white rounded-xl shadow-2xl z-50 border border-gray-100 overflow-hidden">
                                     <button
                                         onClick={downloadPDF}
-                                        className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
+                                        className="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-emerald-50 flex items-center gap-2 sm:gap-3 transition-colors group text-xs sm:text-sm"
                                     >
-                                        <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                                            <svg
-                                                className="w-5 h-5 text-emerald-600"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
-                                                />
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                             </svg>
                                         </div>
-                                            <div>
-                                                <div className="font-medium text-gray-900">{t('manageFarms.downloadOptions.pdf')}</div>
-                                                <div className="text-xs text-gray-500">{t('manageFarms.downloadOptions.pdfHint')}</div>
-                                            </div>
+                                        <div className="min-w-0">
+                                            <div className="font-medium text-gray-900 truncate">{t('manageFarms.downloadOptions.pdf')}</div>
+                                            <div className="text-[10px] sm:text-xs text-gray-500 truncate">{t('manageFarms.downloadOptions.pdfHint')}</div>
+                                        </div>
                                     </button>
                                     <button
                                         onClick={downloadExcel}
-                                        className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group"
+                                        className="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-emerald-50 flex items-center gap-2 sm:gap-3 transition-colors group text-xs sm:text-sm"
                                     >
-                                        <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                                            <svg
-                                                className="w-5 h-5 text-emerald-600"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                                                />
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
                                             </svg>
                                         </div>
-                                        <div>
-                                            <div className="font-medium text-gray-900">{t('manageFarms.downloadOptions.excel')}</div>
-                                            <div className="text-xs text-gray-500">{t('manageFarms.downloadOptions.excelHint')}</div>
+                                        <div className="min-w-0">
+                                            <div className="font-medium text-gray-900 truncate">{t('manageFarms.downloadOptions.excel')}</div>
+                                            <div className="text-[10px] sm:text-xs text-gray-500 truncate">{t('manageFarms.downloadOptions.excelHint')}</div>
                                         </div>
                                     </button>
                                     <button
                                         onClick={downloadCSV}
-                                        className="w-full text-left px-4 py-3 hover:bg-emerald-50 flex items-center gap-3 transition-colors group rounded-b-xl"
+                                        className="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-emerald-50 flex items-center gap-2 sm:gap-3 transition-colors group rounded-b-xl text-xs sm:text-sm"
                                     >
-                                        <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
-                                            <svg
-                                                className="w-5 h-5 text-emerald-600"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                viewBox="0 0 24 24"
-                                            >
-                                                <path
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    strokeWidth={2}
-                                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                                                />
+                                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                                            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
                                         </div>
-                                            <div>
-                                                <div className="font-medium text-gray-900">{t('manageFarms.downloadOptions.csv')}</div>
-                                                <div className="text-xs text-gray-500">{t('manageFarms.downloadOptions.csvHint')}</div>
-                                            </div>
+                                        <div className="min-w-0">
+                                            <div className="font-medium text-gray-900 truncate">{t('manageFarms.downloadOptions.csv')}</div>
+                                            <div className="text-[10px] sm:text-xs text-gray-500 truncate">{t('manageFarms.downloadOptions.csvHint')}</div>
+                                        </div>
                                     </button>
                                 </div>
                             </>
@@ -458,43 +428,41 @@ export default function Index(props) {
                     {/* Add Farm Button */}
                     <button
                         onClick={() => setActiveTab("farm-new")}
-                        className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 font-medium"
-                        title={t('manageFarms.addFarm')}
+                        className="px-3 sm:px-5 py-2 sm:py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg sm:rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-200 font-medium text-xs sm:text-sm"
                     >
                         {t('manageFarms.addFarm')}
                     </button>
                 </div>
             </div>
 
-            <div className='flex justify-between items-center mb-4 flex-col sm:flex-row gap-4'>
+            <div className='flex flex-col gap-3 mb-4'>
                 <input
                     type="text"
                     placeholder="Search by farm number, serial, or ID"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    className="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="border border-gray-300 rounded-lg p-2 sm:p-2.5 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 />
 
-                {/* Min and Max Size Filters */}
-                <div className="flex gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                     <input
                         type="number"
                         placeholder={t('manageFarms.minSize')}
                         value={minSize}
                         onChange={(e) => setMinSize(e.target.value)}
-                        className="border border-gray-300 rounded-lg p-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="border border-gray-300 rounded-lg p-2 w-20 sm:w-24 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     />
                     <input
                         type="number"
                         placeholder={t('manageFarms.maxSize')}
                         value={maxSize}
                         onChange={(e) => setMaxSize(e.target.value)}
-                        className="border border-gray-300 rounded-lg p-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="border border-gray-300 rounded-lg p-2 w-20 sm:w-24 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     />
                     <select
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
-                        className="border border-gray-300 rounded-lg p-2 w-36 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="border border-gray-300 rounded-lg p-2 w-28 sm:w-36 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     >
                         {statusOptions.map((option) => (
                             <option key={option.value || 'all'} value={option.value}>
@@ -502,44 +470,44 @@ export default function Index(props) {
                             </option>
                         ))}
                     </select>
-                </div>
 
-                <div className="flex gap-2 sm:p-4 border-gray-200">
-                    <Dropdown
-                        options={emirates}
-                        value={emirate}
-                        onChange={setEmirate}
-                        placeholder={t('manageFarms.selectEmirate')}
-                        language={language}
-                    />
-                    <Dropdown
-                        options={centers}
-                        value={center}
-                        onChange={setCenter}
-                        placeholder={t('manageFarms.selectCenter')}
-                        language={language}
-                    />
-                    <Dropdown
-                        options={locations}
-                        value={location}
-                        onChange={setLocation}
-                        placeholder={t('manageFarms.selectLocation')}
-                        language={language}
-                    />
-                    <button
-                        className="bg-green-600 text-white px-3 py-1.5 rounded-md hover:bg-green-700 transition-colors"
-                        onClick={() => {
-                            setEmirate(null);
-                            setCenter(null);
-                            setLocation(null);
-                            setQuery('');
-                            setMinSize('');
-                            setMaxSize('');
-                            setStatusFilter('');
-                        }}
-                    >
-                        {t('manageFarms.clear')}
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <Dropdown
+                            options={emirates}
+                            value={emirate}
+                            onChange={setEmirate}
+                            placeholder={t('manageFarms.selectEmirate')}
+                            language={language}
+                        />
+                        <Dropdown
+                            options={centers}
+                            value={center}
+                            onChange={setCenter}
+                            placeholder={t('manageFarms.selectCenter')}
+                            language={language}
+                        />
+                        <Dropdown
+                            options={locations}
+                            value={location}
+                            onChange={setLocation}
+                            placeholder={t('manageFarms.selectLocation')}
+                            language={language}
+                        />
+                        <button
+                            className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm whitespace-nowrap"
+                            onClick={() => {
+                                setEmirate(null);
+                                setCenter(null);
+                                setLocation(null);
+                                setQuery('');
+                                setMinSize('');
+                                setMaxSize('');
+                                setStatusFilter('');
+                            }}
+                        >
+                            {t('manageFarms.clear')}
+                        </button>
+                    </div>
                 </div>
             </div>
 

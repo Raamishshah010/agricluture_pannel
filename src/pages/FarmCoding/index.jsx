@@ -458,7 +458,7 @@ const FarmCodingRequest = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header Section with Gradient */}
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="px-6 py-6">
+        <div className="px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-1">
@@ -473,9 +473,9 @@ const FarmCodingRequest = () => {
             <div className="relative">
               <button
                 onClick={() => setShowDownloadMenu(!showDownloadMenu)}
-                className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
+                className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                 </svg>
                 <span className="font-medium">{t('common.components.farmCoding.download')}</span>
@@ -570,7 +570,7 @@ const FarmCodingRequest = () => {
         </div>
       </div>
 
-      <div className="px-6 py-6">
+      <div className="px-4 sm:px-6 py-4 sm:py-6">
         {/* Filters Section */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex flex-col gap-4">
@@ -584,7 +584,7 @@ const FarmCodingRequest = () => {
                 placeholder={t('common.components.farmCoding.searchByFarmName')}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                className="w-full pl-12 pr-4 py-2.5 sm:py-3.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
               />
             </div>
 
@@ -735,7 +735,7 @@ const FarmCodingRequest = () => {
           overlay: 'bg-black/50 backdrop-blur-sm',
         }}
       >
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center">
               <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

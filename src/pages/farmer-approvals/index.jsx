@@ -153,7 +153,7 @@ export default function FarmerApprovals() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-1">
@@ -199,7 +199,7 @@ export default function FarmerApprovals() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-200">
@@ -231,8 +231,71 @@ export default function FarmerApprovals() {
                   : t("farmers.farmerApprovals.emptyState")}
               </p>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
+          ) : (<>
+            <div className="block sm:hidden space-y-3 p-4">
+              {filteredList.map((item) => {
+                const isBusy = !!actionLoading[item.id];
+                return (
+                  <div key={item.id} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                    <div className="flex justify-between items-start">
+                      <div className="font-semibold text-gray-900 text-sm">{getFarmerName(item)}</div>
+                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-semibold border whitespace-nowrap ${
+                        activeTab === "rejected"
+                          ? "bg-red-50 text-red-700 border-red-200"
+                          : "bg-amber-50 text-amber-700 border-amber-200"
+                      }`}>
+                        {activeTab === "rejected"
+                          ? t("farmers.farmerApprovals.rejectedBadge")
+                          : t("farmers.farmerApprovals.pendingBadge")}
+                      </span>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">{item.email}</div>
+                    <div className="mt-2 space-y-1 text-xs text-gray-600">
+                      <div><span className="font-medium">{t("farmers.farmers.phoneNumber")}:</span> {getFarmerMobile(item)}</div>
+                      <div><span className="font-medium">{t("farmers.farmers.emirateId")}:</span> {item.emirateId || t("common.nA")}</div>
+                      <div><span className="font-medium">{t("farmers.farmers.createdAt")}:</span> {formatDate(item.createdAt)}</div>
+                      <div className="flex items-center gap-2 pt-1">
+                        {item.mergeCandidates?.length ? (
+                          <button
+                            type="button"
+                            onClick={() => openMatchDetails(item)}
+                            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-indigo-50 text-xs font-semibold text-indigo-700 border border-indigo-200"
+                          >
+                            <GitMerge className="w-3 h-3" />
+                            {item.mergeCandidates.length}
+                            <Eye className="w-3 h-3" />
+                          </button>
+                        ) : (
+                          <span className="text-xs text-gray-400">{t("common.nA")}</span>
+                        )}
+                      </div>
+                    </div>
+                    {activeTab === "pending" && (
+                      <div className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+                        <button
+                          onClick={() => openApprovalDialog(item)}
+                          disabled={isBusy}
+                          className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-60"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                          {t("common.components.farmCoding.approve")}
+                        </button>
+                        <button
+                          onClick={() => handleDecision(item, "reject")}
+                          disabled={isBusy}
+                          className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition-colors disabled:opacity-60"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          {t("common.components.farmCoding.reject")}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full table-auto">
                 <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
                   <tr>
@@ -331,6 +394,7 @@ export default function FarmerApprovals() {
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </div>
       </div>
@@ -338,7 +402,7 @@ export default function FarmerApprovals() {
       {approvalDialogItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm">
           <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-emerald-50 to-white">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100 bg-gradient-to-r from-emerald-50 to-white">
               <h2 className="text-xl font-bold text-gray-900">
                 {t("farmers.farmerApprovals.approveRoleTitle")}
               </h2>
@@ -347,7 +411,7 @@ export default function FarmerApprovals() {
               </p>
             </div>
 
-            <div className="px-6 py-5 space-y-4">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 space-y-4">
               <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
                 <div className="text-sm font-semibold text-gray-800">
                   {getFarmerName(approvalDialogItem)}
@@ -456,7 +520,7 @@ export default function FarmerApprovals() {
       {matchDetailsItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-4 backdrop-blur-sm">
           <div className="w-full max-w-3xl rounded-2xl bg-white shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="flex items-start justify-between gap-4 px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white">
+            <div className="flex items-start justify-between gap-4 px-4 sm:px-6 py-4 sm:py-5 border-b border-gray-100 bg-gradient-to-r from-indigo-50 to-white">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">
                   {t("farmers.farmerApprovals.matchDetailsTitle")}
@@ -474,7 +538,7 @@ export default function FarmerApprovals() {
               </button>
             </div>
 
-            <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+            <div className="px-4 sm:px-6 py-4 sm:py-5 space-y-4 max-h-[70vh] overflow-y-auto">
               <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
                 <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">
                   {t("farmers.farmerApprovals.pendingAccount")}

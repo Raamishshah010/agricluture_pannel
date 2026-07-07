@@ -347,6 +347,13 @@ const DashboardLayout = () => {
 
   return (
     <div className={`flex h-screen bg-gray-100 ${directionClass}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Mobile sidebar backdrop */}
+      {isMobile && !sidebarCollapsed && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30"
+          onClick={() => setSidebarCollapsed(true)}
+        />
+      )}
       {/* Sidebar */}
       <div
         className={`bg-white shadow-lg flex flex-col border-gray-300 transition-all duration-300
@@ -355,8 +362,9 @@ const DashboardLayout = () => {
           ${isRTL ? 'border-l-2' : 'border-r-2'}
           ${isRTL && isMobile ? 'right-0' : ''}
           ${!isRTL && isMobile ? 'left-0' : ''}
+          ${isMobile && !sidebarCollapsed ? 'shadow-2xl' : ''}
         `}
-        style={isMobile ? { minWidth: sidebarCollapsed ? '4rem' : '16rem' } : {}}
+        style={isMobile ? { minWidth: sidebarCollapsed ? '4rem' : '80vw', maxWidth: '20rem' } : {}}
       >
         {/* Logo Section */}
         <div className={`px-2 md:px-6 py-2 h-[80px] md:h-[100px] flex items-center justify-between`}>
@@ -539,49 +547,44 @@ const DashboardLayout = () => {
       {/* Main Content Area */}
       <div className={`flex-1 flex flex-col min-w-0 ${isMobile ? (isRTL ? 'mr-[65px]' : 'ml-[65px]') : ''}`}>
         {/* Header */}
-        <header className="bg-white border-b px-2 md:px-6 py-2 md:py-3">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full gap-2 md:gap-0">
-            <div className="flex flex-col">
-                  {(() => {
-                    const adminName = getAdminDisplayName();
-                    return (
-                      <>
-                        <h1 className={`text-lg md:text-2xl font-semibold text-gray-800 ${isRTL ? 'text-right' : 'text-left'}`}>
-                          {t('common.components.dashboard.greeting')}{' '}
-                          {adminName ? <span className="ml-2 inline-block">{adminName}</span> : <span className="inline-block">👋</span>}
-                        </h1>
-                        <p className={`text-xs md:text-[14px] text-gray-600 ${isRTL ? 'text-right' : 'text-left'}`}>
-                          {t('common.components.dashboard.welcome')}
-                        </p>
-                      </>
-                    );
-                  })()}
-                </div>
-            <div className={`flex items-center gap-2 md:gap-4 mt-2 md:mt-0 w-40 md:w-auto flex-wrap ${isRTL ? 'flex-row-reverse' : ''}`}>
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                <Search className="w-5 h-5 text-gray-700" />
-              </button>
-              <span className='text-xl md:text-2xl mb-1 text-gray-600'>|</span>
-              <button className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                <Bell className="w-5 h-5 text-gray-700" />
-              </button>
-              <button
-                className={`px-2 md:px-3 py-1 text-xs md:text-sm mx-2 md:mx-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center ${isRTL ? 'space-x-reverse' : ''} gap-1 md:gap-2`}
-                onClick={handleSidebarToggle}
-              >
-                <Maximize2 className="w-4 h-4 text-gray-700" />
-                <span className="hidden md:inline">{t('common.components.dashboard.expand')}</span>
-              </button>
-              <div className={`flex items-center bg-white border border-gray-300 rounded-lg px-3 py-2 w-fit shadow-sm ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
+        <header className="bg-white border-b px-2 md:px-6 py-2 md:py-3 sticky top-0 z-20">
+          <div className="flex items-start md:items-center justify-between w-full gap-2 md:gap-0">
+            <div className="flex flex-col min-w-0 flex-1">
+              {(() => {
+                const adminName = getAdminDisplayName();
+                return (
+                  <>
+                    <h1 className={`text-base md:text-2xl font-semibold text-gray-800 truncate ${isRTL ? 'text-right' : 'text-left'}`}>
+                      {t('common.components.dashboard.greeting')}{' '}
+                      {adminName ? <span className="ml-2 inline-block truncate max-w-[120px] md:max-w-none align-bottom">{adminName}</span> : <span className="inline-block">👋</span>}
+                    </h1>
+                    <p className={`text-[11px] md:text-[14px] text-gray-600 truncate ${isRTL ? 'text-right' : 'text-left'}`}>
+                      {t('common.components.dashboard.welcome')}
+                    </p>
+                  </>
+                );
+              })()}
+            </div>
+            <div className={`flex items-center gap-1 md:gap-4 flex-shrink-0 ${isRTL ? 'flex-row-reverse' : ''}`}>
+              {isMobile && (
+                <button
+                  className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                  onClick={handleSidebarToggle}
+                  aria-label="Toggle sidebar"
+                >
+                  <Maximize2 className="w-4 h-4 text-gray-700" />
+                </button>
+              )}
+              <div className={`flex items-center bg-white border border-gray-300 rounded-lg px-2 md:px-3 py-1.5 md:py-2 shadow-sm ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
                 <select
                   value={language}
                   onChange={handleChange}
-                  className="border-none bg-transparent text-gray-800 font-semibold focus:outline-none rounded-md cursor-pointer"
+                  className="border-none bg-transparent text-gray-800 font-semibold text-xs md:text-sm focus:outline-none rounded-md cursor-pointer w-10 md:w-auto"
                 >
-                  <option value="en">{t('common.components.dashboard.english')}</option>
-                  <option value="ar">{t('common.components.dashboard.arabic')}</option>
+                  <option value="en">EN</option>
+                  <option value="ar">AR</option>
                 </select>
-                <Globe className="w-4 h-4" />
+                <Globe className="w-3.5 h-3.5 md:w-4 md:h-4" />
               </div>
             </div>
           </div>

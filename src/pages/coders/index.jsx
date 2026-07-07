@@ -649,7 +649,7 @@ const downloadPDF = () => {
               <button
                 onClick={generateInviteLink}
                 disabled={inviteLoading || !inviteLocation}
-                className="bg-white text-emerald-700 border border-emerald-200 px-5 py-2.5 rounded-xl hover:bg-emerald-50 transition-all duration-200 flex items-center gap-2 shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+                className="bg-white text-emerald-700 border border-emerald-200 px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:bg-emerald-50 transition-all duration-200 flex items-center gap-2 shadow-sm disabled:cursor-not-allowed disabled:opacity-60 text-sm sm:text-base"
               >
                 <Link2 size={20} />
                 <span className="font-medium">{inviteLoading ? "Generating..." : "Generate coder invite"}</span>
@@ -659,7 +659,7 @@ const downloadPDF = () => {
               <div className="relative">
                   <button
                     onClick={() => setIsDownloadOpen(!isDownloadOpen)}
-                    className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-5 py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300"
+                    className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-emerald-200 hover:shadow-xl hover:shadow-emerald-300 text-sm sm:text-base"
                   >
                     <Download size={20} />
                     <span className="font-medium">{t("coders.download")}</span>
@@ -768,7 +768,7 @@ const downloadPDF = () => {
               {/* Add Button */}
               <button
                 onClick={openAddModal}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-5 py-2.5 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 sm:px-5 sm:py-2.5 rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 flex items-center gap-2 shadow-lg shadow-blue-200 hover:shadow-xl hover:shadow-blue-300 text-sm sm:text-base"
               >
                 <Plus size={20} />
                 <span className="font-medium">{t("coders.add")}</span>
@@ -849,111 +849,141 @@ const downloadPDF = () => {
           {loading ? (
             <Loader />
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-              <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t("coders.name")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t("coders.emirateId")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t("coders.phoneNumber")}
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t("coders.email")}
-                  </th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">
-                    {t("coders.actions")}
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
+            <>
+              {/* Mobile Card View */}
+              <div className="block sm:hidden space-y-3 p-4">
                 {list.map((coder) => (
-                  <tr
-                    key={coder.id}
-                    className="hover:bg-gray-50 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="font-semibold text-gray-900">
-                        {getCoderName(coder)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">
-                        {coder.emirateId}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">
-                        {getCoderMobile(coder)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">
-                        {getLocationName(coder.location)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-gray-600">
-                        {coder.email}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-center gap-2 whitespace-nowrap flex-nowrap">
-                        <button
-                          onClick={() => openCoderDetails(coder)}
-                          className="p-2.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 hover:shadow-md"
-                          title={t("coders.view")}
-                        >
-                          <Eye size={18} />
-                        </button>
-                        <button
-                          onClick={() => openEditModal(coder)}
-                          className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:shadow-md"
-                          title={t("coders.edit")}
-                        >
-                          <Edit2 size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(coder.id)}
-                          className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:shadow-md"
-                          title={t("coders.delete")}
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                  <div key={coder.id} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                    <div className="flex justify-between items-start">
+                      <div className="font-semibold text-gray-900">{getCoderName(coder)}</div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button onClick={() => openCoderDetails(coder)} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg" title={t("coders.view")}><Eye size={16} /></button>
+                        <button onClick={() => openEditModal(coder)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg" title={t("coders.edit")}><Edit2 size={16} /></button>
+                        <button onClick={() => handleDelete(coder.id)} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg" title={t("coders.delete")}><Trash2 size={16} /></button>
                         {getNormalizedApprovalStatus(coder) === "pending_approval" && (
                           <>
-                            <button
-                              onClick={() => handleApprovalDecision(coder, "approve")}
-                              disabled={!!actionLoading[coder.id]}
-                              className="p-2.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
-                              title={t("common.components.farmCoding.approve")}
-                            >
-                              <CheckCircle2 size={18} />
-                            </button>
-                            <button
-                              onClick={() => handleApprovalDecision(coder, "reject")}
-                              disabled={!!actionLoading[coder.id]}
-                              className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
-                              title={t("common.components.farmCoding.reject")}
-                            >
-                              <XCircle size={18} />
-                            </button>
+                            <button onClick={() => handleApprovalDecision(coder, "approve")} disabled={!!actionLoading[coder.id]} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg disabled:opacity-60" title={t("common.components.farmCoding.approve")}><CheckCircle2 size={16} /></button>
+                            <button onClick={() => handleApprovalDecision(coder, "reject")} disabled={!!actionLoading[coder.id]} className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg disabled:opacity-60" title={t("common.components.farmCoding.reject")}><XCircle size={16} /></button>
                           </>
                         )}
                       </div>
-                    </td>
-                  </tr>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500 space-y-1">
+                      <div><span className="font-medium">{t("coders.emirateId")}:</span> {coder.emirateId}</div>
+                      <div><span className="font-medium">{t("coders.phoneNumber")}:</span> {getCoderMobile(coder)}</div>
+                      <div><span className="font-medium">Location:</span> {getLocationName(coder.location)}</div>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-              </table>
-            </div>
+              </div>
+
+              {/* Desktop Table */}
+              <div className="hidden sm:block overflow-x-auto">
+                <table className="w-full">
+                <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      {t("coders.name")}
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      {t("coders.emirateId")}
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      {t("coders.phoneNumber")}
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      Location
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      {t("coders.email")}
+                    </th>
+                    <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">
+                      {t("coders.actions")}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {list.map((coder) => (
+                    <tr
+                      key={coder.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div className="font-semibold text-gray-900">
+                          {getCoderName(coder)}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {coder.emirateId}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {getCoderMobile(coder)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {getLocationName(coder.location)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {coder.email}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-center gap-2 whitespace-nowrap flex-nowrap">
+                          <button
+                            onClick={() => openCoderDetails(coder)}
+                            className="p-2.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 hover:shadow-md"
+                            title={t("coders.view")}
+                          >
+                            <Eye size={18} />
+                          </button>
+                          <button
+                            onClick={() => openEditModal(coder)}
+                            className="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 hover:shadow-md"
+                            title={t("coders.edit")}
+                          >
+                            <Edit2 size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(coder.id)}
+                            className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:shadow-md"
+                            title={t("coders.delete")}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                          {getNormalizedApprovalStatus(coder) === "pending_approval" && (
+                            <>
+                              <button
+                                onClick={() => handleApprovalDecision(coder, "approve")}
+                                disabled={!!actionLoading[coder.id]}
+                                className="p-2.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+                                title={t("common.components.farmCoding.approve")}
+                              >
+                                <CheckCircle2 size={18} />
+                              </button>
+                              <button
+                                onClick={() => handleApprovalDecision(coder, "reject")}
+                                disabled={!!actionLoading[coder.id]}
+                                className="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+                                title={t("common.components.farmCoding.reject")}
+                              >
+                                <XCircle size={18} />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                </table>
+              </div>
+            </>
           )}
 
           {!loading && list.length === 0 && (
@@ -986,7 +1016,7 @@ const downloadPDF = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full transform transition-all animate-slideUp">
             {/* Modal Header */}
-            <div className="flex justify-between items-center px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex justify-between items-center px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
               <div className="flex items-center gap-3">
                 <div
                   className={`w-12 h-12 rounded-xl ${editingItem ? "bg-gradient-to-br from-blue-500 to-blue-600" : "bg-gradient-to-br from-emerald-500 to-emerald-600"} flex items-center justify-center shadow-lg`}
@@ -1017,7 +1047,7 @@ const downloadPDF = () => {
             </div>
 
             {/* Modal Body */}
-            <div className="px-8 py-6">
+            <div className="px-4 sm:px-8 py-4 sm:py-6">
               <div className="space-y-5 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -1250,7 +1280,7 @@ const downloadPDF = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden transform transition-all animate-slideUp">
             {/* Modal Header */}
-            <div className="flex justify-between items-center px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+            <div className="flex justify-between items-center px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg">
                   <Eye className="text-white" size={20} />
@@ -1273,7 +1303,7 @@ const downloadPDF = () => {
             </div>
 
             {/* Modal Body */}
-            <div className="px-8 py-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+            <div className="px-4 sm:px-8 py-4 sm:py-6 overflow-y-auto max-h-[calc(90vh-200px)]">
               <div className="space-y-6">
                 {/* Coder Information */}
                 <div className="bg-gray-50 rounded-xl p-6">
@@ -1409,7 +1439,7 @@ const downloadPDF = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-end gap-3 px-8 py-6 border-t border-gray-200 bg-gray-50">
+            <div className="flex justify-end gap-3 px-4 sm:px-8 py-4 sm:py-6 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={closeDetailsModal}
                 className="px-6 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-semibold transition-all"

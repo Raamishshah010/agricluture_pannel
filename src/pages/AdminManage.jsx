@@ -241,9 +241,9 @@ export default function AdminManage() {
   if (loading) return <Loader />;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Header */}
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex flex-wrap justify-between items-center gap-3">
         <h1 className="text-2xl font-semibold text-gray-900">
           {t('admin.adminManagement')}
         </h1>
@@ -323,62 +323,32 @@ export default function AdminManage() {
         </div>
       )}
 
-      {/* Table Header */}
-      <div className="px-6 py-4 border-b border-gray-200">
-        <div className="grid grid-cols-8 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider items-center">
-          <div>
-            <input
-              type="checkbox"
-              checked={
-                selectedIds.length === admins.length &&
-                admins.length > 0
-              }
-              onChange={toggleSelectAll}
-            />
-          </div>
-          <div>{t('admin.adminName')}</div>
-          <div>{t('admin.email')}</div>
-          <div>{emiratesIdLabel}</div>
-          <div>{t('admin.emirate')}</div>
-          <div>{t('admin.adminType')}</div>
-          <div>{t('admin.mobileNumberHeader')}</div>
-          <div>{t('common.actions') || 'Action'}</div>
-        </div>
-      </div>
-
-      {/* Table Body */}
-      <div className="divide-y divide-gray-200">
+      {/* Mobile Card View */}
+      <div className="block sm:hidden space-y-3">
         {admins.map(admin => (
-          <div
-            key={admin.id}
-            className="px-6 py-4"
-          >
-            <div className="grid grid-cols-8 gap-4 text-sm text-gray-900 items-center">
-              <div>
-                <input
-                  type="checkbox"
-                  checked={selectedIds.includes(admin.id)}
-                  onChange={() => toggleSelect(admin.id)}
-                />
+          <div key={admin.id} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={selectedIds.includes(admin.id)}
+                onChange={() => toggleSelect(admin.id)}
+                className="mt-1"
+              />
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold text-gray-900">{getAdminName(admin)}</div>
+                <div className="text-xs text-gray-500 truncate mt-0.5">{admin.email}</div>
+                <div className="mt-2 text-xs text-gray-600 space-y-1">
+                  <div><span className="font-medium">{emiratesIdLabel}:</span> {getAdminEmiratesId(admin) || '-'}</div>
+                  <div><span className="font-medium">{t('admin.adminType')}:</span> {admin.type}</div>
+                </div>
               </div>
-              <div className="font-medium">{getAdminName(admin)}</div>
-              <div className="truncate">{admin.email}</div>
-              <div className="truncate">{getAdminEmiratesId(admin) || '-'}</div>
-              <div>{admin.emirate}</div>
-              <div>{admin.type}</div>
-              <div>{admin.mobile}</div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 shrink-0">
                 <button
-                  onClick={() =>
-                    navigate('/dashboard/addAdmin', {
-                      state: { editAdmin: admin }
-                    })
-                  }
+                  onClick={() => navigate('/dashboard/addAdmin', { state: { editAdmin: admin } })}
                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
                 >
                   <Edit2 size={16} />
                 </button>
-
                 <button
                   onClick={() => deleteOne(admin.id)}
                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
@@ -389,15 +359,77 @@ export default function AdminManage() {
             </div>
           </div>
         ))}
-
         {admins.length === 0 && (
           <div className="px-6 py-12 text-center text-gray-500">
             <p>{t('admin.noAdmins')}</p>
-            <p className="text-sm mt-1">
-              {t('admin.clickAddAdmin')}
-            </p>
+            <p className="text-sm mt-1">{t('admin.clickAddAdmin')}</p>
           </div>
         )}
+      </div>
+
+      {/* Desktop Table - hidden on mobile */}
+      <div className="hidden sm:block">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <div className="grid grid-cols-8 gap-4 text-sm font-medium text-gray-700 uppercase tracking-wider items-center">
+            <div>
+              <input
+                type="checkbox"
+                checked={selectedIds.length === admins.length && admins.length > 0}
+                onChange={toggleSelectAll}
+              />
+            </div>
+            <div>{t('admin.adminName')}</div>
+            <div>{t('admin.email')}</div>
+            <div>{emiratesIdLabel}</div>
+            <div>{t('admin.emirate')}</div>
+            <div>{t('admin.adminType')}</div>
+            <div>{t('admin.mobileNumberHeader')}</div>
+            <div>{t('common.actions') || 'Action'}</div>
+          </div>
+        </div>
+
+        <div className="divide-y divide-gray-200">
+          {admins.map(admin => (
+            <div key={admin.id} className="px-6 py-4">
+              <div className="grid grid-cols-8 gap-4 text-sm text-gray-900 items-center">
+                <div>
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(admin.id)}
+                    onChange={() => toggleSelect(admin.id)}
+                  />
+                </div>
+                <div className="font-medium">{getAdminName(admin)}</div>
+                <div className="truncate">{admin.email}</div>
+                <div className="truncate">{getAdminEmiratesId(admin) || '-'}</div>
+                <div>{admin.emirate}</div>
+                <div>{admin.type}</div>
+                <div>{admin.mobile}</div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => navigate('/dashboard/addAdmin', { state: { editAdmin: admin } })}
+                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                  <button
+                    onClick={() => deleteOne(admin.id)}
+                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {admins.length === 0 && (
+            <div className="px-6 py-12 text-center text-gray-500">
+              <p>{t('admin.noAdmins')}</p>
+              <p className="text-sm mt-1">{t('admin.clickAddAdmin')}</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

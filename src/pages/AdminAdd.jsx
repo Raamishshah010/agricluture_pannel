@@ -166,7 +166,7 @@ export default function AdminAdd() {
   if (loading) return <Loader />;
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {showSuccessPopup && (
         <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-green-50 border border-green-200 rounded-lg p-4 shadow-lg max-w-md w-full mx-4">
           <div className="flex items-center justify-between">
@@ -194,7 +194,7 @@ export default function AdminAdd() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">{t('admin.firstName')}</label>
           <input type="text" value={formData.firstName} onChange={e => handleInputChange('firstName', e.target.value)} className="w-full px-3 py-3 border border-gray-300 rounded-lg" />
@@ -247,16 +247,16 @@ export default function AdminAdd() {
         </select>
       </div>
 
-      <div className="flex items-center justify-between pt-6 border-t border-gray-300">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-6 border-t border-gray-300 gap-3">
         <div className="flex items-center text-gray-500"><span className="text-sm">{t('admin.notSaved')}</span></div>
-        <div className="flex space-x-3">
-          <button onClick={() => navigate('/dashboard/manageAdmins')} className="px-6 py-2 text-gray-600 bg-gray-100 rounded-lg">{t('admin.cancel')}</button>
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2">
+          <button onClick={() => navigate('/dashboard/manageAdmins')} className="w-full sm:w-auto px-6 py-2 text-gray-600 bg-gray-100 rounded-lg">{t('admin.cancel')}</button>
           <button
             type="button"
             onClick={save}
             disabled={!isFormValid()}
             aria-disabled={!isFormValid()}
-            className={`px-6 py-2 rounded-lg text-white ${isFormValid() ? 'bg-green-600 hover:bg-green-700' : 'bg-green-400 opacity-60 cursor-not-allowed'}`}
+            className={`w-full sm:w-auto px-6 py-2 rounded-lg text-white ${isFormValid() ? 'bg-green-600 hover:bg-green-700' : 'bg-green-400 opacity-60 cursor-not-allowed'}`}
           >
             {editAdmin ? t('admin.save') : t('admin.addAdminBtn')}
           </button>
