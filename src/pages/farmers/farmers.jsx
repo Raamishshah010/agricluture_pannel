@@ -19,6 +19,7 @@ export default function Farmers({
     const { language } = useStore((state) => state);
     const getFarmerName = (farmer) => getLocalizedPersonName(farmer, language) || t('common.nA');
     const getFarmerMobile = (farmer) => farmer?.mobile || farmer?.phoneNumber || t('common.nA');
+    const getFarmerAgriculturalId = (farmer) => farmer?.agriculturalId || farmer?.agricultureID || t('common.nA');
     const sortFarmersByCreatedAtDesc = (farmers = []) => [...farmers].sort((a, b) => {
         const aTime = new Date(a?.createdAt || 0).getTime();
         const bTime = new Date(b?.createdAt || 0).getTime();
@@ -369,7 +370,7 @@ export default function Farmers({
                         return (
                             <div key={farmer.id} className="p-4 hover:bg-gray-50 transition-colors space-y-2">
                                 <div className="font-semibold text-gray-900 text-sm">{getFarmerName(farmer)}</div>
-                                <div className="text-xs text-gray-500 break-all">{farmer.email}</div>
+                                <div className="text-xs text-gray-500 break-all">{getFarmerAgriculturalId(farmer)}</div>
                                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-600">
                                     <span className="flex items-center gap-1">
                                         <svg className="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -480,7 +481,7 @@ export default function Farmers({
                                     <tr key={farmer.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-4 py-3 align-top">
                                             <div className="font-semibold text-gray-900 text-sm break-words max-w-[260px]">{getFarmerName(farmer)}</div>
-                                            <div className="text-xs text-gray-500 break-all max-w-[260px]">{farmer.email}</div>
+                                            <div className="text-xs text-gray-500 break-all max-w-[260px]">{getFarmerAgriculturalId(farmer)}</div>
 
                                         </td>
                                         <td className="px-4 py-3">

@@ -13,3 +13,11 @@ test("normalizes UAE Pass comma-delimited names and removes empty trailing parts
   assert.equal(getLocalizedPersonName(person, "en"), "HASAN AHMAD KAYALI");
   assert.equal(getLocalizedPersonName(person, "ar"), "حسن احمد كيالي");
 });
+
+test("falls back to farmer fullnameEN when Arabic-specific fields are missing", () => {
+  const person = {
+    fullnameEN: "Aisha Khan",
+  };
+
+  assert.equal(getLocalizedPersonName(person, "ar"), "Aisha Khan");
+});

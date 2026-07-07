@@ -41,8 +41,10 @@ export const getLocalizedPersonName = (person, language = "en") => {
     return firstAvailableName(
       profile.fullnameAR || [profile.firstnameAR, profile.lastnameAR].filter(Boolean).join(" "),
       person?.fullnameAR || [person?.firstnameAR, person?.lastnameAR].filter(Boolean).join(" "),
-      person?.nameAr || person?.nameAR || person?.arabicName,
+      person?.nameAr || person?.nameAR || person?.arabicName || person?.nameInArabic || person?.nameInArrabic,
       person?.name,
+      person?.fullnameEN || [person?.firstnameEN, person?.lastnameEN].filter(Boolean).join(" "),
+      person?.nameEn || person?.nameEN,
       profile.fullnameEN || [profile.firstnameEN, profile.lastnameEN].filter(Boolean).join(" "),
     );
   }

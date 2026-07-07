@@ -55,6 +55,34 @@ const FarmCodingRequest = () => {
   const isArabic = language === 'ar';
   const nA = t('common.nA');
 
+  const normalizeLookupValue = (value) => String(value || '').trim().toLowerCase();
+
+  const farmerLookup = useMemo(() => {
+    const lookup = new Map();
+    const addLookupValue = (value, farmer) => {
+      const key = normalizeLookupValue(value);
+      if (key && !lookup.has(key)) lookup.set(key, farmer);
+    };
+
+    farmers.forEach((farmer) => {
+      [
+        farmer?.id,
+        farmer?._id,
+        farmer?.userId,
+        farmer?.farmerId,
+        farmer?.email,
+        farmer?.emirateId,
+        farmer?.emiratesID,
+        farmer?.emiratesId,
+        farmer?.accountNumber,
+        farmer?.agriculturalId,
+        farmer?.agricultureID,
+      ].forEach((value) => addLookupValue(value, farmer));
+    });
+
+    return lookup;
+  }, [farmers]);
+
   const normalizeCoderOption = (coder) => {
     const displayName = getLocalizedPersonName(coder, language) || coder?.email || coder?.mobile || nA;
     return {
@@ -69,11 +97,43 @@ const FarmCodingRequest = () => {
     const coder = getCoderForFarm(farmId);
     return coder ? (getLocalizedPersonName(coder, language) || coder.email || nA) : 'Unassigned';
   };
-  const getPersonName = (person) => getLocalizedPersonName(person, language) || person?.name || person?.email || nA;
+  const getPersonName = (person) => getLocalizedPersonName(person, language) || person?.name || nA;
+  const findFarmerForFarm = (farm) => {
+    if (farm?.owner && typeof farm.owner === 'object') return farm.owner;
+
+    const candidateKeys = [
+      farm?.owner,
+      farm?.ownerId,
+      farm?.farmerId,
+      farm?.userId,
+      farm?.holder,
+      farm?.emiratesID,
+      farm?.emiratesId,
+      farm?.ownerEmiratesId,
+      farm?.ownerID,
+      farm?.accountNo,
+      farm?.accountNumber,
+      farm?.agricultureId,
+      farm?.agriculturalId,
+      farm?.agricultureID,
+    ];
+
+    for (const value of candidateKeys) {
+      const farmer = farmerLookup.get(normalizeLookupValue(value));
+      if (farmer) return farmer;
+    }
+
+    return null;
+  };
   const getOwnerName = (farm) => {
-    if (farm?.owner && typeof farm.owner === 'object') return getPersonName(farm.owner);
-    const owner = farmers.find((farmer) => farmer.id === farm?.owner);
-    return owner ? getPersonName(owner) : nA;
+    const owner = findFarmerForFarm(farm);
+    if (owner) return getPersonName(owner);
+
+    return getLocalizedPersonName({
+      fullnameAR: farm?.ownerNameArabic || farm?.ownerArabicName,
+      fullnameEN: farm?.ownerName || farm?.farmerName,
+      name: farm?.ownerName || farm?.farmerName,
+    }, language) || nA;
   };
   const getLocationName = (value) => {
     if (!value) return nA;
