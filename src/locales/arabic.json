@@ -1416,6 +1416,7 @@
       "name": "الاسم",
       "agricultureId": "رقم الزراعة",
       "farmNumber": "رقم المزرعة",
+      "farmerName": "اسم المزارع",
       "serial": "التسلسل",
       "emirate": "الإمارة",
       "center": "المركز",

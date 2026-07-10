@@ -304,6 +304,7 @@
       "name": "Name",
       "agricultureId": "Agriculture ID",
       "farmNumber": "Farm Number",
+      "farmerName": "Farmer Name",
       "serial": "Serial",
       "emirate": "Emirate",
       "center": "Center",

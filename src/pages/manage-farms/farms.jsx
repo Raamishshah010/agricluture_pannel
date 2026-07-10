@@ -6,6 +6,7 @@ import farmService from '../../services/farmService';
 import useStore from "../../store/store";
 import useTranslation from "../../hooks/useTranslation";
 import { getDisplayFarmStatus } from "../../utils";
+import { getLocalizedPersonName } from '../../utils/localizedName';
 
 export default function Farmers({ list, setList, handleDetail, handleEdit }) {
     const t = useTranslation();
@@ -15,7 +16,7 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
     const [selectedUser, setSelectedUser] = useState(null);
     const [search, setSearch] = useState("");
     const [coders, setCoders] = useState([]);
-    const { centers, emirates, locations, language } = useStore((state) => state);
+    const { centers, emirates, locations, language, farmers } = useStore((state) => state);
 
     const handleSubmit = async () => {
         if (!selectedFarm) {
@@ -95,6 +96,12 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
 
     const getStatusLabel = (status) => statusLabelMap[status] || status;
 
+    const getFarmerName = (ownerId) => {
+        if (!ownerId) return t('kpi.nA');
+        const farmer = farmers.find(f => f.id === ownerId);
+        return farmer ? getLocalizedPersonName(farmer, language) : ownerId;
+    };
+
     // Helper function to get localized name - supports multiple Arabic property names
     const getLocalizedName = (item) => {
         if (!item) return t('kpi.nA');
@@ -137,6 +144,7 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                                     <div className="flex justify-between items-start">
                                         <div>
                                             <div className="font-semibold text-gray-900 text-sm">#{farm.farmSerial || farm.farmNo}</div>
+                                            <div className="text-xs text-gray-500">{getFarmerName(farm.owner)}</div>
                                             <div className="text-xs text-gray-500">{getLocalizedName(emirateObj)} / {getLocalizedName(centerObj)}</div>
                                         </div>
                                         <span className={getStatusBadge(displayStatus)}>
@@ -163,6 +171,7 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                                 <tr>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.serial')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.farmNumber')}</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.farmerName')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.emirate')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.center')}</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700">{t('manageFarms.farms.location')}</th>
@@ -182,6 +191,7 @@ export default function Farmers({ list, setList, handleDetail, handleEdit }) {
                                         <tr key={farm.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-6 py-4 text-sm font-medium text-gray-900">{farm.farmSerial}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600">{farm.farmNo}</td>
+                                            <td className="px-6 py-4 text-sm text-gray-600">{getFarmerName(farm.owner)}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600">{getLocalizedName(emirateObj)}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600">{getLocalizedName(centerObj)}</td>
                                             <td className="px-6 py-4 text-sm text-gray-600">{getLocalizedName(locationObj)}</td>
